@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caràcters Especials: Pràctica i Joc</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estils generals per assegurar el footer a la part inferior */
+        html, body {
+            height: 100%; /* Assegura que html i body ocupen tota l'altura */
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f4f8; /* Fons gris blavós clar */
+            display: flex;
+            flex-direction: column; /* Organitza els fills verticalment */
+            min-height: 100vh; /* Assegura que el body ocupa almenys tota l'altura de la finestra */
+        }
+        .main-content-wrapper {
+            flex-grow: 1; /* Aquest div ocuparà tot l'espai disponible, empenyent el footer */
+            display: flex;
+            justify-content: center; /* Centrar el contingut del contenidor horitzontalment */
+            align-items: flex-start; /* Alinear a la part superior verticalment */
+            padding: 20px; /* Padding general per a l'àrea de contingut */
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 32px;
+        }
+
+        /* Estils per la secció de PRÀCTICA */
+        .char-box { /* Estil per al quadre del caràcter */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 130px; /* Ample fix per al quadre, lleugerament reduït */
+            height: 130px; /* Alt fix per al quadre, lleugerament reduït */
+            border: 3px solid #3b82f6; /* Vora blava */
+            border-radius: 12px;
+            background-color: #eff6ff; /* Fons blau clar */
+            flex-shrink: 0; /* Evita que es redueixi en el contenidor flex */
+        }
+        .char-display {
+            font-size: 6rem; /* Mida de caràcter gran, lleugerament reduïda */
+            font-weight: bold;
+            color: #3b82f6; /* Color blau per al caràcter */
+            text-align: center;
+            line-height: 1; /* Ajusta l'altura de línia per centrar verticalment */
+        }
+        .instructions {
+            font-size: 1.25rem; /* Text per a les instruccions, AUGMENTAT */
+            line-height: 1.5; /* Altura de línia lleugerament reduïda */
+            color: #4b5563; /* Gris fosc per a les instruccions */
+            flex-grow: 1; /* Permet que les instruccions ocupin l'espai disponible */
+            padding-left: 15px; /* Espaiat entre el quadre i les instruccions */
+            white-space: pre-line; /* Mantiene saltos de línea del JS */
+            text-align: left;
+            min-width: 0; /* Permet que el text es redueixi */
+        }
+        /* Ajustos responsius per a instruccions en pantalles més petites */
+        @media (max-width: 640px) { /* Small screens */
+            .instructions {
+                font-size: 1.125rem; /* Encara més petita en mòbils, però més gran que abans */
+                padding-left: 10px;
+            }
+        }
+        .practice-input {
+            width: 100%;
+            max-width: 250px; /* Reduït per a més compacitat */
+            padding: 12px 16px;
+            margin-top: 0px; /* Ajustat per a la nova posició */
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1.125rem;
+            outline: none;
+            transition: border-color 0.2s;
+            text-align: center; /* Centra el text en l'entrada */
+        }
+        .practice-input:focus {
+            border-color: #3b82f6;
+        }
+        .feedback-message {
+            margin-top: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 24px; /* Assegura espai per al missatge */
+        }
+        .correct {
+            color: #10b981; /* Verd per a correcte */
+        }
+        .incorrect {
+            color: #ef4444; /* Vermell per a incorrecte */
+        }
+        .next-button {
+            background-color: #3b82f6; /* Botó blau */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: block; /* Fa que el botó sigui un bloc */
+            margin: 15px auto 0; /* Ajustat per a la nova posició */
+            width: 100%;
+            max-width: 250px; /* Correspon a l'ample de l'input */
+        }
+        .next-button:hover {
+            background-color: #2563eb;
+        }
+        .home-button { /* Nou estil per al botó de tornar a l'inici */
+            background-color: #6b7280; /* Gris fosc */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px; /* Espaiat superior */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .home-button:hover {
+            background-color: #4b5563;
+        }
+
+        /* Estils per al teclat HTML */
+        .keyboard-layout {
+            display: flex;
+            flex-direction: column;
+            background-color: #d1d5db; /* Gris de fons del teclat */
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 700px; /* Ample màxim per al teclat */
+            margin: 0; /* Eliminat el marge superior/inferior */
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+        .keyboard-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        .key {
+            background-color: #f9fafb; /* Color base de la tecla */
+            border: 1px solid #9ca3af; /* Vora de la tecla */
+            border-radius: 6px;
+            padding: 8px 6px;
+            margin: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Permet que les tecles s'expandeixin */
+            min-width: 30px; /* Ample mínim per a les tecles */
+            height: 40px; /* Alt fix per a les tecles */
+            font-weight: 500;
+            color: #374151;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+            transition: background-color 0.1s, box-shadow 0.1s;
+            position: relative; /* Per a contingut addicional com Alt Gr/Shift */
+        }
+        .key.highlight {
+            background-color: #10b981; /* Verd per a ressaltat */
+            color: white;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.4), 0 0 10px rgba(16, 185, 129, 0.7);
+            border-color: #059669;
+        }
+        .key.wide { flex-basis: 10%; } /* Ajustar per a tecles més amples */
+        .key.medium { flex-basis: 7%; }
+        .key.extra-wide { flex-basis: 15%; }
+        .key.space-bar { flex-basis: 40%; height: 45px; } /* Més gran per a la barra espaiadora */
+        .key.alt-char { font-size: 0.7em; position: absolute; top: 2px; right: 2px; color: #6b7280; }
+        .key.top-right-char { font-size: 0.7em; position: absolute; top: 2px; right: 2px; color: #6b7280;}
+        .key.bottom-left-char { font-size: 0.7em; position: absolute; bottom: 2px; left: 2px; color: #6b7280;}
+
+        /* Afegeix flexbox per a tecles amb múltiple contingut (ex: 1/!/|) */
+        .key.multi-char {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 40px;
+            padding: 2px 4px;
+        }
+        .key.multi-char .top-left { align-self: flex-start; }
+        .key.multi-char .bottom-right { align-self: flex-end; }
+        .key.multi-char .center { align-self: center; }
+
+        /* Estils per a les files de teclat més compactes */
+        .keyboard-row .key:first-child:not(.space-bar) { margin-left: 0; }
+        .keyboard-row .key:last-child:not(.space-bar) { margin-right: 0; }
+
+        /* Contenidor per l'input i el botó */
+        .input-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centrat per defecte */
+            padding: 10px; /* Padding per separar-ho del teclat */
+            width: 100%; /* Ocupa tot l'ample disponible */
+            max-width: 280px; /* Limita l'ample per a compactació */
+            flex-shrink: 0; /* No es redueix */
+        }
+        /* Layout per a pantalles mitjanes i grans */
+        @media (min-width: 768px) { /* md breakpoint */
+            .main-content-layout {
+                display: flex;
+                flex-direction: row; /* Posar elements en fila */
+                align-items: flex-start; /* Alinear dalt */
+                gap: 20px; /* Espaiat entre columnes */
+                margin-top: 20px; /* Espai sota el títol */
+            }
+            .input-controls {
+                width: auto; /* Deixa que el contingut defineixi l'ample */
+                align-items: flex-start; /* Alinear a l'esquerra dins de la columna */
+                order: -1; /* Posicionar a l'esquerra */
+                margin-right: 20px; /* Espai addicional a la dreta */
+            }
+            .keyboard-layout {
+                flex-grow: 1; /* El teclat ocupa l'espai restant */
+                margin: 0; /* Elimina marges no desitjats */
+            }
+        }
+        /* Estils per a la pantalla d'inici */
+        #mainStartScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 400px; /* Altura mínima per centrar contingut */
+        }
+        #mainStartScreen h1 {
+            font-size: 2.5rem;
+            color: #1a202c;
+            margin-bottom: 2rem;
+        }
+        /* NOUS estils per als botons de la pantalla d'inici */
+        .start-screen-button {
+            background-color: #3b82f6; /* Blau vibrant */
+            color: white;
+            padding: 18px 35px; /* Més padding */
+            border-radius: 12px; /* Més arrodonit */
+            font-weight: 700;
+            font-size: 1.3rem; /* Més gran */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out; /* Transició més suau */
+            margin: 15px; /* Més marge entre botons */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Ombra més pronunciada */
+            border: none;
+            outline: none;
+            min-width: 280px; /* Ample mínim per uniformitat */
+            text-transform: uppercase; /* Text en majúscules */
+            letter-spacing: 1px; /* Espaiat entre lletres */
+        }
+        .start-screen-button:hover {
+            background-color: #2563eb; /* Blau fosc en hover */
+            transform: translateY(-4px); /* Efecte "lift" */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Ombra més gran en hover */
+        }
+        .start-screen-button:active {
+            transform: translateY(0); /* Torna a la posició original en clicar */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        /* Estils específics per al botó "Juga" */
+        #mainStartJugaBtn {
+            background-color: #48bb78; /* Verd vibrant */
+        }
+        #mainStartJugaBtn:hover {
+            background-color: #38a169; /* Verd fosc en hover */
+        }
+
+        /* Estils per al peu de pàgina */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #e2e8f0; /* Un gris més suau per al fons */
+            color: #4b5563;
+            width: 100%; /* Assegura que ocupi tot l'ample */
+            margin-top: auto; /* Empenya el footer a la part inferior si el contingut és curt */
+        }
+        footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Estils per la secció de JOC */
+        .game-area-wrapper { /* Contenidor que envolta el joc per donar-li fons fosc */
+            background-color: #2d3748; /* Fons del contenidor més fosc */
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            border: 2px solid #4a5568;
+            color: #e2e8f0; /* Text clar */
+            text-align: center;
+            display: flex; /* Utilitzar flexbox per centrar el contingut del joc */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto; /* Centrar horitzontalment */
+        }
+
+        .game-title-inner { /* Títol del joc dins de la secció del joc */
+            font-size: 3rem; /* Títol gran */
+            font-weight: 800;
+            color: #63b3ed; /* Blau vibrant */
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #a0aec0; /* Gris clar */
+        }
+        .game-objective {
+            font-size: 8rem; /* Caràcter central enorme */
+            font-weight: 900;
+            color: #f6ad55; /* Taronja per al caràcter */
+            margin-bottom: 2rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+        }
+        .game-input-game { /* Nomenclatura diferent per evitar conflictes */
+            width: 100%; /* Changed to 100% to fill max-width */
+            max-width: 300px;
+            padding: 15px 20px;
+            border: 3px solid #63b3ed; /* Vora blava per a l'input */
+            border-radius: 10px;
+            background-color: #1a202c; /* Fons de l'input fosc */
+            color: #e2e8f0;
+            font-size: 1.5rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            margin-bottom: 1.5rem;
+        }
+        .game-input-game:focus {
+            border-color: #38b2ac; /* Verd turquesa en enfocar */
+            box-shadow: 0 0 15px rgba(56, 178, 172, 0.5);
+        }
+        .game-feedback-game { /* Nomenclatura diferent per evitar conflictes */
+            font-size: 1.125rem;
+            font-weight: 600;
+            min-height: 28px; /* Espai per al missatge */
+            margin-bottom: 1.5rem;
+        }
+        .game-feedback-game.correct {
+            color: #48bb78; /* Verd per a correcte */
+        }
+        .game-feedback-game.incorrect {
+            color: #f56565; /* Vermell per a incorrecte */
+        }
+        .game-button-game { /* Nomenclatura diferent per evitar conflictes */
+            background-color: #63b3ed; /* Botó blau vibrant */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            outline: none;
+            margin-top: 1rem;
+        }
+        .game-button-game:hover {
+            background-color: #4299e1;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .game-button-game:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Seccions internes del joc */
+        #gameStartScreenInner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #gamePlayAreaInner, #gameOverScreenInner {
+            display: none; /* Controlat per JS */
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* Per ocupar l'ample del wrapper */
+        }
+        #gameOverScreenInner .game-result {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f6e05e; /* Groc per al resultat */
+            margin-top: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Progress bar */
+        .progress-bar-container {
+            width: 80%;
+            max-width: 400px;
+            height: 15px;
+            background-color: #4a5568;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid #718096;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 100%; /* S'ajustarà amb JS */
+            background-color: #38b2ac; /* Verd turquesa */
+            border-radius: 8px;
+            transition: width 0.1s linear; /* Animació suau */
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content-wrapper">
+        <div class="container">
+            <!-- Pantalla d'Inici PRINCIPAL -->
+            <div id="mainStartScreen">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-blue-700 mb-8">
+                    Pràctica amb el Teclat
+                    <br>
+                    <span class="text-2xl md:text-3xl font-semibold text-gray-600">Caràcters Especials en Català</span>
+                </h1>
+                <button id="mainStartPracticaBtn" class="start-screen-button">
+                    Practica Caràcters Especials
+                </button>
+                <button id="mainStartJugaBtn" class="start-screen-button">
+                    Juga amb Caràcters
+                </button>
+            </div>
+
+            <!-- Secció Aprèn i Practica (inicialment oculta) -->
+            <div id="aprenSection" class="hidden">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Aprèn i Practica</h2>
+
+                <!-- Fila principal: Caràcter a l'esquerra, Instruccions a la dreta -->
+                <div class="flex flex-row items-center justify-start gap-4 mb-8 p-3 bg-blue-50 rounded-lg shadow-sm">
+                    <div class="char-box">
+                        <div id="currentCaracte" class="char-display"></div>
+                    </div>
+                    <div id="instruccionsTeclat" class="instructions text-left"></div>
+                </div>
+
+                <!-- Nou layout per a Controls d'Input i Teclat -->
+                <div class="main-content-layout">
+                    <!-- Columna esquerra: Input i Botó (es mourà a l'esquerra en md i més) -->
+                    <div class="input-controls">
+                        <input type="text" id="practicaInput" class="practice-input" placeholder="Escriu aquí el caràcter...">
+                        <div id="feedbackMessage" class="feedback-message"></div>
+                        <button id="seguentBtn" class="next-button">Següent caràcter</button>
+                    </div>
+
+                    <!-- Columna dreta: Imitació del teclat espanyol amb HTML/CSS -->
+                    <div id="htmlKeyboard" class="keyboard-layout">
+                        <!-- Fila 1: Números y Símbolos -->
+                        <div class="keyboard-row">
+                            <div id="backtick_key" class="key multi-char"><span class="top-left">º</span><span class="bottom-right">\</span></div>
+                            <div id="1_key" class="key multi-char"><span class="top-left">1</span><span class="bottom-right">|</span></div>
+                            <div id="2_key" class="key multi-char"><span class="top-left">2</span><span class="bottom-right">@</span></div>
+                            <div id="3_key" class="key multi-char"><span class="top-left">3</span><span class="bottom-right">#</span></div>
+                            <div id="4_key" class="key multi-char"><span class="top-left">4</span><span class="bottom-right">~</span></div>
+                            <div id="5_key" class="key multi-char"><span class="top-left">5</span><span class="bottom-right">%</span></div>
+                            <div id="6_key" class="key multi-char"><span class="top-left">6</span><span class="bottom-right">&</span></div>
+                            <div id="7_key" class="key multi-char"><span class="top-left">7</span><span class="bottom-right">/</span></div>
+                            <div id="8_key" class="key multi-char"><span class="top-left">8</span><span class="bottom-right">(</span></div>
+                            <div id="9_key" class="key multi-char"><span class="top-left">9</span><span class="bottom-right">)</span></div>
+                            <div id="0_key" class="key multi-char"><span class="top-left">0</span><span class="bottom-right">=</span></div>
+                            <div id="apostrophe_key" class="key multi-char"><span class="top-left">'</span><span class="bottom-right">?</span></div>
+                            <div id="exclamation_open_key" class="key multi-char"><span class="top-left">¡</span><span class="bottom-right">¿</span></div>
+                            <div id="backspace_key" class="key wide">Backspace</div>
+                        </div>
+                        <!-- Fila 2: QWERTY -->
+                        <div class="keyboard-row">
+                            <div class="key medium">Tab</div>
+                            <div id="q_key" class="key">Q</div>
+                            <div id="w_key" class="key">W</div>
+                            <div id="e_key" class="key">E</div>
+                            <div id="r_key" class="key">R</div>
+                            <div id="t_key" class="key">T</div>
+                            <div id="y_key" class="key">Y</div>
+                            <div id="u_key" class="key">U</div>
+                            <div id="i_key" class="key">I</div>
+                            <div id="o_key" class="key">O</div>
+                            <div id="p_key" class="key">P</div>
+                            <div id="grave_dead_key" class="key multi-char"><span class="top-left">`</span><span class="bottom-right">[</span></div>
+                            <div id="plus_key" class="key multi-char"><span class="top-left">+</span><span class="bottom-right">]</span></div>
+                            <div id="enter_key" class="key extra-wide">Enter</div>
+                        </div>
+                        <!-- Fila 3: ASDF -->
+                        <div class="keyboard-row">
+                            <div class="key medium">Caps Lock</div>
+                            <div id="a_key" class="key">A</div>
+                            <div id="s_key" class="key">S</div>
+                            <div id="d_key" class="key">D</div>
+                            <div id="f_key" class="key">F</div>
+                            <div id="g_key" class="key">G</div>
+                            <div id="h_key" class="key">H</div>
+                            <div id="j_key" class="key">J</div>
+                            <div id="k_key" class="key">K</div>
+                            <div id="l_key" class="key">L</div>
+                            <div id="ñ_key" class="key">Ñ</div>
+                            <div id="c_cedilla_key" class="key multi-char"><span class="top-left">Ç</span><span class="bottom-right">{</span></div>
+                            <div id="acute_dead_key" class="key multi-char"><span class="top-left">´</span><span class="bottom-right">}</span></div>
+                        </div>
+                        <!-- Fila 4: ZXCV -->
+                        <div class="keyboard-row">
+                            <div id="left_shift" class="key extra-wide">Shift</div>
+                            <div id="less_greater_key" class="key multi-char"><span class="top-left"><</span><span class="bottom-right">></span></div>
+                            <div id="z_key" class="key">Z</div>
+                            <div id="x_key" class="key">X</div>
+                            <div id="c_key" class="key">C</div>
+                            <div id="v_key" class="key">V</div>
+                            <div id="b_key" class="key">B</div>
+                            <div id="n_key" class="key">N</div>
+                            <div id="m_key" class="key">M</div>
+                            <div id="comma_key" class="key multi-char"><span class="top-left">,</span><span class="bottom-right">;</span></div>
+                            <div id="dot_key" class="key multi-char"><span class="top-left">.</span><span class="bottom-right">:</span></div>
+                            <div id="dash_key" class="key multi-char"><span class="top-left">-</span><span class="bottom-right">_</span></div>
+                            <div id="right_shift" class="key extra-wide">Shift</div>
+                        </div>
+                        <!-- Fila 5: Control/Alt/Espacio -->
+                        <div class="keyboard-row">
+                            <div class="key medium">Ctrl</div>
+                            <div class="key medium">Win</div>
+                            <div class="key medium">Alt</div>
+                            <div id="space_key" class="key space-bar">Espacio</div>
+                            <div id="alt_gr" class="key medium">Alt Gr</div>
+                            <div class="key medium">Ctrl</div>
+                            <div class="key small">⬅︎</div>
+                            <div class="key small">⬆︎</div>
+                            <div class="key small">⬇︎</div>
+                            <div class="key small">➡︎</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="tornarIniciAprènBtn" class="home-button">Tornar a l'Inici</button>
+            </div>
+
+            <!-- Secció JOC (inicialment oculta) -->
+            <div id="jugaSection" class="hidden">
+                <div class="game-area-wrapper">
+                    <h2 class="game-title-inner">Cursa de Caràcters</h2>
+
+                    <!-- Pantalla d'Inici del Joc (interna) -->
+                    <div id="gameStartScreenInner">
+                        <p class="text-lg text-gray-400 mb-8">Escriu els caràcters especials tan ràpid com puguis abans que s'acabi el temps!</p>
+                        <p class="text-xl text-gray-300 mb-6">Tens 4 segons per caràcter i un màxim de 6 errades.</p>
+                        <button id="gameStartButton" class="game-button-game">Començar Partida</button>
+                    </div>
+
+                    <!-- Àrea de Joc Principal (interna) -->
+                    <div id="gamePlayAreaInner">
+                        <div class="game-stats">
+                            <span id="gameScoreEl">Caràcters: 0/0</span>
+                            <span id="gameErrorsEl">Errades: 0/6</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="progressBar" class="progress-bar"></div>
+                        </div>
+                        <div id="currentGameObjectiveEl" class="game-objective"></div>
+                        <input type="text" id="gameInputEl" class="game-input-game" placeholder="Escriu aquí...">
+                        <div id="gameFeedbackEl" class="game-feedback-game"></div>
+                    </div>
+
+                    <!-- Pantalla de Fi de Joc (interna) -->
+                    <div id="gameOverScreenInner">
+                        <p class="game-result" id="gameResultTimeEl"></p>
+                        <button id="gameRestartButton" class="game-button-game">Jugar de Nou</button>
+                    </div>
+                </div>
+                <button id="tornarIniciJugaBtn" class="home-button">Tornar a l'Inici</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p class="text-center text-sm text-gray-500 mt-8">Copyright Luis Romance - <a href="https://www.cfalapau.cat" target="_blank" class="text-blue-600 hover:underline">www.cfalapau.cat</a></p>
+    </footer>
+
+    <script>
+        // --- Funcions Generals ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // --- Dades dels Caràcters per a les dues seccions ---
+        const learnCharactersData = [
+            {
+                char: "à",
+                instructions: "Clica [`] (tecla al costat de la Ç o P)<br>Clica [a]",
+                expectedInput: "à",
+                highlightKeys: ['grave_dead_key', 'a_key']
+            },
+            {
+                char: "è",
+                instructions: "Clica [`] (tecla al costat de la Ç o P)<br>Clica [e]",
+                expectedInput: "è",
+                highlightKeys: ['grave_dead_key', 'e_key']
+            },
+            {
+                char: "ò",
+                instructions: "Clica [`] (tecla al costat de la Ç o P)<br>Clica [o]",
+                expectedInput: "ò",
+                highlightKeys: ['grave_dead_key', 'o_key']
+            },
+            {
+                char: "é",
+                instructions: "Clica [´] (tecla al costat de la Ñ o P)<br>Clica [e]",
+                expectedInput: "é",
+                highlightKeys: ['acute_dead_key', 'e_key']
+            },
+            {
+                char: "í",
+                instructions: "Clica [´] (tecla al costat de la Ñ o P)<br>Clica [i]",
+                expectedInput: "í",
+                highlightKeys: ['acute_dead_key', 'i_key']
+            },
+            {
+                char: "ó",
+                instructions: "Clica [´] (tecla al costat de la Ñ o P)<br>Clica [o]",
+                expectedInput: "ó",
+                highlightKeys: ['acute_dead_key', 'o_key']
+            },
+            {
+                char: "ú",
+                instructions: "Clica [´] (tecla al costat de la Ñ o P)<br>Clica [u]",
+                expectedInput: "ú",
+                highlightKeys: ['acute_dead_key', 'u_key']
+            },
+            {
+                char: "ï",
+                instructions: "Prémer [Shift], mantenir<br>Clica [´] (tecla de l'accent agut/dièresi)<br>Deixar anar [Shift]<br>Clica [i]",
+                expectedInput: "ï",
+                highlightKeys: ['left_shift', 'acute_dead_key', 'i_key']
+            },
+            {
+                char: "ü",
+                instructions: "Prémer [Shift], mantenir<br>Clica [´] (tecla de l'accent agut/dièresi)<br>Deixar anar [Shift]<br>Clica [u]",
+                expectedInput: "ü",
+                highlightKeys: ['left_shift', 'acute_dead_key', 'u_key']
+            },
+            {
+                char: "ç",
+                instructions: "Clica [Ç] (tecla a la dreta de la L)",
+                expectedInput: "ç",
+                highlightKeys: ['c_cedilla_key']
+            },
+            {
+                char: "·",
+                instructions: "Prémer [Shift], mantenir<br>Clica [3]<br>Deixar anar [Shift]",
+                expectedInput: "·",
+                highlightKeys: ['left_shift', '3_key']
+            },
+            {
+                char: ",",
+                instructions: "Clica [,]",
+                expectedInput: ",",
+                highlightKeys: ['comma_key']
+            },
+            {
+                char: ".",
+                instructions: "Clica [.]",
+                expectedInput: ".",
+                highlightKeys: ['dot_key']
+            },
+            {
+                char: ";",
+                instructions: "Prémer [Shift], mantenir<br>Clica [,]<br>Deixar anar [Shift]",
+                expectedInput: ";",
+                highlightKeys: ['left_shift', 'comma_key']
+            },
+            {
+                char: ":",
+                instructions: "Prémer [Shift], mantenir<br>Clica [.]<br>Deixar anar [Shift]",
+                expectedInput: ":",
+                highlightKeys: ['left_shift', 'dot_key']
+            },
+            {
+                char: "'",
+                instructions: "Clica ['] (tecla a la dreta del 0)",
+                expectedInput: "'",
+                highlightKeys: ['apostrophe_key']
+            },
+            {
+                char: "?",
+                instructions: "Prémer [Shift], mantenir<br>Clica ['] (tecla a la dreta del 0)<br>Deixar anar [Shift]",
+                expectedInput: "?",
+                highlightKeys: ['left_shift', 'apostrophe_key']
+            },
+            {
+                char: "!",
+                instructions: "Prémer [Shift], mantenir<br>Clica [1]<br>Deixar anar [Shift]",
+                expectedInput: "!",
+                highlightKeys: ['left_shift', '1_key']
+            },
+            {
+                char: "@",
+                instructions: "Prémer [Alt Gr], mantenir<br>Clica [2]<br>Deixar anar [Alt Gr]",
+                expectedInput: "@",
+                highlightKeys: ['alt_gr', '2_key']
+            }
+        ];
+
+        // Els caràcters per al joc poden ser un subconjunt o tots els de pràctica.
+        // Aquí utilitzem els mateixos per simplicitat, però es podria personalitzar.
+        const gameCharactersData = [...learnCharactersData]; // Utilitza els mateixos caràcters per al joc
+
+        // --- Elements del DOM (compartits i específics) ---
+        const mainStartScreen = document.getElementById('mainStartScreen');
+        const aprenSection = document.getElementById('aprenSection');
+        const jugaSection = document.getElementById('jugaSection');
+
+        // Botons de navegació principal
+        const mainStartPracticaBtn = document.getElementById('mainStartPracticaBtn');
+        const mainStartJugaBtn = document.getElementById('mainStartJugaBtn');
+        const tornarIniciAprènBtn = document.getElementById('tornarIniciAprènBtn');
+        const tornarIniciJugaBtn = document.getElementById('tornarIniciJugaBtn');
+
+        // Elements de la secció APRÈN
+        const currentCaracteEl = document.getElementById('currentCaracte');
+        const instruccionsTeclatEl = document.getElementById('instruccionsTeclat');
+        const practicaInputEl = document.getElementById('practicaInput');
+        const feedbackMessageEl = document.getElementById('feedbackMessage');
+        const seguentBtn = document.getElementById('seguentBtn');
+
+        // Elements de la secció JUGA
+        const gameStartScreenInner = document.getElementById('gameStartScreenInner');
+        const gamePlayAreaInner = document.getElementById('gamePlayAreaInner');
+        const gameOverScreenInner = document.getElementById('gameOverScreenInner');
+        const gameStartButton = document.getElementById('gameStartButton');
+        const gameRestartButton = document.getElementById('gameRestartButton');
+        const currentGameObjectiveEl = document.getElementById('currentGameObjectiveEl');
+        const gameInputEl = document.getElementById('gameInputEl');
+        const gameFeedbackEl = document.getElementById('gameFeedbackEl');
+        const gameScoreEl = document.getElementById('gameScoreEl');
+        const gameErrorsEl = document.getElementById('gameErrorsEl');
+        const progressBar = document.getElementById('progressBar');
+
+        // --- Variables i Lògica de la secció APRÈN ---
+        let learnCurrentIndex = 0;
+        let shuffledLearnCharacters = [];
+
+        /**
+         * Inicialitza la secció "Aprèn".
+         */
+        function initLearnSection() {
+            learnCurrentIndex = 0;
+            shuffledLearnCharacters = [...learnCharactersData];
+            shuffleArray(shuffledLearnCharacters);
+            displayLearnCharacter();
+        }
+
+        /**
+         * Elimina el ressaltat de totes les tecles del teclat HTML.
+         */
+        function clearKeyHighlights() {
+            document.querySelectorAll('.key.highlight').forEach(key => {
+                key.classList.remove('highlight');
+            });
+        }
+
+        /**
+         * Ressalta les tecles especificades per al caràcter actual de la secció "Aprèn".
+         * @param {string[]} keyIds - Array amb els IDs de les tecles a ressaltar.
+         */
+        function highlightKeys(keyIds) {
+            clearKeyHighlights();
+            keyIds.forEach(id => {
+                const keyElement = document.getElementById(id);
+                if (keyElement) {
+                    keyElement.classList.add('highlight');
+                }
+            });
+        }
+
+        /**
+         * Mostra la informació del caràcter actual a la pàgina de la secció "Aprèn".
+         */
+        function displayLearnCharacter() {
+            if (learnCurrentIndex < shuffledLearnCharacters.length) {
+                const charData = shuffledLearnCharacters[learnCurrentIndex];
+                currentCaracteEl.textContent = charData.char;
+                instruccionsTeclatEl.innerHTML = charData.instructions;
+                practicaInputEl.value = '';
+                feedbackMessageEl.textContent = '';
+                feedbackMessageEl.classList.remove('correct', 'incorrect');
+                practicaInputEl.style.display = 'block';
+                seguentBtn.style.display = 'block';
+                practicaInputEl.focus();
+                highlightKeys(charData.highlightKeys);
+            } else {
+                currentCaracteEl.textContent = "🥳";
+                instruccionsTeclatEl.innerHTML = "Has acabat tots els caràcters! Enhorabona!<br>Ara pots tornar a practicar o anar a la secció **Juga**.";
+                practicaInputEl.style.display = 'none';
+                seguentBtn.style.display = 'none';
+                feedbackMessageEl.textContent = '';
+                clearKeyHighlights();
+            }
+        }
+
+        /**
+         * Gestiona l'entrada al camp de pràctica de la secció "Aprèn".
+         */
+        practicaInputEl.addEventListener('input', (event) => {
+            const currentExpectedChar = shuffledLearnCharacters[learnCurrentIndex].expectedInput;
+            const enteredChar = event.target.value;
+
+            if (enteredChar === currentExpectedChar) {
+                feedbackMessageEl.textContent = "✅ Correcte!";
+                feedbackMessageEl.classList.remove('incorrect');
+                feedbackMessageEl.classList.add('correct');
+            } else {
+                feedbackMessageEl.textContent = "❌ Intenta-ho de nou...";
+                feedbackMessageEl.classList.remove('correct');
+                feedbackMessageEl.classList.add('incorrect');
+            }
+            if (event.target.value.length > 1) {
+                event.target.value = event.target.value.slice(0, 1);
+            }
+        });
+
+        /**
+         * Passa al següent caràcter en la seqüència de la secció "Aprèn".
+         */
+        seguentBtn.addEventListener('click', () => {
+            learnCurrentIndex++;
+            displayLearnCharacter();
+        });
+
+        // --- Variables i Lògica de la secció JUGA ---
+        let gameInterval;
+        let charTimeout;
+        let gameErrors = 0;
+        const GAME_MAX_ERRORS = 6;
+        let gameScore = 0;
+        let gameStartTime;
+        let gameIsRunning = false;
+        let gameCharactersQueue = [];
+        const GAME_TIME_LIMIT_PER_CHAR = 4; // Temps límit per caràcter en segons
+        let gameTimeLeftForChar = GAME_TIME_LIMIT_PER_CHAR;
+
+        /**
+         * Inicialitza la pantalla d'inici del joc dins de la secció "Juga".
+         */
+        function initGameSection() {
+            // Neteja qualsevol estat de joc anterior
+            gameIsRunning = false;
+            clearInterval(gameInterval);
+            clearTimeout(charTimeout);
+
+            gameStartScreenInner.style.display = 'flex';
+            gamePlayAreaInner.style.display = 'none';
+            gameOverScreenInner.style.display = 'none';
+        }
+
+        /**
+         * Comença una nova partida del joc.
+         */
+        function startGameRound() {
+            gameErrors = 0;
+            gameScore = 0;
+            gameIsRunning = true;
+            gameCharactersQueue = [...gameCharactersData];
+            shuffleArray(gameCharactersQueue);
+            updateGameStats();
+            gameStartTime = Date.now();
+
+            gamePlayAreaInner.style.display = 'flex';
+            gameStartScreenInner.style.display = 'none';
+            gameOverScreenInner.style.display = 'none';
+
+            displayNextGameCharacter();
+        }
+
+        /**
+         * Actualitza els estadístics de puntuació i errades del joc.
+         */
+        function updateGameStats() {
+            gameScoreEl.textContent = `Caràcters: ${gameScore}/${gameCharactersData.length}`;
+            gameErrorsEl.textContent = `Errades: ${gameErrors}/${GAME_MAX_ERRORS}`;
+        }
+
+        /**
+         * Mostra el següent caràcter per al joc.
+         */
+        function displayNextGameCharacter() {
+            clearInterval(gameInterval);
+            clearTimeout(charTimeout);
+
+            if (gameErrors >= GAME_MAX_ERRORS) {
+                endGame(false);
+                return;
+            }
+            if (gameCharactersQueue.length === 0) {
+                endGame(true);
+                return;
+            }
+
+            const nextCharData = gameCharactersQueue.shift();
+            currentGameObjectiveEl.textContent = nextCharData.char;
+            gameInputEl.value = '';
+            gameFeedbackEl.textContent = '';
+            gameFeedbackEl.classList.remove('correct', 'incorrect');
+            gameInputEl.focus();
+
+            gameTimeLeftForChar = GAME_TIME_LIMIT_PER_CHAR;
+            progressBar.style.width = '100%';
+            progressBar.style.backgroundColor = '#38b2ac';
+
+            gameInterval = setInterval(() => {
+                gameTimeLeftForChar--;
+                const percentage = (gameTimeLeftForChar / GAME_TIME_LIMIT_PER_CHAR) * 100;
+                progressBar.style.width = `${percentage}%`;
+
+                if (gameTimeLeftForChar <= 1) {
+                    progressBar.style.backgroundColor = '#f56565';
+                } else if (gameTimeLeftForChar <= 2) {
+                    progressBar.style.backgroundColor = '#ecc94b';
+                }
+
+                if (gameTimeLeftForChar <= 0) {
+                    clearInterval(gameInterval);
+                    handleGameCharacterTimeout();
+                }
+            }, 1000);
+
+            charTimeout = setTimeout(() => {
+                clearInterval(gameInterval);
+                handleGameCharacterTimeout();
+            }, GAME_TIME_LIMIT_PER_CHAR * 1000);
+        }
+
+        /**
+         * Gestiona el temps esgotat per un caràcter en el joc.
+         */
+        function handleGameCharacterTimeout() {
+            if (!gameIsRunning) return;
+            gameErrors++;
+            gameFeedbackEl.textContent = `❌ Temps esgotat per '${currentGameObjectiveEl.textContent}'!`;
+            gameFeedbackEl.classList.add('incorrect');
+            updateGameStats();
+            displayNextGameCharacter();
+        }
+
+        /**
+         * Gestiona l'entrada de l'usuari en el joc.
+         * @param {Event} event - L'objecte de l'esdeveniment d'entrada.
+         */
+        function handleGameInput(event) {
+            if (!gameIsRunning) return;
+
+            const typedChar = event.target.value; // Access 'event.target.value'
+            const expectedChar = currentGameObjectiveEl.textContent;
+
+            if (typedChar === expectedChar) {
+                clearInterval(gameInterval);
+                clearTimeout(charTimeout);
+                gameScore++;
+                gameFeedbackEl.textContent = `✅ Correcte!`;
+                gameFeedbackEl.classList.remove('incorrect');
+                gameFeedbackEl.classList.add('correct');
+                updateGameStats();
+                gameInputEl.value = '';
+                setTimeout(displayNextGameCharacter, 300);
+            } else {
+                gameFeedbackEl.textContent = `❌ Incorrecte. Intenta-ho de nou.`;
+                gameFeedbackEl.classList.remove('correct');
+                gameFeedbackEl.classList.add('incorrect');
+            }
+            if (event.target.value.length > 1) {
+                event.target.value = event.target.value.slice(0, 1);
+            }
+        }
+
+        /**
+         * Finalitza la partida del joc i mostra el resultat.
+         * @param {boolean} won - Vertader si el jugador ha guanyat, fals si ha perdut.
+         */
+        function endGame(won) {
+            gameIsRunning = false;
+            clearInterval(gameInterval);
+            clearTimeout(charTimeout);
+
+            gamePlayAreaInner.style.display = 'none';
+            gameOverScreenInner.style.display = 'flex';
+
+            if (won) {
+                const totalTime = ((Date.now() - gameStartTime) / 1000).toFixed(1);
+                gameResultTimeEl.textContent = `Has completat tots els caràcters en ${totalTime} segons! 🎉 Ets un campió/na!`;
+                gameResultTimeEl.style.color = '#48bb78';
+            } else {
+                gameResultTimeEl.textContent = `Has perdut! Has fet ${gameErrors} errades. 😞 Torna a intentar-ho!`;
+                gameResultTimeEl.style.color = '#f56565';
+            }
+        }
+
+        // --- Gestió de la Navegació entre Seccions Principals ---
+        /**
+         * Controla la visibilitat de les seccions principals de l'aplicació.
+         * @param {string} sectionId - L'ID de la secció a mostrar ('mainStart', 'apren', 'juga').
+         */
+        function navigateMainSections(sectionId) {
+            mainStartScreen.classList.add('hidden');
+            aprenSection.classList.add('hidden');
+            jugaSection.classList.add('hidden');
+
+            // Neteja qualsevol estat de les seccions quan es canvien
+            clearKeyHighlights(); // Per la secció "Aprèn"
+            clearInterval(gameInterval); // Per la secció "Juga"
+            clearTimeout(charTimeout);
+
+            switch (sectionId) {
+                case 'mainStart':
+                    mainStartScreen.classList.remove('hidden');
+                    break;
+                case 'apren':
+                    aprenSection.classList.remove('hidden');
+                    initLearnSection(); // Reinicia la lògica de la secció d'aprenentatge
+                    break;
+                case 'juga':
+                    jugaSection.classList.remove('hidden');
+                    initGameSection(); // Reinicia la lògica de la secció de joc
+                    break;
+            }
+        }
+
+        // --- Listeners d'Esdeveniments Globals ---
+        // Botons de la pantalla d'inici principal
+        mainStartPracticaBtn.addEventListener('click', () => navigateMainSections('apren'));
+        mainStartJugaBtn.addEventListener('click', () => navigateMainSections('juga'));
+
+        // Botons de tornar a l'inici des de les seccions
+        tornarIniciAprènBtn.addEventListener('click', () => navigateMainSections('mainStart'));
+        tornarIniciJugaBtn.addEventListener('click', () => navigateMainSections('mainStart'));
+
+        // Listeners específics de la secció JUGA
+        gameStartButton.addEventListener('click', startGameRound);
+        gameRestartButton.addEventListener('click', startGameRound);
+        gameInputEl.addEventListener('input', handleGameInput);
+
+        // Configuració inicial: mostra la pantalla d'inici principal en carregar la pàgina
+        document.addEventListener('DOMContentLoaded', () => {
+            navigateMainSections('mainStart');
+        });
+    </script>
+</body>
+</html>
