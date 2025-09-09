@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguretat - El Correu Electrònic</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #374151; /* Dark gray text */
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #1f2937; /* Even darker gray for headings */
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .highlight-box {
+            background-color: #fefce8; /* Light yellow for warnings/tips */
+            border-left: 4px solid #facc15; /* Yellow border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .info-box {
+            background-color: #e0f2fe; /* Light blue for info */
+            border-left: 4px solid #38b2ac; /* Teal border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .danger-box {
+            background-color: #fee2e2; /* Light red for warnings/tips */
+            border-left: 4px solid #ef4444; /* Red border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .interactive-button {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .interactive-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+        }
+        .exercise-option {
+            background-color: #e0e7ff; /* Light blue for options */
+            color: #374151;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .exercise-option:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .exercise-option.correct {
+            background-color: #d1fae5; /* Green for correct */
+            border: 2px solid #34d399;
+        }
+        .exercise-option.incorrect {
+            background-color: #fee2e2; /* Red for incorrect */
+            border: 2px solid #ef4444;
+        }
+        .exercise-feedback {
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .exercise-feedback.correct {
+            color: #059669; /* Green text */
+        }
+        .exercise-feedback.incorrect {
+            color: #dc2626; /* Red text */
+        }
+        /* Icon styling (emojis for simplicity) */
+        .icon-spam::before { content: "🚫"; margin-right: 0.5em; }
+        .icon-reply::before { content: "↩️"; margin-right: 0.5em; }
+        .icon-block::before { content: "⛔"; margin-right: 0.5em; }
+        .icon-check::before { content: "✅"; margin-right: 0.5em; }
+        .icon-shield::before { content: "🛡️"; margin-right: 0.5em; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .section-card { padding: 1.5rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="container bg-white rounded-xl shadow-lg p-6 sm:p-10 mt-8 mb-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">El Correu Electrònic</h1>
+            <p class="text-xl text-gray-600">Aprèn i Practica: Guia per la Competència Digital</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="mb-8 p-4 bg-indigo-100 rounded-lg shadow-inner">
+            <ul class="flex flex-wrap justify-center gap-4 text-indigo-800 font-medium">
+                <li><a href="index.html" class="hover:underline">Introducció</a></li>
+                <li><a href="redactar.html" class="hover:underline">Redactar un Correu</a></li>
+                <li><a href="gestionar.html" class="hover:underline">Gestionar el Correu</a></li>
+                <li><a href="seguretat.html" class="hover:underline font-bold">Seguretat</a></li>
+            </ul>
+        </nav>
+
+        <section id="seguretat" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-shield mr-2"></span>7. Seguretat i Bones Pràctiques</h2>
+            <p class="mb-4">El correu electrònic és molt útil, però també hem de ser curosos per protegir la nostra informació. Aquí tens alguns consells clau.</p>
+
+            <div class="info-box">
+                <h3 class="font-semibold text-blue-800 text-lg flex items-center"><span class="icon-spam mr-2"></span>Gestionar la Brossa (Spam)</h3>
+                <p>Si reps correus no desitjats o amb publicitat molesta, els pots marcar com a spam. Així, el teu servei de correu aprendrà i els futurs correus d'aquest remitent aniran directament a la brossa, mantenint la teva bústia neta.</p>
+            </div>
+
+            <div class="info-box">
+                <h3 class="font-semibold text-blue-800 text-lg flex items-center"><span class="icon-block mr-2"></span>Bloquejar un remitent</h3>
+                <p>Si algú t'envia correus no desitjats o ofensius, pots bloquejar-lo. Així, no tornaràs a rebre correus d'aquesta adreça.</p>
+            </div>
+
+            <div class="danger-box">
+                <h3 class="font-semibold text-red-800">Compte amb el Phishing (Suplantació d'identitat)</h3>
+                <p>El phishing és un tipus d'estafa on els delinqüents envien correus que semblen d'empreses reals (bancs, botigues online) per intentar robar-te les contrasenyes o dades bancàries.</p>
+                <ul class="list-disc list-inside mt-2">
+                    <li><strong>No facis clic a enllaços sospitosos.</strong> Si reps un correu d'un banc, és millor que escriguis tu mateix l'adreça del banc al navegador.</li>
+                    <li><strong>Desconfia de remitents desconeguts</strong> o adreces estranyes.</li>
+                    <li><strong>Mai donis les teves contrasenyes</strong> per correu electrònic. Cap empresa seriosa te les demanarà.</li>
+                </ul>
+            </div>
+            
+            <div class="danger-box">
+                <h3 class="font-semibold text-red-800 flex items-center"><span class="icon-reply mr-2"></span>Atenció amb "Respondre a tots"</h3>
+                <p>Ves amb molta cura amb aquesta opció! Si el correu original tenia moltes adreces de persones que no es coneixen, en fer "Respondre a tots" podries revelar les adreces de correu personal de tots els que van rebre el missatge. Utilitza-ho només quan estiguis segur que tothom ha de veure la teva resposta.</p>
+            </div>
+
+            <!-- Exercicis de Seguretat -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici 7.1: Correu sospitós</h3>
+            <div id="exercise-phishing" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q-phishing-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q-phishing-options" class="space-y-3"></div>
+                <div id="q-phishing-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici 7.2: Respondre a tots</h3>
+            <div id="exercise-replyall" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q-replyall-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q-replyall-options" class="space-y-3"></div>
+                <div id="q-replyall-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-10 pt-6 border-t border-gray-200 text-gray-500">
+            <p>&copy; 2025 Luis Romance MEI COMPETIC. Tots els drets reservats.</p>
+            <p>Materials educatius per a l'aprenentatge de la competència digital.</p>
+        </footer>
+    </div>
+
+    <script>
+        const inlineQuestions = {
+            "q-phishing": {
+                question: "Si una adreça de correu et sembla estranya o ve d'algú que no coneixes, què has de fer?",
+                options: [
+                    "Obrir-lo ràpidament per veure de què va.",
+                    "Clica a tots els enllaços que tingui.",
+                    "No l'obris i esborra'l, pot ser un virus (phishing).",
+                    "Reenvia'l a tots els teus contactes."
+                ],
+                correctAnswer: "No l'obris i esborra'l, pot ser un virus (phishing)."
+            },
+            "q-replyall": {
+                question: "Per què és important vigilar amb l'opció 'Respondre a tots'?",
+                options: [
+                    "Perquè només respon a la persona que ha enviat el missatge.",
+                    "Perquè pot revelar adreces de correu personal a persones que no les haurien de veure.",
+                    "Perquè esborra tots els correus.",
+                    "Perquè envia el missatge a la brossa."
+                ],
+                correctAnswer: "Perquè pot revelar adreces de correu personal a persones que no les haurien de veure."
+            }
+        };
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function checkInlineAnswer(questionId, selectedButton, correctAnswer) {
+            const optionsContainer = document.getElementById(questionId + "-options");
+            const feedbackElement = document.getElementById(questionId + "-feedback");
+            Array.from(optionsContainer.children).forEach(button => { button.disabled = true; button.style.cursor = "default"; });
+            if (selectedButton.textContent === correctAnswer) {
+                selectedButton.classList.add("correct");
+                feedbackElement.textContent = "✅ Correcte!";
+                feedbackElement.classList.remove("incorrect", "hidden");
+                feedbackElement.classList.add("correct");
+            } else {
+                selectedButton.classList.add("incorrect");
+                feedbackElement.textContent = `❌ Incorrecte. La resposta correcta era: "${correctAnswer}"`;
+                feedbackElement.classList.remove("correct", "hidden");
+                feedbackElement.classList.add("incorrect");
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) { button.classList.add("correct"); }
+                });
+            }
+        }
+
+        function loadInlineQuestions() {
+            for (const id in inlineQuestions) {
+                const qData = inlineQuestions[id];
+                const qTextElement = document.getElementById(id + "-text");
+                const optionsContainer = document.getElementById(id + "-options");
+                if (qTextElement && optionsContainer) {
+                    qTextElement.textContent = qData.question;
+                    optionsContainer.innerHTML = "";
+                    const shuffledOptions = shuffleArray([...qData.options]);
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement("button");
+                        button.textContent = option;
+                        button.classList.add("exercise-option", "block", "w-full", "text-left");
+                        button.onclick = () => checkInlineAnswer(id, button, qData.correctAnswer);
+                        optionsContainer.appendChild(button);
+                    });
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadInlineQuestions();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar el Correu - El Correu Electrònic</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #374151; /* Dark gray text */
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #1f2937; /* Even darker gray for headings */
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .highlight-box {
+            background-color: #fefce8; /* Light yellow for warnings/tips */
+            border-left: 4px solid #facc15; /* Yellow border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .info-box {
+            background-color: #e0f2fe; /* Light blue for info */
+            border-left: 4px solid #38b2ac; /* Teal border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .interactive-button {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .interactive-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+        }
+        .exercise-option {
+            background-color: #e0e7ff; /* Light blue for options */
+            color: #374151;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .exercise-option:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .exercise-option.correct {
+            background-color: #d1fae5; /* Green for correct */
+            border: 2px solid #34d399;
+        }
+        .exercise-option.incorrect {
+            background-color: #fee2e2; /* Red for incorrect */
+            border: 2px solid #ef4444;
+        }
+        .exercise-feedback {
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .exercise-feedback.correct {
+            color: #059669; /* Green text */
+        }
+        .exercise-feedback.incorrect {
+            color: #dc2626; /* Red text */
+        }
+        /* Icon styling (emojis for simplicity) */
+        .icon-clip::before { content: "📎"; margin-right: 0.5em; }
+        .icon-tag::before { content: "🏷️"; margin-right: 0.5em; }
+        .icon-archive::before { content: "📦"; margin-right: 0.5em; }
+        .icon-snooze::before { content: "⏰"; margin-right: 0.5em; }
+        .icon-star::before { content: "⭐"; margin-right: 0.5em; }
+        .icon-spam::before { content: "🚫"; margin-right: 0.5em; }
+        .icon-arrow::before { content: "⬇️"; margin-right: 0.5em; }
+        .icon-person::before { content: "👤"; margin-right: 0.5em; }
+        .icon-gear::before { content: "⚙️"; margin-right: 0.5em; }
+        .icon-link::before { content: "🔗"; margin-right: 0.5em; }
+        .icon-drive::before { content: "☁️"; margin-right: 0.5em; }
+        .icon-image::before { content: "🖼️"; margin-right: 0.5em; }
+        .icon-check::before { content: "✅"; margin-right: 0.5em; }
+        .icon-bulb::before { content: "💡"; margin-right: 0.5em; }
+        .icon-practice::before { content: "✍️"; margin-right: 0.5em; }
+        .icon-search::before { content: "🔍"; margin-right: 0.5em; }
+        .icon-filter::before { content: " funnel"; margin-right: 0.5em; }
+        .icon-reply::before { content: "↩️"; margin-right: 0.5em; }
+        .icon-users::before { content: "👥"; margin-right: 0.5em; }
+        .icon-block::before { content: "⛔"; margin-right: 0.5em; }
+        .icon-unread::before { content: "✉️"; margin-right: 0.5em; }
+        .icon-calendar::before { content: "🗓️"; margin-right: 0.5em; }
+
+        /* Styles for new matching exercise */
+        .matching-item {
+            background-color: #e0e7ff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            text-align: center;
+        }
+        .matching-item:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .matching-item.selected {
+            border: 2px solid #4f46e5;
+            background-color: #a5b4fc;
+        }
+        .matching-item.correct-match {
+            background-color: #d1fae5;
+            border: 2px solid #34d399;
+            pointer-events: none; /* Disable after correct match */
+            opacity: 0.7;
+        }
+        .matching-item.incorrect-match {
+            background-color: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .section-card { padding: 1.5rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="container bg-white rounded-xl shadow-lg p-6 sm:p-10 mt-8 mb-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">El Correu Electrònic</h1>
+            <p class="text-xl text-gray-600">Aprèn i Practica: Guia per la Competència Digital</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="mb-8 p-4 bg-indigo-100 rounded-lg shadow-inner">
+            <ul class="flex flex-wrap justify-center gap-4 text-indigo-800 font-medium">
+                <li><a href="index.html" class="hover:underline">Introducció</a></li>
+                <li><a href="redactar.html" class="hover:underline">Redactar un Correu</a></li>
+                <li><a href="gestionar.html" class="hover:underline font-bold">Gestionar el Correu</a></li>
+                <li><a href="seguretat.html" class="hover:underline">Seguretat</a></li>
+            </ul>
+        </nav>
+
+        <!-- Section: Altres eines per organitzar i gestionar el correu electrònic (Gmail i similars) -->
+        <section id="eines-gmail" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-check mr-2"></span>6. Eines útils de Gmail (i similars)</h2>
+            <p class="mb-4">Gmail té moltes opcions que et faciliten la vida per organitzar i gestionar els teus missatges:</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-search mr-2"></span>Cercador</h3>
+                    <p>Utilitza el cercador per trobar correus antics de forma ràpida. Pots buscar per paraules clau, nom de la persona, o fins i tot per dates!</p>
+                </div>
+                <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-tag mr-2"></span>Etiquetes (o "Labels")</h3>
+                    <p>Les etiquetes són com carpetes, però amb un avantatge: un correu pot tenir més d'una etiqueta. Això t'ajuda a tenir-ho tot molt ordenat.</p>
+                </div>
+                <!-- Activitat Pràctica Guiada 6.1: Utilitzar etiquetes per organitzar correus -->
+                <div class="info-box col-span-1 md:col-span-2 bg-green-50 border-green-400">
+                    <h3 class="font-semibold text-green-800 mb-2 flex items-center"><span class="icon-practice mr-2"></span>Activitat Pràctica Guiada 6.1: Organitza amb etiquetes!</h3>
+                    <p class="mb-2">Ara que saps què són les etiquetes, posa-les en pràctica per organitzar el teu correu:</p>
+                    <ol class="list-decimal list-inside ml-4 mt-2">
+                        <li>Crea una nova etiqueta a Gmail anomenada <strong>"Projecte Final COMPETIC"</strong>.</li>
+                        <li>Després, agafa 3 correus qualsevol de la teva bústia d'entrada (pots simular-ho si no tens correus suficients, per exemple, marcant-los com llegits i després aplicant l'etiqueta) i aplica'ls aquesta nova etiqueta.</li>
+                        <li>Finalment, ves a la teva llista d'etiquetes (a la columna esquerra de Gmail) i comprova que els correus estan dins de l'etiqueta <strong>"Projecte Final COMPETIC"</strong>.</li>
+                    </ol>
+                    <div class="highlight-box bg-blue-50 border-blue-400 mt-4">
+                        <p class="font-semibold text-blue-800">📸 Captura de pantalla a enviar al docent:</p>
+                        <p>Fes una captura de pantalla de la llista d'etiquetes amb la nova etiqueta visible, i una altra de la vista de l'etiqueta <strong>"Projecte Final COMPETIC"</strong> amb els 3 correus assignats.</p>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-archive mr-2"></span>Arxivar correus</h3>
+                    <p>Quan arxives un correu, el treus de la Bústia d'entrada, però no l'esborres. És molt útil per netejar la bústia sense perdre informació.</p>
+                </div>
+                <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-snooze mr-2"></span>Posposar correus (o "Snooze")</h3>
+                    <p>Aquesta funció et permet amagar un correu i fer que torni a aparèixer més tard, quan tu ho decideixis.</p>
+                </div>
+                <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-star mr-2"></span>Destacar correus (o "Starred")</h3>
+                    <p>Serveix per marcar els correus importants amb una estrella. Així els podràs trobar fàcilment a la secció "Destacats".</p>
+                </div>
+                <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-filter mr-2"></span>Filtrar correus</h3>
+                    <p>Els filtres són regles que pots crear perquè el teu servei de correu faci coses automàticament amb els correus que rebs.</p>
+                </div>
+                 <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-calendar mr-2"></span>Programar un enviament</h3>
+                    <p>Pots escriure un correu ara i programar-lo per enviar-lo més tard, a l'hora i dia que vulguis.</p>
+                </div>
+                 <div class="info-box">
+                    <h3 class="font-semibold text-blue-800 text-lg"><span class="icon-person mr-2"></span>Desar un contacte</h3>
+                    <p>Si reps un correu d'algú i vols guardar la seva adreça, el pots desar com a contacte a la teva llibreta d'adreces.</p>
+                </div>
+            </div>
+
+            <!-- Activitat Pràctica Guiada 6.4: Contactes i enviaments programats! -->
+            <div class="info-box col-span-1 md:col-span-2 bg-green-50 border-green-400">
+                <h3 class="font-semibold text-green-800 mb-2 flex items-center"><span class="icon-practice mr-2"></span>Activitat Pràctica Guiada 6.4: Contactes i enviaments programats!</h3>
+                <p class="mb-2">Aprèn a guardar contactes i a programar l'enviament dels teus correus:</p>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li>Obre un correu que hagis rebut d'algú i desa l'adreça de correu d'aquesta persona com a contacte nou (si ja el tens guardat, crea un contacte fictici amb una adreça com "proba@exemple.com").</li>
+                    <li>Després, fes clic a "Redactar" per crear un nou correu.</li>
+                    <li>Al camp <strong>"Per a"</strong>, comença a escriure el nom del contacte que acabes de guardar (o el fictici). Veuràs que el servei de correu te'l suggereix. Selecciona'l.</li>
+                    <li>A <strong>"Assumpte"</strong>, escriu: "Prova d'enviament programat".</li>
+                    <li>Al <strong>cos del missatge</strong>, escriu un text curt (per exemple: "Aquest correu s'enviarà automàticament més tard.").</li>
+                    <li>Al costat del botó <strong>"Enviar"</strong> (normalment hi ha una petita fletxa <span class="icon-arrow"></span>), fes-hi clic i tria <strong>"Programar enviament"</strong>. Selecciona una data i hora que sigui d'aquí a uns 5 minuts.</li>
+                    <li>Confirma la programació.</li>
+                </ol>
+                <div class="highlight-box bg-blue-50 border-blue-400 mt-4">
+                    <p class="font-semibold text-blue-800">📸 Captura de pantalla a enviar al docent:</p>
+                    <p>Fes una captura de pantalla on es vegi el contacte guardat (pots anar a "Contactes de Google" si fas servir Gmail, o la secció de Contactes del teu servei de correu). Fes una altra captura de la pantalla de confirmació de l'enviament programat (sol aparèixer un missatge després de programar-lo, o a la secció "Programats").</p>
+                </div>
+            </div>
+
+            <!-- Exercicis -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici 6.1: Arxivar vs. Esborrar</h3>
+            <div id="exercise-5-2" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q5-2-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q5-2-options" class="space-y-3"></div>
+                <div id="q5-2-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+            
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici 6.2: Organitzar amb etiquetes</h3>
+            <div id="exercise-5-1" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q5-1-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q5-1-options" class="space-y-3"></div>
+                <div id="q5-1-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+
+            <!-- New: Matching Exercise (Click-to-pair) -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici 6.3: Relaciona Icona i Funció</h3>
+            <p class="mb-4 text-gray-700">Fes clic en una icona de la llista esquerra i després a la seva funció corresponent de la llista dreta.</p>
+            <div id="matching-exercise" class="bg-indigo-100 p-4 rounded-lg mb-8">
+                <div class="flex flex-col md:flex-row gap-6 justify-around">
+                    <div id="matching-icons-container" class="flex flex-col gap-2 p-4 border border-indigo-200 rounded-lg bg-white md:w-1/2">
+                        <p class="font-semibold text-indigo-800 mb-2">Icones:</p>
+                    </div>
+                    <div id="matching-functions-container" class="flex flex-col gap-2 p-4 border border-indigo-200 rounded-lg bg-white md:w-1/2">
+                        <p class="font-semibold text-indigo-800 mb-2">Funcions:</p>
+                    </div>
+                </div>
+                <div id="matching-feedback" class="exercise-feedback mt-4 hidden text-center"></div>
+                <button id="matching-reset-button" class="interactive-button mt-6 w-full sm:w-auto">Reiniciar exercici</button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-10 pt-6 border-t border-gray-200 text-gray-500">
+            <p>&copy; 2025 Luis Romance MEI COMPETIC. Tots els drets reservats.</p>
+            <p>Materials educatius per a l'aprenentatge de la competència digital.</p>
+        </footer>
+    </div>
+
+    <script>
+        const inlineQuestions = {
+            "q5-1": {
+                question: "Quina funció et permet agrupar correus amb un nom, com si fossin carpetes, però un correu pot ser a més d'un grup?",
+                options: [ "Brossa.", "Arxivar.", "Etiquetes." ],
+                correctAnswer: "Etiquetes."
+            },
+            "q5-2": {
+                question: "Si vols treure un correu de la Bústia d'entrada sense esborrar-lo, a quina opció fas clic?",
+                options: [ "Marcar com a 'Spam'.", "Arxivar.", "Reenviar." ],
+                correctAnswer: "Arxivar."
+            }
+        };
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function checkInlineAnswer(questionId, selectedButton, correctAnswer) {
+            const optionsContainer = document.getElementById(questionId + "-options");
+            const feedbackElement = document.getElementById(questionId + "-feedback");
+            Array.from(optionsContainer.children).forEach(button => { button.disabled = true; button.style.cursor = "default"; });
+            if (selectedButton.textContent === correctAnswer) {
+                selectedButton.classList.add("correct");
+                feedbackElement.textContent = "✅ Correcte!";
+                feedbackElement.classList.remove("incorrect", "hidden");
+                feedbackElement.classList.add("correct");
+            } else {
+                selectedButton.classList.add("incorrect");
+                feedbackElement.textContent = `❌ Incorrecte. La resposta correcta era: "${correctAnswer}"`;
+                feedbackElement.classList.remove("correct", "hidden");
+                feedbackElement.classList.add("incorrect");
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) { button.classList.add("correct"); }
+                });
+            }
+        }
+
+        function loadInlineQuestions() {
+            for (const id in inlineQuestions) {
+                const qData = inlineQuestions[id];
+                const qTextElement = document.getElementById(id + "-text");
+                const optionsContainer = document.getElementById(id + "-options");
+                if (qTextElement && optionsContainer) {
+                    qTextElement.textContent = qData.question;
+                    optionsContainer.innerHTML = "";
+                    const shuffledOptions = shuffleArray([...qData.options]);
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement("button");
+                        button.textContent = option;
+                        button.classList.add("exercise-option", "block", "w-full", "text-left");
+                        button.onclick = () => checkInlineAnswer(id, button, qData.correctAnswer);
+                        optionsContainer.appendChild(button);
+                    });
+                }
+            }
+        }
+
+        const matchingPairs = [
+            { icon: "📎 Clip", func: "Adjuntar arxiu" },
+            { icon: "🏷️ Etiqueta", func: "Organitzar correus" },
+            { icon: "📦 Caixa", func: "Arxivar correus" },
+            { icon: "⏰ Rellotge", func: "Posposar correus" },
+            { icon: "⭐ Estrella", func: "Destacar correus" },
+            { icon: "🚫 Prohibit", func: "Marcar com a Spam" }
+        ];
+
+        let selectedIconElement = null;
+        let selectedFunctionElement = null;
+        let matchedCount = 0;
+
+        const matchingIconsContainer = document.getElementById("matching-icons-container");
+        const matchingFunctionsContainer = document.getElementById("matching-functions-container");
+        const matchingFeedback = document.getElementById("matching-feedback");
+        const matchingResetButton = document.getElementById("matching-reset-button");
+
+        function loadMatchingExercise() {
+            if (!matchingIconsContainer || !matchingFunctionsContainer || !matchingFeedback || !matchingResetButton) return;
+            matchingIconsContainer.innerHTML = '<p class="font-semibold text-indigo-800 mb-2">Icones:</p>';
+            matchingFunctionsContainer.innerHTML = '<p class="font-semibold text-indigo-800 mb-2">Funcions:</p>';
+            matchingFeedback.textContent = "";
+            matchingFeedback.classList.add("hidden");
+            selectedIconElement = null;
+            selectedFunctionElement = null;
+            matchedCount = 0;
+
+            const shuffledIcons = shuffleArray([...matchingPairs.map(p => ({value: p.icon, key: p.func}))]);
+            const shuffledFunctions = shuffleArray([...matchingPairs.map(p => ({value: p.func, key: p.icon}))]);
+
+            shuffledIcons.forEach(item => {
+                const div = document.createElement("div");
+                div.textContent = item.value;
+                div.dataset.key = item.key;
+                div.classList.add("matching-item");
+                div.onclick = () => selectMatchingItem(div, "icon");
+                matchingIconsContainer.appendChild(div);
+            });
+
+            shuffledFunctions.forEach(item => {
+                const div = document.createElement("div");
+                div.textContent = item.value;
+                div.dataset.key = item.key;
+                div.classList.add("matching-item");
+                div.onclick = () => selectMatchingItem(div, "function");
+                matchingFunctionsContainer.appendChild(div);
+            });
+        }
+
+        function selectMatchingItem(element, type) {
+            if (element.classList.contains("correct-match")) return;
+            if (type === "icon") {
+                if (selectedIconElement) selectedIconElement.classList.remove("selected");
+                selectedIconElement = element;
+                selectedIconElement.classList.add("selected");
+            } else {
+                if (selectedFunctionElement) selectedFunctionElement.classList.remove("selected");
+                selectedFunctionElement = element;
+                selectedFunctionElement.classList.add("selected");
+            }
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (selectedIconElement && selectedFunctionElement) {
+                const iconKey = selectedIconElement.dataset.key;
+                const functionText = selectedFunctionElement.textContent;
+                if (iconKey === functionText) {
+                    selectedIconElement.classList.add("correct-match");
+                    selectedFunctionElement.classList.add("correct-match");
+                    matchingFeedback.textContent = "✅ Correcte! Parella trobada.";
+                    matchingFeedback.classList.remove("incorrect", "hidden");
+                    matchingFeedback.classList.add("correct");
+                    selectedIconElement.classList.remove("selected");
+                    selectedFunctionElement.classList.remove("selected");
+                    selectedIconElement = null;
+                    selectedFunctionElement = null;
+                    matchedCount++;
+                    if (matchedCount === matchingPairs.length) {
+                        matchingFeedback.textContent = "🥳 Molt bé! Has relacionat totes les parelles!";
+                    }
+                } else {
+                    selectedIconElement.classList.add("incorrect-match");
+                    selectedFunctionElement.classList.add("incorrect-match");
+                    matchingFeedback.textContent = "❌ Incorrecte. Torna a intentar-ho.";
+                    matchingFeedback.classList.remove("correct", "hidden");
+                    matchingFeedback.classList.add("incorrect");
+                    setTimeout(() => {
+                        selectedIconElement.classList.remove("selected", "incorrect-match");
+                        selectedFunctionElement.classList.remove("selected", "incorrect-match");
+                        selectedIconElement = null;
+                        selectedFunctionElement = null;
+                        matchingFeedback.classList.add("hidden");
+                    }, 800);
+                }
+            }
+        }
+
+        if (matchingResetButton) {
+            matchingResetButton.addEventListener("click", loadMatchingExercise);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadInlineQuestions();
+            loadMatchingExercise();
+        });
+    </script>
+</body>
+</html>

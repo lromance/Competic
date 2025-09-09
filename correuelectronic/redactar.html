@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redactar un Correu - El Correu Electrònic</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #374151; /* Dark gray text */
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #1f2937; /* Even darker gray for headings */
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .highlight-box {
+            background-color: #fefce8; /* Light yellow for warnings/tips */
+            border-left: 4px solid #facc15; /* Yellow border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .info-box {
+            background-color: #e0f2fe; /* Light blue for info */
+            border-left: 4px solid #38b2ac; /* Teal border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .interactive-button {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .interactive-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+        }
+        .exercise-option {
+            background-color: #e0e7ff; /* Light blue for options */
+            color: #374151;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .exercise-option:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .exercise-option.correct {
+            background-color: #d1fae5; /* Green for correct */
+            border: 2px solid #34d399;
+        }
+        .exercise-option.incorrect {
+            background-color: #fee2e2; /* Red for incorrect */
+            border: 2px solid #ef4444;
+        }
+        .exercise-feedback {
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .exercise-feedback.correct {
+            color: #059669; /* Green text */
+        }
+        .exercise-feedback.incorrect {
+            color: #dc2626; /* Red text */
+        }
+        /* Style for tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            border: 1px solid #d1d5db; /* Light gray border */
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #e5e7eb; /* Slightly darker gray for headers */
+            font-weight: 600;
+            color: #374151;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fafb; /* Lighter stripe for rows */
+        }
+        /* Icon styling (emojis for simplicity) */
+        .icon-clip::before { content: "📎"; margin-right: 0.5em; }
+        .icon-tag::before { content: "🏷️"; margin-right: 0.5em; }
+        .icon-archive::before { content: "📦"; margin-right: 0.5em; }
+        .icon-snooze::before { content: "⏰"; margin-right: 0.5em; }
+        .icon-star::before { content: "⭐"; margin-right: 0.5em; }
+        .icon-spam::before { content: "🚫"; margin-right: 0.5em; }
+        .icon-arrow::before { content: "⬇️"; margin-right: 0.5em; }
+        .icon-person::before { content: "👤"; margin-right: 0.5em; }
+        .icon-gear::before { content: "⚙️"; margin-right: 0.5em; }
+        .icon-link::before { content: "🔗"; margin-right: 0.5em; }
+        .icon-drive::before { content: "☁️"; margin-right: 0.5em; }
+        .icon-image::before { content: "🖼️"; margin-right: 0.5em; }
+        .icon-check::before { content: "✅"; margin-right: 0.5em; }
+        .icon-bulb::before { content: "💡"; margin-right: 0.5em; }
+        .icon-practice::before { content: "✍️"; margin-right: 0.5em; }
+        .icon-search::before { content: "🔍"; margin-right: 0.5em; }
+        .icon-filter::before { content: " funnel"; margin-right: 0.5em; } /* Using text for better clarity on filter icon */
+        .icon-reply::before { content: "↩️"; margin-right: 0.5em; }
+        .icon-users::before { content: "👥"; margin-right: 0.5em; }
+        .icon-block::before { content: "⛔"; margin-right: 0.5em; }
+        .icon-unread::before { content: "✉️"; margin-right: 0.5em; }
+        .icon-calendar::before { content: "🗓️"; margin-right: 0.5em; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .section-card {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            h3 {
+                font-size: 1.25rem;
+            }
+            .flex-col-mobile {
+                flex-direction: column;
+            }
+            .w-full-mobile {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="container bg-white rounded-xl shadow-lg p-6 sm:p-10 mt-8 mb-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">El Correu Electrònic</h1>
+            <p class="text-xl text-gray-600">Aprèn i Practica: Guia per la Competència Digital</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="mb-8 p-4 bg-indigo-100 rounded-lg shadow-inner">
+            <ul class="flex flex-wrap justify-center gap-4 text-indigo-800 font-medium">
+                <li><a href="index.html" class="hover:underline">Introducció</a></li>
+                <li><a href="redactar.html" class="hover:underline font-bold">Redactar un Correu</a></li>
+                <li><a href="gestionar.html" class="hover:underline">Gestionar el Correu</a></li>
+                <li><a href="seguretat.html" class="hover:underline">Seguretat</a></li>
+            </ul>
+        </nav>
+
+        <!-- Section: Quines parts té un correu electrònic? -->
+        <section id="parts-correu" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-check mr-2"></span>4. Quines parts té un correu electrònic nou?</h2>
+            <p class="mb-4">Quan crees un correu nou, veuràs aquests camps per omplir:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">➡️ Per a (o "To"):</p>
+                    <p>Aquí escrius l'adreça de correu de la persona o persones que rebran el missatge principal. És el destinatari directe.</p>
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">📄 CC (amb còpia o "Carbon Copy"):</p>
+                    <p>Utilitza aquest camp per afegir adreces de persones que vols que rebin una còpia del missatge. Tots els destinataris (els de "Per a" i els de "CC") podran veure qui més ha rebut el correu.</p>
+                </div>
+                <div class="info-box col-span-1 md:col-span-2">
+                    <p class="font-semibold text-blue-800 text-lg">🕵️‍♀️ CCO (amb còpia oculta o "Blind Carbon Copy"):</p>
+                    <p>Aquí escrius adreces de persones que vols que rebin una còpia, però sense que els altres destinataris (els de "Per a" i els de "CC") ho sàpiguen. La seva adreça queda "oculta" per a la resta.</p>
+                    <div class="highlight-box bg-red-50 border-red-400 mt-2">
+                        <p class="font-semibold text-red-800">⚠️ ÚS IMPORTANT DE CCO:</p>
+                        <p>Aquesta opció és molt útil per protegir la privacitat dels contactes, especialment quan envies un correu a moltes persones que no es coneixen entre elles (per exemple, per convidar a un esdeveniment públic).</p>
+                    </div>
+                </div>
+                <div class="info-box col-span-1 md:col-span-2">
+                    <img src="captura2.PNG" alt="finestra redactar correu" class="rounded-md center-block mx-auto" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">🎯 Assumpte (o "Subject"):</p>
+                    <p>És el títol del correu. Ha de ser curt i clar, per saber de què va el missatge abans d'obrir-lo. És el primer que veurà el destinatari!</p>
+                    <p class="ml-4 italic text-gray-600">Exemple: `Reunió de veïns`, `Dubte sobre el curs`, `Factura de la llum`</p>
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">💬 Missatge (o "Body"):</p>
+                    <p>Aquesta és l'àrea principal on escrius el text del correu. Aquí expresses el que vols comunicar.</p>
+                </div>
+                <div class="info-box col-span-1 md:col-span-2">
+                    <p class="font-semibold text-blue-800 text-lg"><span class="icon-clip"></span> Adjuntar arxiu (o "Attach file"):</p>
+                    <p>Aquesta icona de clip et permet enviar fotos, documents de Word, Excel, PDF, etc., amb el correu. És essencial per compartir documents!</p>
+                </div>
+            </div>
+
+            <!-- Exercici Ràpid 4.1 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 4.1: Títol del missatge</h3>
+            <div id="exercise-4-1" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q4-1-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q4-1-options" class="space-y-3"></div>
+                <div id="q4-1-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+
+            <!-- Exercici Ràpid 4.2 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 4.2: CCO i privacitat</h3>
+            <div id="exercise-4-2" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q4-2-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q4-2-options" class="space-y-3"></div>
+                <div id="q4-2-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+             <!-- New: Dropdown Exercise -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici: Completa la frase</h3>
+            <div id="dropdown-exercise" class="bg-indigo-50 p-4 rounded-lg">
+                <p class="text-lg font-semibold mb-4">Per evitar que els altres destinataris vegin les adreces de correu d'un grup de persones, utilitzarem el camp:
+                    <select id="dropdown-select" class="ml-2 p-2 border border-gray-300 rounded-md bg-white text-gray-700">
+                        <option value="">-- Tria una opció --</option>
+                        <option value="Per a">Per a</option>
+                        <option value="CC">CC</option>
+                        <option value="CCO">CCO</option>
+                    </select>
+                </p>
+                <button id="dropdown-check-button" class="interactive-button mt-4">Comprovar</button>
+                <div id="dropdown-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+            <!-- Activitat Pràctica Guiada 4.3: Crear i enviar un correu bàsic -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700 flex items-center"><span class="icon-practice mr-2"></span>Activitat Pràctica Guiada 4.3: El teu primer correu!</h3>
+            <div class="info-box bg-green-50 border-green-400">
+                <p class="font-semibold text-green-800 mb-2">Comença a practicar enviant el teu primer correu:</p>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li>Obre el teu servei de correu (Gmail, Outlook, etc.).</li>
+                    <li>Fes clic a "Redactar" o "Nou missatge".</li>
+                    <li>Al camp <strong>"Per a"</strong>, escriu l'adreça de correu d'un company/a del curs o la que et doni el docent.</li>
+                    <li>A <strong>"Assumpte"</strong>, escriu: "La meva primera prova de correu".</li>
+                    <li>Al <strong>cos del missatge</strong>, escriu: "Hola! Aquest és el meu primer correu de prova del curs de Competència Digital. Espero aprendre molt!".</li>
+                    <li>Recorda incloure una salutació i un comiat adequats al principi i al final del missatge.</li>
+                    <li>Fes clic a "Enviar".</li>
+                </ol>
+                <div class="highlight-box bg-blue-50 border-blue-400 mt-4">
+                    <p class="font-semibold text-blue-800">📸 Captura de pantalla a enviar al docent:</p>
+                    <p>Fes una captura de pantalla clara del correu un cop l'hagis enviat (la trobaràs a la carpeta "Elements enviats").</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Redacció del correu: Com escriure un bon missatge? -->
+        <section id="redaccio" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-practice mr-2"></span>5. Redacció del correu: Com escriure un bon missatge?</h2>
+
+            <h3 class="text-xl font-semibold mb-3">5.1. Parts bàsiques del missatge</h3>
+            <p class="mb-4">Un correu electrònic té una estructura bàsica que cal seguir per ser clar i efectiu:</p>
+            <div class="mt-4 flex flex-col space-y-4">
+                <div class="info-box !my-0">
+                    <p class="font-semibold text-blue-800 text-lg">1. Salutació</p>
+                    <p>Per començar el missatge de forma educada.</p>
+                    <p class="italic text-gray-600 mt-2 text-sm">Exemple: `Hola Joan,`, `Bon dia,`</p>
+                </div>
+                <div class="info-box !my-0">
+                    <p class="font-semibold text-blue-800 text-lg">2. Cos del missatge</p>
+                    <p>Aquí és on escrius el que vols comunicar, de forma clara i concisa.</p>
+                </div>
+                <div class="info-box !my-0">
+                    <p class="font-semibold text-blue-800 text-lg">3. Comiat</p>
+                    <p>Per acabar el missatge de forma correcta.</p>
+                    <p class="italic text-gray-600 mt-2 text-sm">Exemple: `Gràcies,`, `Salutacions,`</p>
+                </div>
+                <div class="info-box !my-0">
+                    <p class="font-semibold text-blue-800 text-lg">4. Signatura</p>
+                    <p>El teu nom per identificar-te.</p>
+                </div>
+            </div>
+
+            <!-- Activitat Pràctica Guiada 5.1.1: Crea la teva signatura! -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700 flex items-center"><span class="icon-practice mr-2"></span>Activitat Pràctica Guiada 5.1.1: Crea la teva signatura!</h3>
+            <div class="info-box bg-green-50 border-green-400">
+                <p class="font-semibold text-green-800 mb-2">Pas 1: Accedeix a la configuració de Gmail</p>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li>A Gmail, fes clic a la icona de <strong>"Configuració"</strong> <span class="icon-gear"></span> (una roda dentada) a la part de dalt a la dreta.</li>
+                    <li>Fes clic a <strong>"Mostra totes les configuracions"</strong> o "Veure totes les configuracions".</li>
+                </ol>
+                <p class="font-semibold text-green-800 mt-4 mb-2">Pas 2: Crea la teva signatura</p>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li>Dins de la configuració, baixa fins a la secció <strong>"Signatura"</strong>.</li>
+                    <li>Fes clic a <strong>"Crea'n una de nova"</strong> i posa-li un nom (per exemple, "La meva signatura").</li>
+                    <li>A la caixa de text, escriu la teva signatura. Pots posar:
+                        <ul class="list-disc list-inside ml-4">
+                            <li>El teu nom complet</li>
+                            <li>"Alumne/a de Competència Digital"</li>
+                            <li>(Opcional) Un número de telèfon o correu electrònic de contacte addicional.</li>
+                        </ul>
+                    </li>
+                    <li>Assegura't de seleccionar la teva nova signatura per als <strong>"Usos predeterminats de la signatura"</strong> (correus nous i respostes/reenviaments).</li>
+                    <li>Fes clic a <strong>"Desa els canvis"</strong> al final de la pàgina.</li>
+                </ol>
+                <div class="highlight-box bg-blue-50 border-blue-400 mt-4">
+                    <p class="font-semibold text-blue-800">📸 Captura de pantalla a enviar al docent:</p>
+                    <p>Fes una captura de pantalla de la configuració de la signatura creada, on es vegi el text de la signatura i que l'has seleccionat per als usos predeterminats.</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-3 mt-8">5.2. Opcions de format i inserció</h3>
+            <p class="mb-4">Pots fer servir aquestes eines per millorar la presentació del text:</p>
+            <ul class="list-disc list-inside space-y-4">
+                <li><strong>Format de text:</strong> <strong>Negreta</strong>, <em>Cursiva</em>, <u>Subratllada</u>, llistes, etc.</li>
+                <li><span class="icon-link"></span><strong>Inserir enllaç:</strong> Per posar un text que si cliques et porta a una pàgina web.</li>
+                <li><span class="icon-drive"></span><span class="icon-image"></span><strong>Inserir fitxer de Google Drive o imatge:</strong> Perquè aparegui dins del correu.</li>
+            </ul>
+
+            <!-- Exercici Ràpid 6.2.1 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 5.1: Inserir elements</h3>
+            <div id="exercise-6-2-1" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q6-2-1-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q6-2-1-options" class="space-y-3"></div>
+                <div id="q6-2-1-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+
+            <!-- Activitat Pràctica Guiada 5.2.1: Adjunts i format de text! -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700 flex items-center"><span class="icon-practice mr-2"></span>Activitat Pràctica Guiada 5.2.1: Adjunts i format de text!</h3>
+            <div class="info-box col-span-1 md:col-span-2 bg-green-50 border-green-400">
+                <p class="font-semibold text-green-800 mb-2">Aprèn a adjuntar arxius i a donar format al teu missatge:</p>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li>Obre el teu servei de correu i crea un nou missatge.</li>
+                    <li>Al camp <strong>"Per a"</strong>, escriu la mateixa adreça de l'activitat anterior (o una nova que et doni el docent).</li>
+                    <li>A <strong>"Assumpte"</strong>, escriu: "Correu amb adjunt i format de text".</li>
+                    <li>Al <strong>cos del missatge</strong>, escriu un text curt (per exemple, "Aquí t'adjunto la foto de la nostra sortida!").</li>
+                    <li>Ara, cerca la icona del clip <span class="icon-clip"></span> (adjuntar arxiu) i afegeix com a adjunt una foto que tinguis al teu mòbil o ordinador (pot ser qualsevol imatge).</li>
+                    <li><strong>Formatem el text:</strong> selecciona la paraula "foto" al teu missatge i fes-la <strong>negreta</strong>. Després, selecciona la frase "la nostra sortida!" i posa-la en <em>cursiva</em>.</li>
+                    <li>No cal que l'enviïs realment si no vols.</li>
+                </ol>
+                <div class="highlight-box bg-blue-50 border-blue-400 mt-4">
+                    <p class="font-semibold text-blue-800">📸 Captura de pantalla a enviar al docent:</p>
+                    <p>Fes una captura de pantalla de la finestra del correu amb l'adjunt visible i el text formatat (la paraula "foto" en negreta i la frase en cursiva), abans d'enviar-lo.</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-3 mt-8">5.3. To i formalitat del missatge</h3>
+            <p class="mb-4">És molt important adaptar el teu missatge a la persona a qui escrius.</p>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead>
+                        <tr>
+                            <th>Aspecte</th>
+                            <th>To informal (Amics, família)</th>
+                            <th>To formal (Professors, caps, empreses)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Salutació</strong></td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>Hola [nom],</code></li>
+                                    <li><code>Bon dia [nom],</code></li>
+                                    <li><code>Què tal?</code></li>
+                                    <li><code>Ei, com va?</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>Benvolgut/da Sr./Sra. [Cognom],</code></li>
+                                    <li><code>Estimat/da [Nom],</code> (si hi ha certa confiança)</li>
+                                    <li><code>Bon dia,</code></li>
+                                    <li><code>A qui pugui interessar:</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frases d'inici</strong></td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>T'escric per...</code></li>
+                                    <li><code>Et volia comentar que...</code></li>
+                                    <li><code>Només per dir-te que...</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>M'adreço a vostè per...</code></li>
+                                    <li><code>Li escric en relació a...</code></li>
+                                    <li><code>L'objectiu d'aquest correu és informar-lo sobre...</code></li>
+                                    <li><code>En resposta al seu correu del passat [data],...</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frases de comiat</strong></td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>Ja em diràs,</code></li>
+                                    <li><code>Parlem aviat,</code></li>
+                                    <li><code>Cuida't,</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>Quedo a la seva disposició per a qualsevol dubte.</code></li>
+                                    <li><code>Agraeixo per endavant la seva atenció/col·laboració.</code></li>
+                                    <li><code>Resto a l'espera de la seva resposta.</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Comiat final</strong></td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>Una abraçada,</code></li>
+                                    <li><code>Records,</code></li>
+                                    <li><code>Fins aviat,</code></li>
+                                    <li><code>Salut,</code></li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="list-disc list-inside">
+                                    <li><code>Cordialment,</code></li>
+                                    <li><code>Atentament,</code></li>
+                                    <li><code>Salutacions cordials,</code></li>
+                                    <li><code>Una salutació,</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Signatura</strong></td>
+                            <td>Nom de pila (Ex: <code>Maria</code>)</td>
+                            <td>Nom complet i càrrec (Ex: <code>Maria López, Tècnica de Projectes</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercici Ràpid 6.3.1 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 5.2: To adequat</h3>
+            <div id="exercise-6-3-1" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q6-3-1-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q6-3-1-options" class="space-y-3"></div>
+                <div id="q6-3-1-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+
+            <!-- Activitat Pràctica Guiada 5.3: Exercici de formalitat: Redacció d'un correu demanant informació -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700 flex items-center"><span class="icon-practice mr-2"></span>Activitat Pràctica Guiada 5.3: Redacta un correu formal!</h3>
+            <div class="info-box col-span-1 md:col-span-2 bg-green-50 border-green-400">
+                <p class="font-semibold text-green-800 mb-2">És hora de practicar la redacció formal!</p>
+                <p class="mb-2">Imagina que vols demanar informació sobre un curs de català a una escola oficial (per exemple, l'Escola Oficial d'Idiomes de Barcelona). Redacta un correu electrònic nou amb un to formal i professional, incloent:</p>
+                <ol class="list-decimal list-inside ml-4 mt-2">
+                    <li>Un camp <strong>"Per a"</strong> amb una adreça fictícia (per exemple, "info@escolaidiomes.cat").</li>
+                    <li>Un <strong>"Assumpte"</strong> clar i concís (per exemple, "Sol·licitud d'informació: Curs de català").</li>
+                    <li>Una <strong>salutació formal</strong> (per exemple, "Benvolguts/des Srs./Sres. de l'Escola Oficial d'Idiomes,").</li>
+                    <li>Una <strong>introducció clara</strong> sobre el motiu del correu.</li>
+                    <li>Les preguntes que vulguis fer (per exemple: horaris disponibles, preus del curs, requisits per matricular-se, si hi ha proves de nivell).</li>
+                    <li>Un <strong>comiat formal</strong> (com els de la taula de dalt).</li>
+                    <li>La teva <strong>signatura</strong> (la que has creat a l'activitat anterior o el teu nom complet).</li>
+                </ol>
+                <p class="mt-2 text-red-700 font-semibold">⚠️ Important: No cal que l'enviïs realment! Només el redactes per practicar.</p>
+                <div class="highlight-box bg-blue-50 border-blue-400 mt-4">
+                    <p class="font-semibold text-blue-800">📸 Captura de pantalla a enviar al docent:</p>
+                    <p>Fes una captura de pantalla de la finestra del correu un cop l'hagis redactat, on es vegi tot el contingut (assumpte, salutació, cos, comiat i signatura), abans de tancar-lo o enviar-lo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-10 pt-6 border-t border-gray-200 text-gray-500">
+            <p>&copy; 2025 Luis Romance MEI COMPETIC. Tots els drets reservats.</p>
+            <p>Materials educatius per a l'aprenentatge de la competència digital.</p>
+        </footer>
+    </div>
+
+    <script>
+        const inlineQuestions = {
+            "q4-1": {
+                question: "Quin camp d'un correu has d'omplir perquè el destinatari sàpiga de què va el missatge abans d'obrir-lo?",
+                options: [ "CC.", "Assumpte.", "Per a." ],
+                correctAnswer: "Assumpte."
+            },
+            "q4-2": {
+                question: "Si vols enviar una còpia d'un correu a algú sense que els altres destinataris ho sàpiguen, on posaries la seva adreça?",
+                options: [ "Al camp 'Per a'.", "Al camp 'CC'.", "Al camp 'CCO' (amb còpia oculta)." ],
+                correctAnswer: "Al camp 'CCO' (amb còpia oculta)."
+            },
+            "q6-2-1": {
+                question: "Si vols que la paraula 'important' aparegui en <strong>negreta</strong> al teu correu, quina eina de format has d'usar?",
+                options: [ "La icona del clip.", "La funció 'Respon a tots'.", "Les opcions de format de text (per exemple, la 'B' de bold)." ],
+                correctAnswer: "Les opcions de format de text (per exemple, la 'B' de bold)."
+            },
+            "q6-3-1": {
+                question: "Si escrius un correu a un amic, quina salutació és més adequada?",
+                options: [ "Benvolgut Sr. [Cognom],", "A qui pugui interessar:", "Hola [nom]," ],
+                correctAnswer: "Hola [nom],"
+            }
+        };
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function checkInlineAnswer(questionId, selectedButton, correctAnswer) {
+            const optionsContainer = document.getElementById(questionId + "-options");
+            const feedbackElement = document.getElementById(questionId + "-feedback");
+            Array.from(optionsContainer.children).forEach(button => {
+                button.disabled = true;
+                button.style.cursor = "default";
+            });
+            if (selectedButton.textContent === correctAnswer) {
+                selectedButton.classList.add("correct");
+                feedbackElement.textContent = "✅ Correcte!";
+                feedbackElement.classList.remove("incorrect", "hidden");
+                feedbackElement.classList.add("correct");
+            } else {
+                selectedButton.classList.add("incorrect");
+                feedbackElement.textContent = `❌ Incorrecte. La resposta correcta era: "${correctAnswer}"`;
+                feedbackElement.classList.remove("correct", "hidden");
+                feedbackElement.classList.add("incorrect");
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) {
+                        button.classList.add("correct");
+                    }
+                });
+            }
+        }
+
+        function loadInlineQuestions() {
+            for (const id in inlineQuestions) {
+                const qData = inlineQuestions[id];
+                const qTextElement = document.getElementById(id + "-text");
+                const optionsContainer = document.getElementById(id + "-options");
+                if (qTextElement && optionsContainer) {
+                    qTextElement.textContent = qData.question;
+                    optionsContainer.innerHTML = "";
+                    const shuffledOptions = shuffleArray([...qData.options]);
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement("button");
+                        button.textContent = option;
+                        button.classList.add("exercise-option", "block", "w-full", "text-left");
+                        button.onclick = () => checkInlineAnswer(id, button, qData.correctAnswer);
+                        optionsContainer.appendChild(button);
+                    });
+                }
+            }
+        }
+
+        const dropdownSelect = document.getElementById("dropdown-select");
+        const dropdownCheckButton = document.getElementById("dropdown-check-button");
+        const dropdownFeedback = document.getElementById("dropdown-feedback");
+        const dropdownCorrectAnswer = "CCO";
+
+        if (dropdownCheckButton) {
+            dropdownCheckButton.addEventListener("click", () => {
+                if (dropdownSelect) {
+                    if (dropdownSelect.value === dropdownCorrectAnswer) {
+                        dropdownFeedback.textContent = "✅ Correcte! El camp CCO és per a còpia oculta.";
+                        dropdownFeedback.classList.remove("incorrect", "hidden");
+                        dropdownFeedback.classList.add("correct");
+                        dropdownSelect.disabled = true;
+                    } else if (dropdownSelect.value === "") {
+                        dropdownFeedback.textContent = "Si us plau, tria una opció abans de comprovar.";
+                        dropdownFeedback.classList.remove("correct", "incorrect", "hidden");
+                    } else {
+                        dropdownFeedback.textContent = `❌ Incorrecte. La resposta correcta era: "${dropdownCorrectAnswer}"`;
+                        dropdownFeedback.classList.remove("correct", "hidden");
+                        dropdownFeedback.classList.add("incorrect");
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadInlineQuestions();
+        });
+    </script>
+</body>
+</html>

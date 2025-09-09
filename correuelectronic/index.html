@@ -1,1 +1,528 @@
-v
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducció - El Correu Electrònic</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #374151; /* Dark gray text */
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #1f2937; /* Even darker gray for headings */
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .highlight-box {
+            background-color: #fefce8; /* Light yellow for warnings/tips */
+            border-left: 4px solid #facc15; /* Yellow border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .info-box {
+            background-color: #e0f2fe; /* Light blue for info */
+            border-left: 4px solid #38b2ac; /* Teal border */
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+        }
+        .interactive-button {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .interactive-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+        }
+        .exercise-option {
+            background-color: #e0e7ff; /* Light blue for options */
+            color: #374151;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .exercise-option:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .exercise-option.correct {
+            background-color: #d1fae5; /* Green for correct */
+            border: 2px solid #34d399;
+        }
+        .exercise-option.incorrect {
+            background-color: #fee2e2; /* Red for incorrect */
+            border: 2px solid #ef4444;
+        }
+        .exercise-feedback {
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .exercise-feedback.correct {
+            color: #059669; /* Green text */
+        }
+        .exercise-feedback.incorrect {
+            color: #dc2626; /* Red text */
+        }
+        /* Style for tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            border: 1px solid #d1d5db; /* Light gray border */
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #e5e7eb; /* Slightly darker gray for headers */
+            font-weight: 600;
+            color: #374151;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fafb; /* Lighter stripe for rows */
+        }
+        /* Icon styling (emojis for simplicity) */
+        .icon-clip::before { content: "📎"; margin-right: 0.5em; }
+        .icon-tag::before { content: "🏷️"; margin-right: 0.5em; }
+        .icon-archive::before { content: "📦"; margin-right: 0.5em; }
+        .icon-snooze::before { content: "⏰"; margin-right: 0.5em; }
+        .icon-star::before { content: "⭐"; margin-right: 0.5em; }
+        .icon-spam::before { content: "🚫"; margin-right: 0.5em; }
+        .icon-arrow::before { content: "⬇️"; margin-right: 0.5em; }
+        .icon-person::before { content: "👤"; margin-right: 0.5em; }
+        .icon-gear::before { content: "⚙️"; margin-right: 0.5em; }
+        .icon-link::before { content: "🔗"; margin-right: 0.5em; }
+        .icon-drive::before { content: "☁️"; margin-right: 0.5em; }
+        .icon-image::before { content: "🖼️"; margin-right: 0.5em; }
+        .icon-check::before { content: "✅"; margin-right: 0.5em; }
+        .icon-bulb::before { content: "💡"; margin-right: 0.5em; }
+        .icon-practice::before { content: "✍️"; margin-right: 0.5em; }
+        .icon-search::before { content: "🔍"; margin-right: 0.5em; }
+        .icon-filter::before { content: " funnel"; margin-right: 0.5em; } /* Using text for better clarity on filter icon */
+        .icon-reply::before { content: "↩️"; margin-right: 0.5em; }
+        .icon-users::before { content: "👥"; margin-right: 0.5em; }
+        .icon-block::before { content: "⛔"; margin-right: 0.5em; }
+        .icon-unread::before { content: "✉️"; margin-right: 0.5em; }
+        .icon-calendar::before { content: "🗓️"; margin-right: 0.5em; }
+
+        /* Styles for new matching exercise */
+        .matching-item {
+            background-color: #e0e7ff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            text-align: center;
+        }
+        .matching-item:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .matching-item.selected {
+            border: 2px solid #4f46e5;
+            background-color: #a5b4fc;
+        }
+        .matching-item.correct-match {
+            background-color: #d1fae5;
+            border: 2px solid #34d399;
+            pointer-events: none; /* Disable after correct match */
+            opacity: 0.7;
+        }
+        .matching-item.incorrect-match {
+            background-color: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .section-card {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            h3 {
+                font-size: 1.25rem;
+            }
+            .flex-col-mobile {
+                flex-direction: column;
+            }
+            .w-full-mobile {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="container bg-white rounded-xl shadow-lg p-6 sm:p-10 mt-8 mb-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">El Correu Electrònic</h1>
+            <p class="text-xl text-gray-600">Aprèn i Practica: Guia per la Competència Digital</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="mb-8 p-4 bg-indigo-100 rounded-lg shadow-inner">
+            <ul class="flex flex-wrap justify-center gap-4 text-indigo-800 font-medium">
+                <li><a href="index.html" class="hover:underline font-bold">Introducció</a></li>
+                <li><a href="redactar.html" class="hover:underline">Redactar un Correu</a></li>
+                <li><a href="gestionar.html" class="hover:underline">Gestionar el Correu</a></li>
+                <li><a href="seguretat.html" class="hover:underline">Seguretat</a></li>
+            </ul>
+        </nav>
+
+        <!-- Section: Què és el correu electrònic? -->
+        <section id="que-es" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-bulb mr-2"></span>1. Què és el correu electrònic?</h2>
+            <p class="mb-4">El correu electrònic és com una carta, però per internet. Ens permet enviar missatges, fotos i documents a altres persones, siguin on siguin, de forma ràpida i gratuïta. S'hi poden mantenir converses però normalment els missatges contenen més informació que no pas un parell de frases i no es llegeixen ni es responen al moment.</p>
+            <p class="mb-4">Pots enviar un correu des del teu ordinador, mòbil o tauleta. Per fer-ho, necessites una adreça de correu electrònic, que és com el teu número de telèfon per rebre missatges.</p>
+            <div class="highlight-box">
+                <p class="font-semibold text-yellow-800">✉️ Exemple d'adreça de correu electrònic:</p>
+                <code class="text-2xl block bg-white p-2 rounded mt-2"><strong>elmeunom</strong><span class="text-indigo-600 font-bold">@</span><strong>gmail.com</strong></code>
+                <ul class="list-disc list-inside mt-2">
+                    <li><code><strong>elmeunom</strong></code> és el teu nom d'usuari.</li>
+                    <li><span class="text-indigo-600 font-bold"><code>@</code></span> és la "arroba", que sempre va en una adreça de correu.</li>
+                    <li><code><strong>gmail.com</strong></code> és el "proveïdor de correu", és a dir, l'empresa que t'ofereix el servei.</li>
+                </ul>
+            </div>
+
+            <!-- Exercici Ràpid 1.1 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 1.1: Què és l'Arroba?</h3>
+            <div id="exercise-1-1" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q1-1-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q1-1-options" class="space-y-3">
+                    <!-- Options will be loaded by JS -->
+                </div>
+                <div id="q1-1-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+        </section>
+
+        <!-- Section: Quines aplicacions hi ha per al correu electrònic? -->
+        <section id="aplicacions" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-check mr-2"></span>2. Quines aplicacions hi ha per al correu electrònic?</h2>
+            <p class="mb-4">Hi ha moltes aplicacions (programes) que ens ajuden a enviar i rebre correus. Les més populars són:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="info-box flex items-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Icona de Gmail" class="rounded-md mr-4" width="60">
+                    <div>
+                        <p class="font-semibold text-blue-800 text-lg">Gmail:</p>
+                        <p>De Google. És molt usada i fàcil. Pots usar-la des del navegador web o una app.</p>
+                    </div>
+                </div>
+                <div class="info-box flex items-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg" alt="Icona d'Outlook" class="rounded-md mr-4" width="60">
+                    <div>
+                        <p class="font-semibold text-blue-800 text-lg">Outlook:</p>
+                        <p>De Microsoft. També és molt coneguda, sobretot en el món laboral.</p>
+                    </div>
+                </div>
+                <div class="info-box flex items-center">
+                    <img src="https://static.cdnlogo.com/logos/y/53/yahoo-icon.svg" alt="Icona de Yahoo Mail" class="rounded-md mr-4" width="60">
+                    <div>
+                        <p class="font-semibold text-blue-800 text-lg">Yahoo Mail:</p>
+                        <p>Una altra opció popular, amb molts anys d'experiència.</p>
+                    </div>
+                </div>
+                <div class="info-box flex items-center">
+                    <img src="https://static.cdnlogo.com/logos/m/37/mozilla-thunderbird.svg" alt="Icona de Thunderbird" class="rounded-md mr-4" width="60">
+                    <div>
+                        <p class="font-semibold text-blue-800 text-lg">Thunderbird:</p>
+                        <p>És un programa que pots instal·lar al teu ordinador per gestionar diversos correus, si tens accés directe al servidor i només a l'aplicació web.</p>
+                    </div>
+                </div>
+            </div>
+             <!-- Exercici General -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Posa a prova el que saps!</h3>
+            <div id="general-exercise-container" class="bg-indigo-100 p-4 rounded-lg mb-8">
+                <p id="general-question-text" class="text-lg font-semibold mb-4"></p>
+                <div id="general-options-container" class="space-y-3"></div>
+                <div id="general-feedback" class="exercise-feedback mt-4 hidden"></div>
+                <button id="general-next-question-button" class="interactive-button mt-6 w-full sm:w-auto">Següent pregunta</button>
+            </div>
+        </section>
+
+        <!-- Section: Com és l'aplicació del correu electrònic? -->
+        <section id="parts-app" class="section-card">
+            <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon-gear mr-2"></span>3. Com és l'aplicació del correu electrònic?</h2>
+            <p class="mb-4">Quan obres el teu correu, veuràs diferents seccions, com si fossin carpetes:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">📥 Bústia d'entrada (o "Safata d'entrada"):</p>
+                    <p>Aquí estan tots els correus que reps.</p>
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">📤 Elements enviats:</p>
+                    <p>Aquí estan tots els correus que tu has enviat.</p>
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">📝 Esborranys:</p>
+                    <p>Si comences un correu i no l'acabes, es guarda automàticament aquí perquè el puguis continuar més tard.</p>
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">🗑️ Brossa (o "Spam"):</p>
+                    <p>Aquí van els correus no desitjats o amb publicitat. És important revisar-ho de tant en tant, per si un correu important ha anat a parar aquí per error.</p>
+                </div>
+                <div class="info-box">
+                    <p class="font-semibold text-blue-800 text-lg">🚮 Paperera:</p>
+                    <p>Aquí van els correus que has esborrat. Normalment es queden un temps abans d'esborrar-se definitivament.</p>
+                </div>
+                <div class="info-box"><img src="captura1.PNG" alt="menú correu electrònic" class="rounded-md center-block mx-auto" style="max-width: 100%; height: auto;">
+                    <p class="text-sm text-gray-600 mt-2">Exemple de menú d'una aplicació de correu electrònic (Gmail).</p>
+
+                </div>
+            </div>
+
+            <!-- Exercici Ràpid 3.1 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 3.1: On arriben els correus?</h3>
+            <div id="exercise-3-1" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q3-1-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q3-1-options" class="space-y-3"></div>
+                <div id="q3-1-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+
+            <!-- Exercici Ràpid 3.2 -->
+            <h3 class="text-xl font-semibold mb-3 mt-8 text-indigo-700">Exercici Ràpid 3.2: Missatges enviats</h3>
+            <div id="exercise-3-2" class="bg-indigo-50 p-4 rounded-lg">
+                <p id="q3-2-text" class="text-lg font-semibold mb-4"></p>
+                <div id="q3-2-options" class="space-y-3"></div>
+                <div id="q3-2-feedback" class="exercise-feedback mt-4 hidden"></div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-10 pt-6 border-t border-gray-200 text-gray-500">
+            <p>&copy; 2025 Luis Romance MEI COMPETIC. Tots els drets reservats.</p>
+            <p>Materials educatius per a l'aprenentatge de la competència digital.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Inline Exercise Management ---
+        const inlineQuestions = {
+            "q1-1": {
+                question: "En una adreça de correu electrònic com 'usuari@domini.cat', què representa el símbol '@' (arroba)?",
+                options: [
+                    "El final del nom d'usuari.",
+                    "Separa el nom d'usuari del nom del proveïdor de correu.",
+                    "Indica el tipus de correu."
+                ],
+                correctAnswer: "Separa el nom d'usuari del nom del proveïdor de correu."
+            },
+            "q3-1": {
+                question: "Si reps un correu nou, on el trobaràs primer?",
+                options: [
+                    "Elements enviats.",
+                    "Esborranys.",
+                    "Bústia d'entrada."
+                ],
+                correctAnswer: "Bústia d'entrada."
+            },
+            "q3-2": {
+                question: "On es guarden els correus que TU has enviat a altres persones?",
+                options: [
+                    "A la Bústia d'entrada.",
+                    "A la Paperera.",
+                    "A la secció 'Elements enviats'."
+                ],
+                correctAnswer: "A la secció 'Elements enviats'."
+            }
+        };
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function checkInlineAnswer(questionId, selectedButton, correctAnswer) {
+            const optionsContainer = document.getElementById(questionId + "-options");
+            const feedbackElement = document.getElementById(questionId + "-feedback");
+
+            Array.from(optionsContainer.children).forEach(button => {
+                button.disabled = true;
+                button.style.cursor = "default";
+            });
+
+            if (selectedButton.textContent === correctAnswer) {
+                selectedButton.classList.add("correct");
+                feedbackElement.textContent = "✅ Correcte!";
+                feedbackElement.classList.remove("incorrect", "hidden");
+                feedbackElement.classList.add("correct");
+            } else {
+                selectedButton.classList.add("incorrect");
+                feedbackElement.textContent = `❌ Incorrecte. La resposta correcta era: "${correctAnswer}"`;
+                feedbackElement.classList.remove("correct", "hidden");
+                feedbackElement.classList.add("incorrect");
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) {
+                        button.classList.add("correct");
+                    }
+                });
+            }
+        }
+
+        function loadInlineQuestions() {
+            for (const id in inlineQuestions) {
+                const qData = inlineQuestions[id];
+                const qTextElement = document.getElementById(id + "-text");
+                const optionsContainer = document.getElementById(id + "-options");
+
+                if (qTextElement && optionsContainer) {
+                    qTextElement.textContent = qData.question;
+                    optionsContainer.innerHTML = ""; 
+
+                    const shuffledOptions = shuffleArray([...qData.options]);
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement("button");
+                        button.textContent = option;
+                        button.classList.add("exercise-option", "block", "w-full", "text-left");
+                        button.onclick = () => checkInlineAnswer(id, button, qData.correctAnswer);
+                        optionsContainer.appendChild(button);
+                    });
+                }
+            }
+        }
+
+        const generalExercises = [
+            {
+                question: "Quina de les següents NO és una aplicació popular de correu electrònic?",
+                options: [
+                    "Gmail.",
+                    "Outlook.",
+                    "WhatsApp.",
+                    "Yahoo Mail."
+                ],
+                correctAnswer: "WhatsApp."
+            },
+            {
+                question: "Quina part del correu electrònic ha de ser curta i clara per saber de què va el missatge abans d'obrir-lo?",
+                options: [
+                    "La salutació.",
+                    "El cos del missatge.",
+                    "L'assumpte.",
+                    "La signatura."
+                ],
+                correctAnswer: "L'assumpte."
+            }
+        ];
+
+        let currentGeneralQuestionIndex = 0;
+        let shuffledGeneralQuestions = [];
+
+        const generalQuestionText = document.getElementById("general-question-text");
+        const generalOptionsContainer = document.getElementById("general-options-container");
+        const generalFeedbackElement = document.getElementById("general-feedback");
+        const generalNextQuestionButton = document.getElementById("general-next-question-button");
+
+        function loadGeneralQuestion() {
+            if (shuffledGeneralQuestions.length === 0 || currentGeneralQuestionIndex >= shuffledGeneralQuestions.length) {
+                shuffledGeneralQuestions = shuffleArray([...generalExercises]);
+                currentGeneralQuestionIndex = 0;
+            }
+            const currentQuestion = shuffledGeneralQuestions[currentGeneralQuestionIndex];
+
+            if (generalQuestionText) {
+                generalQuestionText.textContent = currentQuestion.question;
+            }
+            if (generalOptionsContainer) {
+                generalOptionsContainer.innerHTML = "";
+            }
+            if (generalFeedbackElement) {
+                generalFeedbackElement.textContent = "";
+                generalFeedbackElement.classList.add("hidden");
+            }
+            if (generalNextQuestionButton) {
+                generalNextQuestionButton.textContent = "Següent pregunta";
+                generalNextQuestionButton.disabled = true;
+            }
+
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+
+            if (generalOptionsContainer) {
+                shuffledOptions.forEach(option => {
+                    const button = document.createElement("button");
+                    button.textContent = option;
+                    button.classList.add("exercise-option", "block", "w-full", "text-left");
+                    button.onclick = () => checkGeneralAnswer(option, currentQuestion.correctAnswer, button);
+                    generalOptionsContainer.appendChild(button);
+                });
+            }
+        }
+
+        function checkGeneralAnswer(selectedOption, correctAnswer, button) {
+            if (!generalOptionsContainer || !generalFeedbackElement || !generalNextQuestionButton) return;
+
+            Array.from(generalOptionsContainer.children).forEach(opt => {
+                opt.disabled = true;
+                opt.style.cursor = "default";
+            });
+
+            if (selectedOption === correctAnswer) {
+                button.classList.add("correct");
+                generalFeedbackElement.textContent = "✅ Correcte!";
+                generalFeedbackElement.classList.remove("incorrect", "hidden");
+                generalFeedbackElement.classList.add("correct");
+            } else {
+                button.classList.add("incorrect");
+                generalFeedbackElement.textContent = `❌ Incorrecte. La resposta correcta era: "${correctAnswer}"`;
+                generalFeedbackElement.classList.remove("correct", "hidden");
+                generalFeedbackElement.classList.add("incorrect");
+                Array.from(generalOptionsContainer.children).forEach(opt => {
+                    if (opt.textContent === correctAnswer) {
+                        opt.classList.add("correct");
+                    }
+                });
+            }
+            generalNextQuestionButton.disabled = false;
+        }
+
+        if (generalNextQuestionButton) {
+            generalNextQuestionButton.addEventListener("click", () => {
+                currentGeneralQuestionIndex++;
+                if (currentGeneralQuestionIndex >= shuffledGeneralQuestions.length) {
+                    alert("Has completat tots els exercicis! Comencem de nou amb preguntes barrejades.");
+                    shuffledGeneralQuestions = shuffleArray([...generalExercises]);
+                    currentGeneralQuestionIndex = 0;
+                }
+                loadGeneralQuestion();
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadInlineQuestions();
+            if (generalQuestionText) {
+                loadGeneralQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
