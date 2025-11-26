@@ -84,11 +84,20 @@
             font-family: 'Times New Roman', serif;
             font-style: italic;
         }
+        .download-box {
+            background-color: #e0f2f1; /* Verd suau per destacar */
+            color: #047878;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #2dd4bf;
+            font-weight: 600;
+            text-align: center;
+        }
     </style>
 </head>
-<body class="p-4 md:p-8 lg:p-12">
+<body class="flex flex-col min-h-screen">
 
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto flex-grow p-4 md:p-8 lg:p-12">
         
         <!-- HEADER -->
         <header class="header-gradient rounded-2xl p-8 md:p-12 text-center mb-10 shadow-lg">
@@ -112,30 +121,33 @@
                     <p class="text-slate-500 text-sm">Segons l'ordre de la Barra d'Eines</p>
                 </div>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-1/4">Funció</th>
-                            <th class="w-2/5">Descripció</th>
-                            <th class="w-1/3">On es troba?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Tipus de font</td><td>Escollir la família de la lletra (p. ex., Arial, Times New Roman, Inter).</td><td>Barra d'eines (el quadre desplegable de la font).</td></tr>
-                        <tr><td>Mida de la font</td><td>Canviar la grandària del text.</td><td>Barra d'eines (el quadre numèric, p. ex., 12).</td></tr>
-                        <tr><td>Negreta (B)</td><td>Fa la lletra més gruixuda i fosca per destacar-la.</td><td>Barra d'eines (icona <strong>B</strong>).</td></tr>
-                        <tr><td>Cursiva (I)</td><td>Inclina la lletra cap a la dreta.</td><td>Barra d'eines (icona <em>I</em>).</td></tr>
-                        <tr><td>Subratllat (U)</td><td>Posa una línia sota el text.</td><td>Barra d'eines (icona <u>U</u>).</td></tr>
-                        <tr><td>Ratllat <span class="asterisk">*</span></td><td>Traça una línia horitzontal sobre el text.</td><td>Menú Format > Text > Ratllat.</td></tr>
-                        <tr><td>Subíndex / Superíndex <span class="asterisk">*</span></td><td>Col·locar text lleugerament a dalt (<span class="formula">x²</span>) o a baix (<span class="formula">H₂O</span>) (p. ex., per a fórmules).</td><td>Menú Format > Text.</td></tr>
-                        <tr><td>Majúscules / Minúscules <span class="asterisk">*</span></td><td>Canviar la capitalització del text seleccionat (p. ex., TOT EN MAJÚSCULES o tot en minúscules).</td><td>Menú Format > Text > Ús de majúscules.</td></tr>
-                        <tr><td>Enllaç (Link)</td><td>Insereix un hipervincle al text seleccionat (p. ex., a una pàgina web).</td><td>Barra d'eines (icona d'una cadena).</td></tr>
-                        <tr><td>Color de text</td><td>Canviar el color de les lletres.</td><td>Barra d'eines (icona amb una A i una barra de color).</td></tr>
-                        <tr><td>Ressaltat de text</td><td>Posar un color de fons només darrere de les paraules escollides (com un subratllador fluorescent).</td><td>Barra d'eines (icona amb una A i un requadre de color darrere).</td></tr>
-                        <tr><td>Netejar format</td><td>Elimina tots els formats de text (negreta, color, mida, etc.), tornant al 'Text normal'.</td><td>Barra d'eines (icona Tx).</td></tr>
-                    </tbody>
-                </table>
+            <!-- Afegit p-6 i estil de vora al contenidor de la taula -->
+            <div class="p-6">
+                <div class="table-container border border-slate-200 rounded-lg">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-2/5">Descripció</th>
+                                <th class="w-1/3">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Tipus de font</td><td>Escollir la família de la lletra (p. ex., Arial, Times New Roman, Inter).</td><td>Barra d'eines (el quadre desplegable de la font).</td></tr>
+                            <tr><td>Mida de la font</td><td>Canviar la grandària del text.</td><td>Barra d'eines (el quadre numèric, p. ex., 12).</td></tr>
+                            <tr><td>Negreta (B)</td><td>Fa la lletra més gruixuda i fosca per destacar-la.</td><td>Barra d'eines (icona <strong>B</strong>).</td></tr>
+                            <tr><td>Cursiva (I)</td><td>Inclina la lletra cap a la dreta.</td><td>Barra d'eines (icona <em>I</em>).</td></tr>
+                            <tr><td>Subratllat (U)</td><td>Posa una línia sota el text.</td><td>Barra d'eines (icona <u>U</u>).</td></tr>
+                            <tr><td>Ratllat <span class="asterisk">*</span></td><td>Traça una línia horitzontal sobre el text.</td><td>Menú Format > Text > Ratllat.</td></tr>
+                            <tr><td>Subíndex / Superíndex <span class="asterisk">*</span></td><td>Col·locar text lleugerament a dalt (<span class="formula">x²</span>) o a baix (<span class="formula">H₂O</span>) (p. ex., per a fórmules).</td><td>Menú Format > Text.</td></tr>
+                            <tr><td>Majúscules / Minúscules <span class="asterisk">*</span></td><td>Canviar la capitalització del text seleccionat (p. ex., TOT EN MAJÚSCULES o tot en minúscules).</td><td>Menú Format > Text > Ús de majúscules.</td></tr>
+                            <tr><td>Enllaç (Link)</td><td>Insereix un hipervincle al text seleccionat (p. ex., a una pàgina web).</td><td>Barra d'eines (icona d'una cadena).</td></tr>
+                            <tr><td>Color de text</td><td>Canviar el color de les lletres.</td><td>Barra d'eines (icona amb una A i una barra de color).</td></tr>
+                            <tr><td>Ressaltat de text</td><td>Posar un color de fons només darrere de les paraules escollides (com un subratllador fluorescent).</td><td>Barra d'eines (icona amb una A i un requadre de color darrere).</td></tr>
+                            <tr><td>Netejar format</td><td>Elimina tots els formats de text (negreta, color, mida, etc.), tornant al 'Text normal'.</td><td>Barra d'eines (icona Tx).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -221,7 +233,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Encapçalament i peu de pàgina</td><td>Text o números que es repeteixen a dalt o a baix de les pàgines.</td><td>Menú Insereix > Capçaleres i números de pàgina. També es pot accedir fent doble clic sobre o sota el cos de la pàgina (als marges superior o inferior).</td></tr>
+                            <tr><td>Encapçalament i peu de pàgina</td><td>Text o números que es repeteixen a dalt o a baix de les pàgines.</td><td>Menú Insereix > Capçaleres i números de pàgina. També es pot accedir fent doble clic sobre o sota el cos de la pàgina (aos marges superior o inferior).</td></tr>
                             <tr><td>Diferents a primera pàgina</td><td>Fer que la primera pàgina (p. ex., la portada) tingui un encapçalament/peu de pàgina diferent o cap.</td><td>Feu doble clic a l'encapçalament/peu de pàgina i marqueu l'opció "Primera pàgina diferent".</td></tr>
                             <tr><td>Senars i parells diferents</td><td>Fer que les pàgines senars (1, 3, 5...) tinguin un format diferent de les parells (2, 4, 6...).</td><td>Feu doble clic a l'encapçalament/peu de pàgina, cliqueu a <strong>Opcions</strong> i marqueu "Pàgines senars i parells diferents" sota <strong>Format de capçalera</strong>.</td></tr>
                             <tr><td>Numeració de pàgina</td><td>Inserir el número de pàgina (amb opcions per començar diferent o saltar la primera pàgina).</td><td>Menú Insereix > Números de pàgina.</td></tr>
@@ -240,23 +252,26 @@
                     <p class="text-slate-500 text-sm">Control total sobre el disseny de files i columnes.</p>
                 </div>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-1/4">Funció</th>
-                            <th class="w-2/5">Descripció</th>
-                            <th class="w-1/3">On es troba?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Insereix Taula</td><td>Crea una taula nova amb el nombre de files i columnes seleccionat.</td><td>Menú Insereix > Taula.</td></tr>
-                        <tr><td>Afegir/Eliminar Columnes i Files</td><td>Canviar la mida de la taula.</td><td>Feu clic amb el botó dret del ratolí a qualsevol lloc de la taula, i trieu "Insereix fila/columna" o "Elimina fila/columna".</td></tr>
-                        <tr><td>Combina Cel·les</td><td>Ajuntar diverses cel·les en una de sola per crear capçaleres grans o dissenys complexos.</td><td>Seleccioneu les cel·les i feu clic amb el botó dret > Combina cel·les.</td></tr>
-                        <tr><td>Alçada de files</td><td>Augmentar o disminuir l'alçada d'una fila per donar més espai vertical al text.</td><td>Seleccioneu la fila i aneu a Menú Format > Taula > Propietats de la taula (o Botó dret > Propietats de la taula).</td></tr>
-                        <tr><td>Alineació vertical en una cel·la</td><td>Decidir si el text de la cel·la es col·loca a dalt, al centre o a baix de l'espai vertical.</td><td>Seleccioneu la cel·la i aneu a Menú Format > Taula > Propietats de la taula > Alineació vertical de la cel·la.</td></tr>
-                    </tbody>
-                </table>
+            <!-- Afegit p-6 i estil de vora al contenidor de la taula -->
+            <div class="p-6">
+                <div class="table-container border border-slate-200 rounded-lg">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-2/5">Descripció</th>
+                                <th class="w-1/3">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Insereix Taula</td><td>Crea una taula nova amb el nombre de files i columnes seleccionat.</td><td>Menú Insereix > Taula.</td></tr>
+                            <tr><td>Afegir/Eliminar Columnes i Files</td><td>Canviar la mida de la taula.</td><td>Feu clic amb el botó dret del ratolí a qualsevol lloc de la taula, i trieu "Insereix fila/columna" o "Elimina fila/columna".</td></tr>
+                            <tr><td>Combina Cel·les</td><td>Ajuntar diverses cel·les en una de sola per crear capçaleres grans o dissenys complexos.</td><td>Seleccioneu les cel·les i feu clic amb el botó dret > Combina cel·les.</td></tr>
+                            <tr><td>Alçada de files</td><td>Augmentar o disminuir l'alçada d'una fila per donar més espai vertical al text.</td><td>Seleccioneu la fila i aneu a Menú Format > Taula > Propietats de la taula (o Botó dret > Propietats de la taula).</td></tr>
+                            <tr><td>Alineació vertical en una cel·la</td><td>Decidir si el text de la cel·la es col·loca a dalt, al centre o a baix de l'espai vertical.</td><td>Seleccioneu la cel·la i aneu a Menú Format > Taula > Propietats de la taula > Alineació vertical de la cel·la.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -269,21 +284,24 @@
                     <p class="text-slate-500 text-sm">Estructura automàtica i taula de continguts.</p>
                 </div>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-1/4">Funció</th>
-                            <th class="w-2/5">Descripció</th>
-                            <th class="w-1/3">On es troba?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Estils (Títol 1, Títol 2, etc.)</td><td>Format ràpid i coherent per a títols i subtítols que estructura el document.</td><td>Barra d'eines (el quadre desplegable que diu 'Text normal' o 'Estils').</td></tr>
-                        <tr><td>Taula de Continguts</td><td>Crea automàticament un índex clicable dels vostres títols.</td><td>Menú Insereix > Taula de continguts.</td></tr>
-                        <tr><td>Columnes</td><td>Dividir el text de la pàgina en dues o més columnes.</td><td>Menú Format > Columnes.</td></tr>
-                    </tbody>
-                </table>
+            <!-- Afegit p-6 i estil de vora al contenidor de la taula -->
+            <div class="p-6">
+                <div class="table-container border border-slate-200 rounded-lg">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-2/5">Descripció</th>
+                                <th class="w-1/3">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Estils (Títol 1, Títol 2, etc.)</td><td>Format ràpid i coherent per a títols i subtítols que estructura el document.</td><td>Barra d'eines (el quadre desplegable que diu 'Text normal' o 'Estils').</td></tr>
+                            <tr><td>Taula de Continguts</td><td>Crea automàticament un índex clicable dels vostres títols.</td><td>Menú Insereix > Taula de continguts.</td></tr>
+                            <tr><td>Columnes</td><td>Dividir el text de la pàgina en dues o més columnes.</td><td>Menú Format > Columnes.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -295,21 +313,24 @@
                     <h2 class="text-xl font-bold">Inserir Elements Essencials</h2>
                 </div>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-1/4">Funció</th>
-                            <th class="w-2/5">Descripció</th>
-                            <th class="w-1/3">On es troba?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Inserir Imatges</td><td>Afegir una imatge des de l'ordinador, Drive o la web.</td><td>Menú Insereix > Imatge.</td></tr>
-                        <tr><td>Notes a peu de pàgina <span class="asterisk">*</span></td><td>Afegir una petita nota o referència al final de la pàgina.</td><td>Menú Insereix > Nota a peu de pàgina (Ctrl+Alt+F).</td></tr>
-                        <tr><td>Filigranes (Watermark) <span class="asterisk">*</span></td><td>Posar una imatge o text semitransparent darrere el contingut de cada pàgina (p. ex., 'Esborrany').</td><td>Menú Insereix > Filigrana.</td></tr>
-                    </tbody>
-                </table>
+            <!-- Afegit p-6 i estil de vora al contenidor de la taula -->
+            <div class="p-6">
+                <div class="table-container border border-slate-200 rounded-lg">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-2/5">Descripció</th>
+                                <th class="w-1/3">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Inserir Imatges</td><td>Afegir una imatge des de l'ordinador, Drive o la web.</td><td>Menú Insereix > Imatge.</td></tr>
+                            <tr><td>Notes a peu de pàgina <span class="asterisk">*</span></td><td>Afegir una petita nota o referència al final de la pàgina.</td><td>Menú Insereix > Nota a peu de pàgina (Ctrl+Alt+F).</td></tr>
+                            <tr><td>Filigranes (Watermark) <span class="asterisk">*</span></td><td>Posar una imatge o text semitransparent darrere el contingut de cada pàgina (p. ex., 'Esborrany').</td><td>Menú Insereix > Filigrana.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -322,34 +343,55 @@
                     <p class="text-slate-500 text-sm">Funcions per col·laborar i gestionar fitxers.</p>
                 </div>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="w-1/4">Funció</th>
-                            <th class="w-2/5">Descripció</th>
-                            <th class="w-1/3">On es troba?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Canviar el nom del document</td><td>Posar un títol clar al document.</td><td>Part superior esquerra del document.</td></tr>
-                        <tr><td>Compartir document</td><td>Donar accés a altres usuaris per visualitzar, comentar o editar el fitxer.</td><td>Botó <strong>Compartir</strong> a la cantonada superior dreta.</td></tr>
-                        <tr><td>Fes una còpia</td><td>Crear una còpia de seguretat o una versió nova per editar-la per separat.</td><td>Menú Fitxer > Fes una còpia.</td></tr>
-                        <tr><td>Moure document</td><td>Organitzar el document al vostre Google Drive.</td><td>Menú Fitxer > Moure.</td></tr>
-                        <tr><td>Mostra caràcters no imprimibles</td><td>Visualitza els caràcters de format ocults com espais (punts), tabulacions (fletxes) i salts de paràgraf (¶) per depurar problemes d'espaiat i disseny.</td><td>Menú Visualitza > Mostra caràcters no imprimibles.</td></tr>
-                        <tr><td>Cerca i substitueix</td><td>Cercar una paraula o frase i reemplaçar-la per una altra a tot el document.</td><td>Menú Edita > Cerca i substitueix (Ctrl+H).</td></tr>
-                        <tr><td>Obre document</td><td>Permet obrir un document existent des del vostre Google Drive o des del vostre dispositiu.</td><td>Menú Fitxer > Obre... (Ctrl+O).</td></tr>
-                        <tr><td>Descarrega</td><td>Guardar una còpia al vostre ordinador (p. ex., PDF, .docx, etc.).</td><td>Menú Fitxer > Descarrega.</td></tr>
-                        <tr><td>Idioma del document</td><td>Canviar l'idioma principal per a les correccions ortogràfiques i gramaticals.</td><td>Menú Fitxer > Idioma.</td></tr>
-                        <tr><td>Traducció del document</td><td>Traduir el document sencer a un altre idioma automàticament, creant una nova còpia.</td><td>Menú Eines > Tradueix el document.</td></tr>
-                        <tr><td>Dictat per veu <span class="asterisk">*</span></td><td>Parleu i Google Docs escriu.</td><td>Menú Eines > Dictat per veu (Ctrl+Majús+S).</td></tr>
-                        <tr><td>Comptador de paraules <span class="asterisk">*</span></td><td>Mostra el nombre de paraules, caràcters i pàgines del document.</td><td>Menú Eines > Comptador de paraules (Ctrl+Majús+C).</td></tr>
-                    </tbody>
-                </table>
+            <!-- Afegit p-6 i estil de vora al contenidor de la taula -->
+            <div class="p-6">
+                <div class="table-container border border-slate-200 rounded-lg">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-2/5">Descripció</th>
+                                <th class="w-1/3">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Canviar el nom del document</td><td>Posar un títol clar al document.</td><td>Part superior esquerra del document.</td></tr>
+                            <tr><td>Compartir document</td><td>Donar accés a altres usuaris per visualitzar, comentar o editar el fitxer.</td><td>Botó <strong>Compartir</strong> a la cantonada superior dreta.</td></tr>
+                            <tr><td>Fes una còpia</td><td>Crear una còpia de seguretat o una versió nova per editar-la per separat.</td><td>Menú Fitxer > Fes una còpia.</td></tr>
+                            <tr><td>Moure document</td><td>Organitzar el document al vostre Google Drive.</td><td>Menú Fitxer > Moure.</td></tr>
+                            <tr><td>Mostra caràcters no imprimibles</td><td>Visualitza els caràcters de format ocults com espais (punts), tabulacions (fletxes) i salts de paràgraf (¶) per depurar problemes d'espaiat i disseny.</td><td>Menú Visualitza > Mostra caràcters no imprimibles.</td></tr>
+                            <tr><td>Cerca i substitueix</td><td>Cercar una paraula o frase i reemplaçar-la per una altra a tot el document.</td><td>Menú Edita > Cerca i substitueix (Ctrl+H).</td></tr>
+                            <tr><td>Obre document</td><td>Permet obrir un document existent des del vostre Google Drive o des del vostre dispositiu.</td><td>Menú Fitxer > Obre... (Ctrl+O).</td></tr>
+                            <tr><td>Descarrega</td><td>Guardar una còpia al vostre ordinador (p. ex., PDF, .docx, etc.).</td><td>Menú Fitxer > Descarrega.</td></tr>
+                            <tr><td>Idioma del document</td><td>Canviar l'idioma principal per a les correccions ortogràfiques i gramaticals.</td><td>Menú Fitxer > Idioma.</td></tr>
+                            <tr><td>Traducció del document</td><td>Traduir el document sencer a un altre idioma automàticament, creant una nova còpia.</td><td>Menú Eines > Tradueix el document.</td></tr>
+                            <tr><td>Dictat per veu <span class="asterisk">*</span></td><td>Parleu i Google Docs escriu.</td><td>Menú Eines > Dictat per veu (Ctrl+Majús+S).</td></tr>
+                            <tr><td>Comptador de paraules <span class="asterisk">*</span></td><td>Mostra el nombre de paraules, caràcters i pàgines del document.</td><td>Menú Eines > Comptador de paraules (Ctrl+Majús+C).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
+        <!-- NOU: Enllaç de descàrrega PDF -->
+        <div class="download-box mt-10 max-w-2xl mx-auto">
+            Si vols, pots descarregar aquest document en PDF:
+            <a href="https://drive.google.com/file/d/1qf8e99mhSNMnbz6h-LyLyKOJtY2ZfTkv/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:text-blue-900 underline font-bold transition duration-200 ml-2">
+                Descarrega PDF (Google Drive)
+            </a>
+        </div>
+
     </div>
+
+    <!-- NOU: Peu de pàgina (Footer) -->
+    <footer class="text-center text-gray-500 text-sm mt-8 p-4 bg-white border-t border-gray-200">
+        <p>
+            &copy; Luis Romance / 
+            <a href="https://www.cfalapau.cat" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">
+                www.cfalapau.cat
+            </a>
+        </p>
+    </footer>
 
 </body>
 </html>
