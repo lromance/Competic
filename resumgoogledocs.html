@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Google Docs (COMPETIC C4)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        h1, h2, h3 {
+            color: #1e3a8a; /* Blau fosc elegant */
+        }
+        .section-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border-top: 4px solid #3b82f6; /* Accent blau */
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        th {
+            background-color: #eff6ff;
+            color: #1e40af;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid #bfdbfe;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .highlight-box {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+        .code-snippet {
+            font-family: monospace;
+            background-color: #f3f4f6;
+            padding: 2px 4px;
+            border-radius: 4px;
+            color: #db2777;
+        }
+        /* Estil per a les llistes de definicions */
+        .def-list dt {
+            font-weight: 600;
+            color: #111827;
+            margin-top: 0.5rem;
+        }
+        .def-list dd {
+            margin-left: 0;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- HEADER -->
+        <header class="text-center mb-10">
+            <div class="inline-block p-2 px-4 rounded-full bg-blue-100 text-blue-800 text-sm font-semibold mb-2 shadow-sm">
+                COMPETIC C4
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold mb-4 text-blue-900 tracking-tight">
+                Eina essencial: Google Docs
+            </h1>
+            <p class="text-xl text-gray-600 font-light">Guia Completa per al Tractament de la Informació Escrita</p>
+        </header>
+
+        <!-- INTRODUCCIÓ -->
+        <div class="bg-white p-6 rounded-xl shadow-sm mb-8 border border-gray-100">
+            <div class="flex items-start gap-4">
+                <div class="text-4xl">👋</div>
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800 mb-2">Benvinguts i Benvingudes!</h2>
+                    <p class="text-gray-600 leading-relaxed">
+                        Sóc el vostre Docent MEI COMPETIC i us felicito per la vostra dedicació. Hem recopilat totes les funcions de Google Docs en aquesta guia completa. Això us permetrà complir amb els indicadors més avançats de la competència C4, demostrant que sou capaços de configurar i donar format adequat a un document usant de manera eficaç les principals utilitats d'un processador de textos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓ 1: DEFINICIONS -->
+        <section class="section-card">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>📌</span> El Català i el Processador de Textos
+                </h2>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                    <dl class="def-list grid md:grid-cols-[auto_1fr] gap-x-4 items-baseline">
+                        <dt>Alçada:</dt>
+                        <dd>Distància de dalt a baix.</dd>
+                        
+                        <dt>Cel·la:</dt>
+                        <dd>El quadre petit on es creuen una fila i una columna a la taula.</dd>
+                        
+                        <dt>Encapçalament:</dt>
+                        <dd>Informació que es repeteix a la part superior de cada pàgina.</dd>
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓ 2: FORMAT DE TEXT -->
+        <section class="section-card">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span>📝</span> Format de Text
+                </h2>
+                <p class="text-gray-500 text-sm mt-1">Segons l'ordre de la Barra d'Eines</p>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Funció</th>
+                            <th class="w-1/2">Descripció</th>
+                            <th class="w-1/4">On es troba?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Tipus de font</td><td>Escollir la família de la lletra (p. ex., Arial, Inter).</td><td>Barra d'eines (desplegable).</td></tr>
+                        <tr><td>Mida de la font</td><td>Canviar la grandària del text.</td><td>Barra d'eines (número, p. ex., 11).</td></tr>
+                        <tr><td>Negreta (B)</td><td>Fa la lletra més gruixuda i fosca.</td><td>Barra d'eines (icona <strong>B</strong>).</td></tr>
+                        <tr><td>Cursiva (I)</td><td>Inclina la lletra cap a la dreta.</td><td>Barra d'eines (icona <em>I</em>).</td></tr>
+                        <tr><td>Subratllat (U)</td><td>Posa una línia sota el text.</td><td>Barra d'eines (icona <u>U</u>).</td></tr>
+                        <tr><td>Ratllat</td><td>Traça una línia horitzontal sobre el text.</td><td>Menú Format > Text > Ratllat.</td></tr>
+                        <tr><td>Subíndex / Superíndex</td><td>Col·locar text a dalt (x²) o a baix (H₂O).</td><td>Menú Format > Text.</td></tr>
+                        <tr><td>Majúscules / Minúscules</td><td>Canviar la capitalització del text seleccionat.</td><td>Menú Format > Text > Ús de majúscules.</td></tr>
+                        <tr><td>Enllaç (Link)</td><td>Insereix un hipervincle (web).</td><td>Barra d'eines (icona cadena).</td></tr>
+                        <tr><td>Color de text</td><td>Canviar el color de les lletres.</td><td>Barra d'eines (icona A amb barra).</td></tr>
+                        <tr><td>Ressaltat de text</td><td>Color de fons darrere les paraules (fluorescent).</td><td>Barra d'eines (icona A amb requadre).</td></tr>
+                        <tr><td>Netejar format</td><td>Elimina tots els formats, torna a 'Text normal'.</td><td>Barra d'eines (icona Tx).</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓ 3: PARÀGRAF I PÀGINA -->
+        <section class="section-card">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span>📃</span> Format de Paràgraf i Pàgina (Avançat)
+                </h2>
+            </div>
+            
+            <div class="p-6 bg-gray-50 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3">Alineació, Llistes i Interlineat</h3>
+                <div class="table-container bg-white rounded-lg shadow-sm border border-gray-200">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-1/2">Descripció</th>
+                                <th class="w-1/4">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Alineació</td><td>Esquerra, centre, dreta o justificat.</td><td>Barra d'eines (línies).</td></tr>
+                            <tr><td>Interlineat</td><td>Espai vertical entre línies (senzill, 1.5).</td><td>Barra d'eines (fletxes verticals).</td></tr>
+                            <tr><td>Llista amb punts</td><td>Llista no ordenada (pics o vinyetes).</td><td>Barra d'eines (tres punts).</td></tr>
+                            <tr><td>Llista numerada</td><td>Llista ordenada (números o lletres).</td><td>Barra d'eines (números).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-6 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3">Format de Paràgraf (Avançat)</h3>
+                <div class="table-container bg-white rounded-lg shadow-sm border border-gray-200">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-1/2">Descripció</th>
+                                <th class="w-1/4">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Sagnat de primera fila</td><td>Moure només la primera línia a la dreta.</td><td>Regle superior o Menú Format.</td></tr>
+                            <tr><td>Sagnats</td><td>Distància respecte al marge <strong>esquerre</strong> o <strong>dret</strong>.</td><td>Menú Format > Alineació i sagnat.</td></tr>
+                            <tr><td>Espaiat de paràgraf</td><td>Espai addicional <strong>abans</strong> o <strong>després</strong> del paràgraf.</td><td>Menú Format > Interlineat i espaiat.</td></tr>
+                            <tr><td>Fons i vores</td><td>Afegir ombrejat o línies al paràgraf.</td><td>Menú Format > Paràgraf i estils.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3">Configuració de la Pàgina</h3>
+                <div class="table-container bg-white rounded-lg shadow-sm border border-gray-200">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-1/2">Descripció</th>
+                                <th class="w-1/4">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Marges</td><td>Mida dels marges (superior, inferior, esquerre, dret).</td><td>Menú Fitxer > Config. pàgina.</td></tr>
+                            <tr><td>Orientació</td><td>Vertical o horitzontal (apaisada/<strong>landscape</strong>).</td><td>Menú Fitxer > Config. pàgina.</td></tr>
+                            <tr><td>Color de fons</td><td>Color del "paper" virtual.</td><td>Menú Fitxer > Config. pàgina.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3">Encapçalament i Peu de Pàgina</h3>
+                <div class="table-container bg-white rounded-lg shadow-sm border border-gray-200">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="w-1/4">Funció</th>
+                                <th class="w-1/2">Descripció</th>
+                                <th class="w-1/4">On es troba?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Encapçalament i peu</td><td>Text repetit a dalt/baix de cada pàgina.</td><td>Insereix > Capçaleres (o <strong>Doble clic</strong> al marge).</td></tr>
+                            <tr><td>Diferents a 1a pàgina</td><td>Format diferent per a la portada.</td><td>Doble clic header > "Primera pàgina diferent".</td></tr>
+                            <tr><td>Senars/Parells diferents</td><td>Format altern per pàgines esquerra/dreta.</td><td>Doble clic > <strong>Opcions</strong> > Format de capçalera.</td></tr>
+                            <tr><td>Numeració de pàgina</td><td>Inserir número automàtic.</td><td>Menú Insereix > Números de pàgina.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓ 4: TAULES -->
+        <section class="section-card">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span>📐</span> Taules Avançades
+                </h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Funció</th>
+                            <th class="w-1/2">Descripció</th>
+                            <th class="w-1/4">On es troba?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Insereix Taula</td><td>Crea taula amb X files i Y columnes.</td><td>Menú Insereix > Taula.</td></tr>
+                        <tr><td>Afegir/Eliminar</td><td>Modificar estructura (files/columnes).</td><td>Botó dret sobre la taula.</td></tr>
+                        <tr><td>Combina Cel·les</td><td>Unir cel·les (per títols).</td><td>Seleccionar > Botó dret > Combina.</td></tr>
+                        <tr><td>Alçada de files</td><td>Espai vertical de la fila.</td><td>Botó dret > Propietats de la taula.</td></tr>
+                        <tr><td>Alineació vertical</td><td>Text a dalt, centre o baix de la cel·la.</td><td>Botó dret > Propietats > Alineació cel·la.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓ 5: ESTILS -->
+        <section class="section-card">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span>✨</span> Estils i Organització
+                </h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Funció</th>
+                            <th class="w-1/2">Descripció</th>
+                            <th class="w-1/4">On es troba?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Estils</td><td>Format ràpid (Títol 1, Títol 2).</td><td>Barra d'eines (desplegable 'Text normal').</td></tr>
+                        <tr><td>Taula de Continguts</td><td>Índex automàtic i clicable.</td><td>Menú Insereix > Taula de continguts.</td></tr>
+                        <tr><td>Columnes</td><td>Dividir text en columnes periodístiques.</td><td>Menú Format > Columnes.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓ 6: INSERIR -->
+        <section class="section-card">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span>🖼️</span> Inserir Elements Essencials
+                </h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Funció</th>
+                            <th class="w-1/2">Descripció</th>
+                            <th class="w-1/4">On es troba?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Inserir Imatges</td><td>Des de l'ordinador, Drive o web.</td><td>Menú Insereix > Imatge.</td></tr>
+                        <tr><td>Notes a peu</td><td>Referència al final de la pàgina.</td><td>Menú Insereix > Nota a peu (Ctrl+Alt+F).</td></tr>
+                        <tr><td>Filigranes</td><td>Imatge/text de fons (watermark).</td><td>Menú Insereix > Filigrana.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓ 7: GESTIÓ (ORDRE ESPECÍFIC) -->
+        <section class="section-card">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span>💬</span> Eines i Gestió de Documents
+                </h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">Funció</th>
+                            <th class="w-1/2">Descripció</th>
+                            <th class="w-1/4">On es troba?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Canviar el nom</td><td>Posar títol al document.</td><td>Part superior esquerra.</td></tr>
+                        <tr><td>Compartir</td><td>Donar accés a altres usuaris.</td><td>Botó <strong>Compartir</strong> (dalt dreta).</td></tr>
+                        <tr><td>Fes una còpia</td><td>Duplicar el document.</td><td>Menú Fitxer > Fes una còpia.</td></tr>
+                        <tr><td>Moure document</td><td>Organitzar a Drive.</td><td>Menú Fitxer > Moure.</td></tr>
+                        <tr><td>Obre document</td><td>Obrir fitxer existent.</td><td>Menú Fitxer > Obre (Ctrl+O).</td></tr>
+                        <tr><td>Descarrega</td><td>Guardar com PDF, Docx, etc.</td><td>Menú Fitxer > Descarrega.</td></tr>
+                        <tr><td>Idioma</td><td>Configuració correcció ortogràfica.</td><td>Menú Fitxer > Idioma.</td></tr>
+                        <tr><td>Traducció</td><td>Crear còpia traduïda automàticament.</td><td>Menú Eines > Tradueix.</td></tr>
+                        <tr><td>Cerca i substitueix</td><td>Trobar i canviar text massivament.</td><td>Menú Edita > Cerca i substitueix.</td></tr>
+                        <tr><td>Caràcters no imprimibles</td><td>Veure espais, salts (¶).</td><td>Menú Visualitza > Mostra caràcters...</td></tr>
+                        <tr><td>Dictat per veu</td><td>Escriure parlant.</td><td>Menú Eines > Dictat per veu.</td></tr>
+                        <tr><td>Comptador paraules</td><td>Estadístiques del document.</td><td>Menú Eines > Comptador de paraules.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- EXERCICI PRÀCTIC -->
+        <section class="bg-indigo-600 text-white rounded-xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span class="bg-white text-indigo-600 rounded-full p-1 text-sm">🛠️</span> 
+                Exercici Pràctic Final
+            </h2>
+            <div class="bg-indigo-700 bg-opacity-50 rounded-lg p-6">
+                <ul class="space-y-4 list-disc list-inside">
+                    <li>Crea un document nou.</li>
+                    <li>Aplica color de fons <strong>blau clar</strong> al document.</li>
+                    <li><strong>Insereix una imatge</strong> i aplica-li un ajust de text.</li>
+                    <li>Insereix una taula de 3x3. <strong>Combina les tres cel·les de la primera fila</strong>.</li>
+                    <li>Afegeix una nova columna a la dreta i elimina una fila.</li>
+                    <li>Prova l'alineació vertical al <strong>centre</strong> en una de les cel·les.</li>
+                    <li>Configura un encapçalament diferent a la <strong>primera pàgina</strong> (deixa'l buit) i un encapçalament normal a la resta.</li>
+                </ul>
+            </div>
+            <div class="mt-6 text-center text-indigo-200 text-sm font-medium">
+                Docent MEI COMPETIC | C4 Assolida amb èxit 🚀
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>
