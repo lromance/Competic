@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Velocitat d'Escriptura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .char-correct {
+            color: #10b981; /* Green */
+            background-color: #d1fae5;
+        }
+
+        .char-wrong {
+            color: #ef4444; /* Red */
+            background-color: #fee2e2;
+            text-decoration: underline;
+        }
+
+        .char-current {
+            border-left: 2px solid #3b82f6;
+            animation: blink 1s infinite;
+        }
+
+        .char-default {
+            color: #6b7280; /* Gray */
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: #3b82f6; }
+            50% { border-color: transparent; }
+        }
+
+        /* Hide scrollbar for text area but allow scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-slate-800">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-slate-900 text-white p-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center gap-3 mb-4 md:mb-0">
+                <i class="fa-solid fa-keyboard text-3xl text-blue-400"></i>
+                <div>
+                    <h1 class="text-2xl font-bold">MecaTest Estudiant</h1>
+                    <p class="text-slate-400 text-sm">Comprova si estàs preparat per treballar amb comoditat</p>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="flex bg-slate-800 rounded-lg p-1">
+                <button onclick="setTime(60)" id="btn-1min" class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-blue-600 text-white">1 Minut</button>
+                <button onclick="setTime(120)" id="btn-2min" class="px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-300 hover:text-white">2 Minuts</button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="bg-blue-50 p-4 border-b border-blue-100 flex justify-around items-center">
+            <div class="text-center">
+                <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Temps</p>
+                <p id="timer" class="text-3xl font-bold text-slate-800 mono-font">60s</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">PPM (Velocitat)</p>
+                <p id="wpm-live" class="text-3xl font-bold text-blue-600 mono-font">0</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Precisió</p>
+                <p id="accuracy-live" class="text-3xl font-bold text-green-600 mono-font">100%</p>
+            </div>
+        </div>
+
+        <!-- Typing Area -->
+        <div class="p-8 relative">
+            
+            <!-- Instructions Overlay (Visible initially) -->
+            <div id="start-overlay" class="absolute inset-0 z-10 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-b-2xl">
+                <div class="text-center max-w-md p-6">
+                    <div class="mb-4 text-blue-500 text-5xl">
+                        <i class="fa-solid fa-play-circle"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-2">Fes clic aquí per començar</h2>
+                    <p class="text-slate-600 mb-6">Comença a escriure tan bon punt desaparegui aquest missatge. El temps començarà a comptar amb la primera tecla que premis.</p>
+                    <button onclick="prepareTest()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold shadow-lg transition transform hover:scale-105">
+                        Activar Teclat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Text Display (Visual Reference) -->
+            <div id="text-display" class="mono-font text-xl md:text-2xl leading-relaxed text-slate-400 mb-6 select-none h-48 overflow-y-auto no-scrollbar p-4 border rounded-lg bg-slate-50 border-slate-200">
+                <!-- Text will be injected here -->
+            </div>
+
+            <!-- Input Area (Hidden transparency but active) -->
+            <textarea id="input-field" class="w-full p-4 border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-xl mono-font text-transparent bg-transparent absolute top-8 left-8 h-48 -z-10 opacity-0" spellcheck="false" autocomplete="off"></textarea>
+            
+            <p class="text-center text-slate-400 text-sm mt-4">
+                <i class="fa-solid fa-info-circle mr-1"></i> No miris el teclat. Centra't en la precisió més que en la velocitat.
+            </p>
+            
+            <div class="flex justify-center mt-4">
+                 <button onclick="resetTest()" class="text-slate-500 hover:text-slate-800 text-sm flex items-center gap-2 px-4 py-2 rounded border border-slate-200 hover:bg-white hover:shadow-sm transition">
+                    <i class="fa-solid fa-rotate-right"></i> Reiniciar prova
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="fixed inset-0 z-50 bg-slate-900/80 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all scale-100">
+            <div class="bg-blue-600 p-6 text-center text-white">
+                <h2 class="text-3xl font-bold mb-1">Resultats</h2>
+                <p class="text-blue-100">Resum de la teva sessió</p>
+            </div>
+            
+            <div class="p-8">
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="text-center p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <p class="text-sm text-slate-500 uppercase font-bold">Velocitat Final</p>
+                        <p id="final-wpm" class="text-4xl font-extrabold text-slate-800">0</p>
+                        <p class="text-xs text-slate-400">Paraules/minut</p>
+                    </div>
+                    <div class="text-center p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <p class="text-sm text-slate-500 uppercase font-bold">Precisió</p>
+                        <p id="final-accuracy" class="text-4xl font-extrabold text-slate-800">0%</p>
+                        <p class="text-xs text-slate-400">Encerts vs Errors</p>
+                    </div>
+                </div>
+
+                <!-- Evaluation Message -->
+                <div id="evaluation-box" class="mb-8 p-4 rounded-lg bg-blue-50 border border-blue-100">
+                    <h3 id="eval-title" class="font-bold text-lg text-blue-800 mb-1">Títol Avaluació</h3>
+                    <p id="eval-desc" class="text-slate-700 text-sm">Descripció avaluació...</p>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="closeModalAndReset()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg">
+                        Tornar a provar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & Data ---
+        const texts = [
+            "La tecnologia ha transformat profundament la nostra manera de viure i de treballar. Avui dia, saber utilitzar un teclat amb agilitat és gairebé tan important com saber escriure a mà. Els estudiants que dominen la mecanografia tenen un avantatge significatiu a l'hora de prendre apunts a classe o redactar treballs acadèmics. No es tracta només de velocitat, sinó de comoditat mental: quan els dits troben les tecles sense mirar, el cervell es pot centrar completament en el contingut i les idees, evitant interrupcions constants.",
+            "L'aprenentatge és un procés continu que no s'acaba quan sortim de l'escola o la universitat. En el món professional modern, la capacitat d'adaptar-se a noves eines digitals és fonamental. Escriure ràpidament permet gestionar el correu electrònic de manera eficient, programar codi sense frustracions o comunicar-se amb companys en temps real. La pràctica constant és la clau de l'èxit. Dedicar uns minuts cada dia a millorar la tècnica pot estalviar centenars d'hores al llarg de l'any.",
+            "La història de la informàtica està plena de grans innovacions que han canviat el món. Des dels primers ordinadors gegants que ocupaven habitacions senceres fins als dispositius mòbils que portem a la butxaca, l'evolució ha estat constant. Tanmateix, el teclat QWERTY, dissenyat originalment per a les màquines d'escriure mecàniques per evitar que les tecles s'encallessin, ha perdurat com l'estàndard principal. Encara que existeixen dissenys més eficients, el costum i la tradició fan que sigui difícil canviar un sistema tan arrelat."
+        ];
+
+        let timeLimit = 60;
+        let timeLeft = timeLimit;
+        let timer = null;
+        let isRunning = false;
+        let currentText = "";
+        let inputField = document.getElementById('input-field');
+        let textDisplay = document.getElementById('text-display');
+        let timerDisplay = document.getElementById('timer');
+        let wpmDisplay = document.getElementById('wpm-live');
+        let accuracyDisplay = document.getElementById('accuracy-live');
+        let startOverlay = document.getElementById('start-overlay');
+        let resultsModal = document.getElementById('results-modal');
+        let currentTextIndex = 0;
+
+        // --- Core Functions ---
+
+        function setTime(seconds) {
+            if(isRunning) return;
+            timeLimit = seconds;
+            timeLeft = seconds;
+            timerDisplay.innerText = timeLeft + "s";
+            
+            // UI Toggle
+            document.getElementById('btn-1min').className = seconds === 60 ? "px-4 py-2 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-300 hover:text-white";
+            document.getElementById('btn-2min').className = seconds === 120 ? "px-4 py-2 rounded-md text-sm font-medium transition-all bg-blue-600 text-white" : "px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-300 hover:text-white";
+        }
+
+        function getRandomText() {
+            // Combine all texts if user selects 2 mins to ensure enough content, or loop randoms
+            if (timeLimit > 60) {
+                return texts.join(" "); 
+            }
+            return texts[Math.floor(Math.random() * texts.length)];
+        }
+
+        function prepareTest() {
+            currentText = getRandomText();
+            inputField.value = "";
+            inputField.disabled = false;
+            renderText();
+            startOverlay.classList.add('hidden');
+            inputField.focus();
+            
+            // Add listener just once or reset it
+            inputField.removeEventListener('input', handleInput);
+            inputField.addEventListener('input', handleInput);
+            
+            // The timer starts on first keypress inside handleInput
+        }
+
+        function resetTest() {
+            clearInterval(timer);
+            timer = null;
+            isRunning = false;
+            timeLeft = timeLimit;
+            timerDisplay.innerText = timeLeft + "s";
+            wpmDisplay.innerText = "0";
+            accuracyDisplay.innerText = "100%";
+            inputField.value = "";
+            inputField.disabled = true;
+            startOverlay.classList.remove('hidden');
+            resultsModal.classList.add('hidden');
+            resultsModal.classList.remove('flex');
+        }
+
+        function closeModalAndReset() {
+            resetTest();
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft + "s";
+                
+                // Live WPM Calc
+                calculateStats();
+
+                if (timeLeft <= 0) {
+                    finishTest();
+                }
+            }, 1000);
+        }
+
+        function renderText() {
+            textDisplay.innerHTML = '';
+            currentText.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                span.className = 'char-default';
+                textDisplay.appendChild(span);
+            });
+        }
+
+        function handleInput() {
+            if (!isRunning && inputField.value.length > 0) {
+                startTimer();
+            }
+
+            const inputChars = inputField.value.split('');
+            const textSpans = textDisplay.querySelectorAll('span');
+            
+            // Auto scroll logic
+            let currentSpan = textSpans[inputChars.length];
+            if(currentSpan) {
+                // Ensure the current character is visible (simple scroll)
+                if (currentSpan.offsetTop > textDisplay.scrollTop + textDisplay.clientHeight - 40) {
+                    textDisplay.scrollTop = currentSpan.offsetTop - 40;
+                }
+            }
+
+            // Highlighting Logic
+            textSpans.forEach((span, index) => {
+                const char = inputChars[index];
+                
+                // Clear blinking cursor from all
+                span.classList.remove('char-current');
+
+                if (char == null) {
+                    span.className = 'char-default'; // Not typed yet
+                } else if (char === span.innerText) {
+                    span.className = 'char-correct'; // Correct
+                } else {
+                    span.className = 'char-wrong'; // Incorrect
+                }
+            });
+
+            // Add cursor to next char
+            if (inputChars.length < textSpans.length) {
+                textSpans[inputChars.length].classList.add('char-current');
+            }
+
+            // If finished text early
+            if (inputField.value.length >= currentText.length) {
+                finishTest();
+            }
+        }
+
+        function calculateStats() {
+            const inputVal = inputField.value;
+            const targetVal = currentText.substring(0, inputVal.length);
+            
+            let correctChars = 0;
+            for (let i = 0; i < inputVal.length; i++) {
+                if (inputVal[i] === targetVal[i]) correctChars++;
+            }
+
+            const timeElapsed = timeLimit - timeLeft;
+            if (timeElapsed === 0) return;
+
+            // WPM = (Correct Chars / 5) / Time in Minutes
+            const grossWPM = Math.round((correctChars / 5) / (timeElapsed / 60));
+            wpmDisplay.innerText = grossWPM;
+
+            // Accuracy
+            const accuracy = inputVal.length > 0 ? Math.round((correctChars / inputVal.length) * 100) : 100;
+            accuracyDisplay.innerText = accuracy + "%";
+
+            return { wpm: grossWPM, accuracy: accuracy };
+        }
+
+        function finishTest() {
+            clearInterval(timer);
+            isRunning = false;
+            inputField.disabled = true;
+            
+            const stats = calculateStats();
+            showResults(stats.wpm, stats.accuracy);
+        }
+
+        function showResults(wpm, accuracy) {
+            document.getElementById('final-wpm').innerText = wpm;
+            document.getElementById('final-accuracy').innerText = accuracy + "%";
+
+            const evalBox = document.getElementById('evaluation-box');
+            const evalTitle = document.getElementById('eval-title');
+            const evalDesc = document.getElementById('eval-desc');
+
+            // Logic from user prompt discussion
+            if (wpm < 20) {
+                evalBox.className = "mb-8 p-4 rounded-lg bg-orange-50 border border-orange-200";
+                evalTitle.className = "font-bold text-lg text-orange-800 mb-1";
+                evalTitle.innerText = "Necessita Millora (Iniciació)";
+                evalDesc.innerText = "Estàs al principi. No et preocupis per la velocitat, centra't en encertar les tecles sense mirar.";
+            } else if (wpm >= 20 && wpm < 30) {
+                evalBox.className = "mb-8 p-4 rounded-lg bg-yellow-50 border border-yellow-200";
+                evalTitle.className = "font-bold text-lg text-yellow-800 mb-1";
+                evalTitle.innerText = "Gairebé hi ets (Intermedi)";
+                evalDesc.innerText = "Ja tens una bona base. Amb una mica més de pràctica arribaràs ràpidament a la zona ideal de 30 PPM.";
+            } else if (wpm >= 30 && wpm <= 45) {
+                evalBox.className = "mb-8 p-4 rounded-lg bg-green-50 border border-green-200";
+                evalTitle.className = "font-bold text-lg text-green-800 mb-1";
+                evalTitle.innerText = "Objectiu Assolit! (Rang Ideal)";
+                evalDesc.innerText = "Perfecte! Entre 30 i 40 PPM és la velocitat ideal per treballar còmodament a secundària. Molt bona feina.";
+            } else {
+                evalBox.className = "mb-8 p-4 rounded-lg bg-purple-50 border border-purple-200";
+                evalTitle.className = "font-bold text-lg text-purple-800 mb-1";
+                evalTitle.innerText = "Velocitat Avançada (Pro)";
+                evalDesc.innerText = "Tens una velocitat molt superior a la necessària. Ets molt eficient amb el teclat!";
+            }
+
+            resultsModal.classList.remove('hidden');
+            resultsModal.classList.add('flex');
+        }
+
+        // Initialize
+        setTime(60);
+    </script>
+</body>
+</html>
