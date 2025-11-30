@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor HTML Profesional V10</title>
+    <title>Editor HTML V12 - Sync & Autocomplete</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -20,7 +20,7 @@
             overflow: hidden;
         }
 
-        /* --- TIPOGRAFÍA COMPARTIDA (Pixel Perfect) --- */
+        /* --- TIPOGRAFÍA COMPARTIDA --- */
         :root {
             --code-font-family: 'Roboto Mono', monospace;
             --code-font-size: 13px;
@@ -28,7 +28,7 @@
             --code-padding: 10px;
         }
 
-        /* --- IZQUIERDA: EDITOR --- */
+        /* --- EDITOR --- */
         .code-wrapper {
             position: relative;
             flex: 1;
@@ -47,7 +47,6 @@
             position: relative;
         }
 
-        /* Optimización #2: Un solo pre para números */
         #line-numbers {
             font-family: var(--code-font-family);
             font-size: var(--code-font-size);
@@ -96,9 +95,10 @@
             resize: none;
             outline: none;
             overflow: auto;
-            padding-bottom: 40px !important; /* Espacio extra al final */
+            padding-bottom: 40px !important; 
         }
 
+        /* Resaltado de selección */
         mark.selection-highlight {
             background-color: #264f78;
             color: transparent;
@@ -108,7 +108,53 @@
             line-height: var(--code-line-height) !important;
         }
 
-        /* --- DERECHA: IFRAME PREVIEW --- */
+        /* --- AUTOCOMPLETADO (NUEVO) --- */
+        #suggestions-box {
+            position: absolute;
+            background-color: #252526;
+            border: 1px solid #454545;
+            border-radius: 4px;
+            width: 220px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            font-family: var(--code-font-family);
+            font-size: 12px;
+        }
+
+        .suggestion-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            color: #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .suggestion-item:hover, .suggestion-item.active {
+            background-color: #04395e;
+            color: white;
+        }
+
+        /* Elemento espejo para calcular posición del cursor */
+        #cursor-mirror {
+            visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            white-space: pre;
+            font-family: var(--code-font-family);
+            font-size: var(--code-font-size);
+            line-height: var(--code-line-height);
+            padding: var(--code-padding);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* --- PREVIEW --- */
         #preview-container {
             flex: 1;
             display: flex;
@@ -117,7 +163,6 @@
             position: relative;
         }
         
-        /* Optimización #5: Iframe aislado */
         #preview-iframe {
             flex: 1;
             border: none;
@@ -126,7 +171,6 @@
             background: white;
         }
 
-        /* Scrollbars Custom */
         ::-webkit-scrollbar { width: 12px; height: 12px; }
         ::-webkit-scrollbar-track { background: #1e1e1e; }
         ::-webkit-scrollbar-thumb { background: #4a4a4a; border: 3px solid #1e1e1e; border-radius: 6px; }
@@ -137,8 +181,8 @@
     <!-- Header -->
     <header class="h-12 bg-[#2d2d2d] border-b border-[#1e1e1e] flex items-center justify-between px-4 shrink-0 shadow-sm z-20">
         <div class="flex items-center gap-3">
-            <i class="fa-solid fa-code text-green-400"></i>
-            <span class="text-xs text-gray-400 font-semibold tracking-wide">EDITOR PRO V10</span>
+            <i class="fa-solid fa-wand-magic-sparkles text-yellow-400"></i>
+            <span class="text-xs text-gray-400 font-semibold tracking-wide">EDITOR V12 FINAL</span>
             <div class="h-4 w-px bg-gray-600 mx-1"></div>
             <input type="text" id="filename" value="index.html" class="bg-transparent border-none text-gray-200 text-sm focus:outline-none w-32 font-mono placeholder-gray-600">
             
@@ -166,14 +210,16 @@
             <div class="relative flex-1 overflow-hidden">
                 <div id="code-backdrop" class="editor-layer"></div>
                 <textarea id="html-code" class="editor-layer" spellcheck="false"></textarea>
+                <!-- UI Autocompletado -->
+                <div id="suggestions-box"></div>
+                <div id="cursor-mirror"></div>
             </div>
         </div>
 
-        <!-- PREVIEW (IFRAME) -->
+        <!-- PREVIEW -->
         <div id="preview-container" class="w-1/2">
             <div class="bg-gray-100 border-b border-gray-200 text-gray-400 text-[10px] uppercase px-3 py-1 font-bold tracking-wider select-none flex justify-between">
-                <span>Vista Previa (Iframe Aislado)</span>
-                <span id="sync-status" class="text-green-600 hidden"><i class="fa-solid fa-check"></i></span>
+                <span>Vista Previa Interactiva</span>
             </div>
             <iframe id="preview-iframe"></iframe>
         </div>
@@ -196,140 +242,286 @@
         const codeBackdrop = document.getElementById('code-backdrop');
         const lineNumbers = document.getElementById('line-numbers');
         const previewIframe = document.getElementById('preview-iframe');
-        const statusMsg = document.getElementById('status-msg');
+        const suggestionsBox = document.getElementById('suggestions-box');
+        const cursorMirror = document.getElementById('cursor-mirror');
 
-        // --- Configuración ---
         const LINE_HEIGHT = 20;
         
+        // --- Datos Autocompletado ---
+        const htmlTags = ['div','p','span','a','img','h1','h2','h3','ul','ol','li','table','tr','td','form','input','button','label','br','hr','style','script','header','footer','nav','section','article'];
+        const tagAttributes = {
+            'a': ['href','target','class','id'],
+            'img': ['src','alt','width','height','class'],
+            'input': ['type','placeholder','value','name','required'],
+            'div': ['class','id','style'],
+            'p': ['class','style'],
+            'button': ['type','onclick','class']
+        };
+
         // --- Estado ---
         let historyStack = [];
         let historyIndex = -1;
         let isSyncing = false;
+        let sourceTextMap = [];
+        let currentSuggestions = [];
+        let selectedSuggestionIndex = 0;
 
-        // --- Contenido Inicial ---
+        // --- Inicialización ---
         const initialContent = `<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: system-ui, sans-serif; padding: 20px; color: #333; line-height: 1.6; }
-        h1 { color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .feature { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin: 10px 0; }
-        code { background: #eee; padding: 2px 4px; border-radius: 3px; font-family: monospace; font-size: 0.9em; }
+        body { font-family: sans-serif; padding: 20px; color: #333; }
+        h1 { color: #d97706; }
+        .hint { background: #fffbeb; padding: 10px; border-left: 4px solid #d97706; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h1>Editor HTML V10</h1>
+    <h1>Editor V12 Completo</h1>
     
-    <div class="feature">
-        <p><strong>🚀 Aislamiento Real:</strong></p>
-        <p>Esta vista previa es un <code>iframe</code>. Tu CSS no se mezcla con el editor.</p>
+    <div class="hint">
+        <p><strong>Novedad 1:</strong> Haz clic aquí (sin seleccionar). Verás que el código salta y se ilumina.</p>
     </div>
 
-    <p>Prueba de selección profunda:</p>
+    <div class="hint">
+        <p><strong>Novedad 2:</strong> Ve al código y escribe "<strong>&lt;</strong>". ¡El autocompletado ha vuelto!</p>
+    </div>
+
+    <p>Texto repetido para probar sync:</p>
     <ul>
-        <li>Item 1</li>
-        <li>Item 2 (<span>Selecciona <b>este texto</b> anidado</span>)</li>
-        <li>Item 3</li>
+        <li>Elemento A</li>
+        <li>Elemento A</li>
+        <li>Elemento A (Clicame)</li>
     </ul>
 </body>
 </html>`;
 
-        // --- Inicialización ---
         function init() {
             codeInput.value = initialContent;
-            
-            // Inicializar Iframe
-            // Necesitamos esperar un tick para asegurar que el iframe está listo en el DOM
             setTimeout(() => {
-                writeToIframe(initialContent, true); // true = full rewrite
+                writeToIframe(initialContent, true);
                 setupIframeListeners();
                 updateLineNumbers();
                 saveHistory();
+                rebuildSourceMap();
             }, 0);
         }
 
-        // --- 1. Lógica del Iframe ---
-        function getIframeDoc() {
-            return previewIframe.contentDocument || previewIframe.contentWindow.document;
-        }
-
-        function writeToIframe(html, fullRewrite = false) {
-            const doc = getIframeDoc();
-            if (!doc) return;
-
-            if (fullRewrite) {
-                doc.open();
-                doc.write(html);
-                doc.close();
-                // Al reescribir, perdemos los listeners, hay que reponerlos
-                setupIframeListeners();
-            } else {
-                // Actualización inteligente (preserva scroll y estado)
-                // Intentamos actualizar solo body y estilos
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, 'text/html');
-                
-                // Actualizar estilos
-                const oldStyles = doc.head.querySelectorAll('style');
-                oldStyles.forEach(s => s.remove());
-                const newStyles = newDoc.head.querySelectorAll('style');
-                newStyles.forEach(s => doc.head.appendChild(s.cloneNode(true)));
-
-                // Actualizar body
-                if (doc.body.innerHTML !== newDoc.body.innerHTML) {
-                    doc.body.innerHTML = newDoc.body.innerHTML;
+        // --- 1. Autocompletado (Restaurado) ---
+        codeInput.addEventListener('keydown', (e) => {
+            if (suggestionsBox.style.display === 'block') {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex + 1) % currentSuggestions.length;
+                    renderSuggestions();
+                    return;
                 }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
+                    renderSuggestions();
+                    return;
+                }
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    selectSuggestion(currentSuggestions[selectedSuggestionIndex]);
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    hideSuggestions();
+                    return;
+                }
+            }
+        });
+
+        codeInput.addEventListener('keyup', (e) => {
+            if (['ArrowUp','ArrowDown','Enter','Escape','ArrowLeft','ArrowRight'].includes(e.key)) return;
+            handleAutocompleteTrigger();
+        });
+
+        function handleAutocompleteTrigger() {
+            const cursor = codeInput.selectionStart;
+            const text = codeInput.value;
+            const textBefore = text.substring(0, cursor);
+
+            // Detectar etiqueta <ta...
+            const tagMatch = textBefore.match(/<([a-zA-Z0-9]*)$/);
+            // Detectar atributo <div cl...
+            const attrMatch = textBefore.match(/<([a-zA-Z0-9]+)\s+([^>]*)$/);
+
+            if (tagMatch) {
+                const query = tagMatch[1].toLowerCase();
+                let matches = htmlTags.filter(t => t.startsWith(query));
                 
-                // Activar edición
-                doc.body.contentEditable = true;
-                doc.body.style.outline = 'none'; // Quitar borde de foco
+                // Cierre inteligente
+                const stack = getOpenTagsStack(textBefore);
+                if (stack.length > 0) {
+                    const toClose = stack[stack.length - 1];
+                    if (('/' + toClose + '>').startsWith(query) || query === '') {
+                        matches.unshift('/' + toClose + '>');
+                    }
+                }
+                showSuggestions(matches, 'tag', cursor - query.length);
+            } 
+            else if (attrMatch) {
+                const tagName = attrMatch[1].toLowerCase();
+                const existingAttrs = attrMatch[2];
+                const currentAttrMatch = existingAttrs.match(/([a-zA-Z0-9-]*)$/);
+                const query = currentAttrMatch ? currentAttrMatch[1].toLowerCase() : "";
+                
+                const specific = tagAttributes[tagName] || [];
+                const global = ['class','id','style','title'];
+                const all = [...new Set([...specific, ...global])];
+                const matches = all.filter(a => a.startsWith(query));
+                
+                showSuggestions(matches, 'attr', cursor - query.length);
+            } else {
+                hideSuggestions();
             }
         }
 
-        function setupIframeListeners() {
-            const win = previewIframe.contentWindow;
-            const doc = getIframeDoc();
-            if (!win || !doc) return;
-
-            // Hacer body editable
-            if (doc.body) {
-                doc.body.contentEditable = true;
-                doc.body.style.outline = 'none';
+        function getOpenTagsStack(html) {
+            const stack = [];
+            const regex = /<\/?([a-z0-9]+)[^>]*>/gi;
+            let match;
+            while ((match = regex.exec(html)) !== null) {
+                const tagName = match[1].toLowerCase();
+                if (['br','hr','img','input','meta','link'].includes(tagName)) continue;
+                if (match[0].startsWith('</')) {
+                    if (stack.length && stack[stack.length-1] === tagName) stack.pop();
+                } else {
+                    stack.push(tagName);
+                }
             }
+            return stack;
+        }
 
-            // Listeners
-            doc.addEventListener('input', () => {
-                updateCodeFromVisual();
-                saveHistory();
-            });
-
-            // Selección Visual -> Código
-            doc.addEventListener('selectionchange', () => {
-                handleVisualSelection(doc);
-            });
+        function showSuggestions(list, type, startIndex) {
+            if (list.length === 0) { hideSuggestions(); return; }
+            currentSuggestions = list;
+            selectedSuggestionIndex = 0;
             
-            // Re-bindear si el usuario hace clic (para asegurar foco)
-            doc.addEventListener('click', () => {
-                if(doc.body.contentEditable !== 'true') doc.body.contentEditable = true;
-            });
+            const coords = getCaretCoordinates();
+            suggestionsBox.style.left = (coords.left + 45) + 'px';
+            suggestionsBox.style.top = (coords.top + 20) + 'px';
+            suggestionsBox.style.display = 'block';
+            suggestionsBox.dataset.startIndex = startIndex;
+            suggestionsBox.dataset.type = type;
+            renderSuggestions();
         }
 
-        // --- 2. Optimizaciones de Renderizado ---
-        
-        // Optimización #1: Backdrop eficiente
+        function renderSuggestions() {
+            const html = currentSuggestions.map((item, index) => {
+                const active = index === selectedSuggestionIndex ? 'active' : '';
+                return `<div class="suggestion-item ${active}" onclick="selectSuggestion('${item}')"><span>${item}</span></div>`;
+            }).join('');
+            suggestionsBox.innerHTML = html;
+        }
+
+        window.selectSuggestion = function(value) {
+            const start = parseInt(suggestionsBox.dataset.startIndex);
+            const type = suggestionsBox.dataset.type;
+            const text = codeInput.value;
+            let insertion = value;
+            if (type === 'attr') insertion += '=""';
+            if (type === 'tag' && !value.startsWith('/')) insertion += '';
+
+            const newText = text.substring(0, start) + insertion + text.substring(codeInput.selectionStart);
+            codeInput.value = newText;
+            
+            let newCursor = start + insertion.length;
+            if (type === 'attr') newCursor -= 1;
+            
+            codeInput.focus();
+            codeInput.setSelectionRange(newCursor, newCursor);
+            hideSuggestions();
+            renderPreviewFromCode(); // Update preview
+        };
+
+        function hideSuggestions() { suggestionsBox.style.display = 'none'; }
+
+        function getCaretCoordinates() {
+            const cursor = codeInput.selectionStart;
+            const text = codeInput.value.substring(0, cursor);
+            cursorMirror.textContent = text;
+            const span = document.createElement('span');
+            span.textContent = '|';
+            cursorMirror.appendChild(span);
+            return { top: span.offsetTop - codeInput.scrollTop, left: span.offsetLeft - codeInput.scrollLeft };
+        }
+
+        // --- 2. Sync Visual -> Código (Clic y Selección) ---
+
+        function rebuildSourceMap() {
+            const html = codeInput.value;
+            sourceTextMap = [];
+            const regex = /(>)([^<]+)(<)/g;
+            let match;
+            while ((match = regex.exec(html)) !== null) {
+                const content = match[2];
+                if (content.trim().length > 0) {
+                    sourceTextMap.push({ text: content, start: match.index + 1, end: match.index + 1 + content.length });
+                }
+            }
+        }
+
+        function handleVisualSelection(doc) {
+            const sel = doc.getSelection();
+            if (sel.rangeCount === 0) return;
+
+            const range = sel.getRangeAt(0);
+            const node = range.startContainer;
+
+            // Si no es nodo de texto, salir
+            if (node.nodeType !== Node.TEXT_NODE) return;
+
+            // 1. Encontrar índice ordinal del nodo
+            const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+                acceptNode: n => n.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+            });
+
+            let nodeIndex = 0;
+            let found = false;
+            while (walker.nextNode()) {
+                if (walker.currentNode === node) { found = true; break; }
+                nodeIndex++;
+            }
+
+            if (found && sourceTextMap[nodeIndex]) {
+                const mapEntry = sourceTextMap[nodeIndex];
+                
+                // 2. Calcular inicio y fin
+                let startCode, endCode;
+
+                if (sel.isCollapsed) {
+                    // CLIC SIMPLE: Resaltar todo el bloque de texto para orientar al usuario
+                    startCode = mapEntry.start;
+                    endCode = mapEntry.end;
+                } else {
+                    // SELECCIÓN DE RANGO
+                    startCode = mapEntry.start + range.startOffset;
+                    endCode = startCode + range.toString().length;
+                    // Clamp
+                    startCode = Math.max(mapEntry.start, Math.min(startCode, mapEntry.end));
+                    endCode = Math.max(startCode, Math.min(endCode, mapEntry.end));
+                }
+
+                updateHighlights(startCode, endCode, true);
+            }
+        }
+
+        // --- 3. Resto del Core (Sync Code->Visual, Iframe, etc.) ---
+
         function updateHighlights(start = -1, end = -1, doScroll = false) {
             const text = codeInput.value;
+            const escape = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
             
-            // Escape HTML seguro
-            const escape = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
             if (start < 0 || end <= start) {
-                codeBackdrop.textContent = text; // Más rápido que innerHTML si no hay tags
+                codeBackdrop.textContent = text;
                 return;
             }
 
-            // Construcción eficiente
             const before = escape(text.slice(0, start));
             const sel = escape(text.slice(start, end));
             const after = escape(text.slice(end));
@@ -339,190 +531,126 @@
             if (doScroll) {
                 const linesBefore = text.slice(0, start).split('\n').length;
                 const targetPixel = (linesBefore * LINE_HEIGHT) - (codeInput.clientHeight / 2);
-                
-                const currentTop = codeInput.scrollTop;
-                // Umbral para evitar saltos pequeños
-                if (Math.abs(targetPixel - currentTop) > 100) {
+                if (Math.abs(targetPixel - codeInput.scrollTop) > 50) {
                      codeInput.scrollTo({ top: Math.max(0, targetPixel), behavior: 'smooth' });
                 }
             }
         }
 
-        // Optimización #2: Números de línea DOM ligero
-        function updateLineNumbers() {
-            const lines = codeInput.value.split('\n').length;
-            // Usar un solo nodo de texto con saltos de línea es mucho más rápido que 1000 divs
-            lineNumbers.textContent = Array(lines).fill(0).map((_, i) => i + 1).join('\n');
+        function getIframeDoc() { return previewIframe.contentDocument || previewIframe.contentWindow.document; }
+
+        function writeToIframe(html, fullRewrite = false) {
+            const doc = getIframeDoc();
+            if (!doc) return;
+            if (fullRewrite) {
+                doc.open(); doc.write(html); doc.close();
+                setupIframeListeners();
+            } else {
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                const oldStyles = doc.head.querySelectorAll('style');
+                oldStyles.forEach(s => s.remove());
+                const newStyles = newDoc.head.querySelectorAll('style');
+                newStyles.forEach(s => doc.head.appendChild(s.cloneNode(true)));
+                if (doc.body.innerHTML !== newDoc.body.innerHTML) doc.body.innerHTML = newDoc.body.innerHTML;
+                doc.body.contentEditable = true;
+                doc.body.style.outline = 'none';
+            }
+            rebuildSourceMap();
         }
 
-        // Optimización #3: Sync de scroll
-        codeInput.addEventListener('scroll', () => {
-            const top = codeInput.scrollTop;
-            const left = codeInput.scrollLeft;
-            
-            codeBackdrop.scrollTop = top;
-            codeBackdrop.scrollLeft = left;
-            
-            // Sync vertical con transform
-            lineNumbers.parentElement.scrollTop = top; // O usar transform si el container es fixed
-            // Para asegurar alineación, movemos el pre dentro del container
-            lineNumbers.style.transform = `translateY(-${top}px)`;
-        });
-
-
-        // --- 3. Lógica de Sincronización (Bidireccional) ---
-
-        // Code -> Visual
-        function renderPreviewFromCode() {
-            if (isSyncing) return;
-            isSyncing = true;
-            
-            writeToIframe(codeInput.value, false); // false = actualización parcial
-            
-            updateHighlights();
-            isSyncing = false;
+        function setupIframeListeners() {
+            const doc = getIframeDoc();
+            if (!doc) return;
+            doc.body.contentEditable = true;
+            doc.body.style.outline = 'none';
+            doc.addEventListener('input', () => { updateCodeFromVisual(); saveHistory(); });
+            // Sync Selección y Clic
+            doc.addEventListener('selectionchange', () => handleVisualSelection(doc));
+            doc.addEventListener('click', () => {
+                 if(doc.body.contentEditable !== 'true') doc.body.contentEditable = true;
+            });
         }
 
-        // Visual -> Code
+        // Sync Code -> Visual
+        function syncCodeToVisual() {
+            const cursor = codeInput.selectionStart;
+            let targetMapIndex = -1;
+            for (let i = 0; i < sourceTextMap.length; i++) {
+                if (cursor >= sourceTextMap[i].start && cursor <= sourceTextMap[i].end) {
+                    targetMapIndex = i; break;
+                }
+            }
+            if (targetMapIndex !== -1) {
+                const doc = getIframeDoc();
+                const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+                    acceptNode: n => n.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+                });
+                let idx = 0;
+                while(walker.nextNode()) {
+                    if (idx === targetMapIndex) { highlightDomNode(walker.currentNode); return; }
+                    idx++;
+                }
+            }
+        }
+
+        function highlightDomNode(textNode) {
+            const parent = textNode.parentElement;
+            if(!parent) return;
+            parent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            parent.style.transition = 'outline 0.2s';
+            parent.style.outline = '3px solid rgba(255, 200, 0, 0.6)';
+            setTimeout(() => parent.style.outline = 'none', 1000);
+        }
+
         function updateCodeFromVisual() {
             if (isSyncing) return;
             isSyncing = true;
-            
             const doc = getIframeDoc();
             const currentCode = codeInput.value;
-            
-            // Extraer solo el body innerHTML del iframe
-            const newBodyContent = doc.body.innerHTML;
-            
-            // Regex para inyectar en el código fuente
-            const bodyRegex = /(<body[^>]*>)([\s\S]*?)(<\/body>)/i;
-            
-            if (currentCode.match(bodyRegex)) {
-                codeInput.value = currentCode.replace(bodyRegex, `$1\n${newBodyContent}\n$3`);
-            }
-            
+            const newBody = doc.body.innerHTML;
+            const regex = /(<body[^>]*>)([\s\S]*?)(<\/body>)/i;
+            if (currentCode.match(regex)) codeInput.value = currentCode.replace(regex, `$1\n${newBody}\n$3`);
             updateLineNumbers();
-            updateHighlights();
+            rebuildSourceMap();
             isSyncing = false;
         }
 
-        // --- 4. Selección Avanzada (Cross-Frame) ---
-        function handleVisualSelection(doc) {
-            const sel = doc.getSelection();
-            if (sel.isCollapsed) {
-                updateHighlights();
-                return;
-            }
-
-            // Optimización #4: Normalización de texto (Clean)
-            const clean = (s) => s.replace(/\s+/g, " ").trim();
-            const selectedText = clean(sel.toString());
-            
-            if (selectedText.length < 2) return;
-
-            // Encontrar ocurrencia ordinal
-            // Necesitamos contar cuántas veces aparece el texto seleccionado ANTES de la selección actual
-            const range = sel.getRangeAt(0);
-            const preRange = doc.createRange();
-            preRange.selectNodeContents(doc.body);
-            preRange.setEnd(range.startContainer, range.startOffset);
-            
-            const textBefore = clean(preRange.toString());
-            // Contamos ocurrencias "sucias" pero efectivas
-            const occurrence = textBefore.split(selectedText).length - 1;
-
-            // Buscar en Código
-            const code = codeInput.value;
-            // Ignorar head
-            const bodyMatch = code.match(/<body[^>]*>/i);
-            const bodyStart = bodyMatch ? bodyMatch.index + bodyMatch[0].length : 0;
-            const codeBody = code.substring(bodyStart);
-            
-            // Limpiamos el código también para buscar (truco: normalizamos espacios para la búsqueda)
-            // Nota: Esto es complejo porque necesitamos el índice REAL.
-            // Estrategia simple: Buscar literal. Si falla, fallback.
-            
-            let searchIndex = -1;
-            let count = 0;
-            let pos = 0;
-            
-            // Buscar literal
-            while (count <= occurrence) {
-                // Buscamos sin limpiar en el código para obtener indices exactos
-                // Esto asume que el usuario no ha destruido los espacios en el visual
-                pos = codeBody.indexOf(sel.toString(), pos); 
-                
-                // Fallback: si no encuentra literal (por diferencias de espacios), intentamos aproximación
-                if (pos === -1) {
-                    // Intento de recuperación simple: buscar solo los primeros 20 caracteres
-                    const snippet = sel.toString().substring(0, 20);
-                    pos = codeBody.indexOf(snippet, pos > 0 ? pos : 0);
-                }
-
-                if (pos === -1) break;
-                
-                if (count === occurrence) {
-                    searchIndex = pos;
-                    break;
-                }
-                pos++;
-                count++;
-            }
-
-            if (searchIndex !== -1) {
-                const absStart = bodyStart + searchIndex;
-                updateHighlights(absStart, absStart + sel.toString().length, true);
-            }
-        }
-
-        // --- 5. Formateador Mejorado (Optimización #6) ---
-        function formatHTML(html) {
-            let indent = 0;
-            const tab = "    ";
-            
-            // Tokenizar
-            const tokens = html.replace(/>\s*</g, "><")
-                               .replace(/</g, "~::~<")
-                               .replace(/\s*~::~<\s*/g, "\n<")
-                               .split('\n');
-            
-            let formatted = "";
-            
-            tokens.forEach(line => {
-                line = line.trim();
-                if (!line) return;
-                
-                // Bajar indent si es cierre
-                if (line.match(/^<\//)) indent = Math.max(0, indent - 1);
-                
-                formatted += tab.repeat(indent) + line + "\n";
-                
-                // Subir indent si es apertura y no es void ni cierre
-                const isVoid = /^(<img|<br|<hr|<input|<meta|<link|<source)/.test(line);
-                if (!/^<\//.test(line) && !isVoid && /^<[a-z0-9]+/.test(line)) {
-                    indent++;
-                }
-            });
-            return formatted.trim();
-        }
-
-        window.formatSourceCode = function() {
-            const code = codeInput.value;
-            codeInput.value = formatHTML(code);
-            renderPreviewFromCode();
-            updateLineNumbers();
-            saveHistory();
-        };
-
-
-        // --- Eventos Generales ---
+        // Events
         codeInput.addEventListener('input', () => {
-            renderPreviewFromCode();
-            updateLineNumbers();
-            saveHistory();
+            renderPreviewFromCode(); updateLineNumbers(); saveHistory(); rebuildSourceMap();
+        });
+        codeInput.addEventListener('click', syncCodeToVisual);
+        codeInput.addEventListener('keyup', (e) => {
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) syncCodeToVisual();
+            updateStatus();
+        });
+        codeInput.addEventListener('scroll', () => {
+            codeBackdrop.scrollTop = codeInput.scrollTop;
+            codeBackdrop.scrollLeft = codeInput.scrollLeft;
+            lineNumbers.style.transform = `translateY(-${codeInput.scrollTop}px)`;
         });
 
-        // Historial Custom (Más fiable para este caso que execCommand)
+        function renderPreviewFromCode() {
+            if (isSyncing) return;
+            isSyncing = true;
+            writeToIframe(codeInput.value, false);
+            updateHighlights();
+            isSyncing = false;
+        }
+        function updateLineNumbers() {
+            lineNumbers.textContent = Array(codeInput.value.split('\n').length).fill(0).map((_, i) => i + 1).join('\n');
+        }
+        function updateStatus() {
+            const val = codeInput.value;
+            const sel = codeInput.selectionStart;
+            const line = val.substring(0, sel).split('\n').length;
+            const col = sel - val.lastIndexOf('\n', sel - 1);
+            document.getElementById('ln-display').innerText = line;
+            document.getElementById('col-display').innerText = col;
+        }
+        
+        // History & Utils
         function saveHistory() {
             const content = codeInput.value;
             if (historyStack.length > 0 && historyStack[historyIndex] === content) return;
@@ -530,53 +658,46 @@
             historyStack.push(content);
             historyIndex++;
         }
-        window.undo = () => {
-            if(historyIndex > 0) {
-                historyIndex--;
-                codeInput.value = historyStack[historyIndex];
-                renderPreviewFromCode();
-                updateLineNumbers();
-                updateHighlights();
-            }
-        };
-        window.redo = () => {
-            if(historyIndex < historyStack.length - 1) {
-                historyIndex++;
-                codeInput.value = historyStack[historyIndex];
-                renderPreviewFromCode();
-                updateLineNumbers();
-                updateHighlights();
-            }
+        window.undo = () => { if(historyIndex>0) { historyIndex--; restoreState(); } };
+        window.redo = () => { if(historyIndex<historyStack.length-1) { historyIndex++; restoreState(); } };
+        function restoreState() {
+            codeInput.value = historyStack[historyIndex];
+            renderPreviewFromCode(); updateLineNumbers(); updateHighlights(); rebuildSourceMap();
+        }
+
+        window.formatSourceCode = function() {
+            let indent=0; const tab="    ";
+            const tokens = codeInput.value.replace(/>\s*</g, "><").replace(/</g, "~::~<").replace(/\s*~::~<\s*/g, "\n<").split('\n');
+            let fmt = "";
+            tokens.forEach(line => {
+                line=line.trim(); if(!line)return;
+                if(line.match(/^<\//)) indent=Math.max(0,indent-1);
+                fmt += tab.repeat(indent)+line+"\n";
+                if(!/^<\//.test(line) && !/^(<img|<br|<hr|<input|<meta|<link)/.test(line) && /^<[a-z0-9]+/.test(line)) indent++;
+            });
+            codeInput.value = fmt.trim();
+            renderPreviewFromCode(); updateLineNumbers(); saveHistory(); rebuildSourceMap();
         };
 
-        // File I/O
         document.getElementById('file-upload').addEventListener('change', (e) => {
-            const f = e.target.files[0];
-            if(!f) return;
-            const r = new FileReader();
-            r.onload = (e) => {
-                codeInput.value = e.target.result;
-                document.getElementById('filename').value = f.name;
-                // Full reload para el iframe
+            const f=e.target.files[0]; if(!f)return;
+            const r=new FileReader();
+            r.onload=(ev)=>{
+                codeInput.value=ev.target.result; 
+                document.getElementById('filename').value=f.name;
                 writeToIframe(codeInput.value, true);
-                updateLineNumbers();
-                saveHistory();
+                updateLineNumbers(); saveHistory(); rebuildSourceMap();
             };
             r.readAsText(f);
         });
-
         window.downloadFile = () => {
-            const blob = new Blob([codeInput.value], {type: 'text/html'});
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(new Blob([codeInput.value], {type: 'text/html'}));
             a.download = document.getElementById('filename').value || 'index.html';
             a.click();
         };
 
-        // Arrancar
         init();
-
     </script>
 </body>
 </html>
