@@ -506,13 +506,38 @@
             const index = code.indexOf(text); 
             
             if (index !== -1) {
+                // 1. Seleccionar texto
                 textarea.focus();
                 textarea.setSelectionRange(index, index + text.length);
                 
-                // Scroll lógico (aproximado porque ahora las líneas tienen altura variable)
-                // Usamos blur/focus para intentar forzar al navegador a mostrar el cursor
-                textarea.blur();
-                textarea.focus();
+                // 2. SCROLL PRECISO USANDO EL MIRROR
+                // Como tenemos word-wrap variable, usamos el mirror para medir 
+                // exactamente a qué altura de píxel cae el inicio del texto seleccionado.
+                const mirror = document.getElementById('code-mirror');
+                if (mirror) {
+                    // Limpiamos temporalmente el mirror (usado para números de línea) para medir
+                    mirror.innerHTML = '';
+                    
+                    // Recreamos el contenido exacto hasta el punto de selección
+                    const textBefore = code.substring(0, index);
+                    const preNode = document.createTextNode(textBefore);
+                    mirror.appendChild(preNode);
+                    
+                    // Ponemos un marcador visible/invisible
+                    const marker = document.createElement('span');
+                    marker.textContent = '|'; // Carácter para asegurar altura de línea
+                    mirror.appendChild(marker);
+                    
+                    // Medimos la altura exacta (offsetTop)
+                    const top = marker.offsetTop;
+                    
+                    // Centramos el scroll: Posición del marcador - Mitad de altura del editor
+                    const editorHeight = textarea.clientHeight;
+                    textarea.scrollTop = top - (editorHeight / 2);
+                    
+                    // 3. Restauramos la UI de números de línea inmediatamente
+                    updateLineNumbers();
+                }
                 
                 syncStatus.classList.remove('hidden');
                 setTimeout(() => syncStatus.classList.add('hidden'), 1000);
