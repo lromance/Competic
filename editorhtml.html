@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor HTML V12 - Sync & Autocomplete</title>
+    <title>Editor HTML V14 - Sync Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@400;600&display=swap');
 
-        /* Reset estricto */
         * { box-sizing: border-box; }
 
         body {
@@ -20,7 +19,7 @@
             overflow: hidden;
         }
 
-        /* --- TIPOGRAFÍA COMPARTIDA --- */
+        /* Variables de Alineación */
         :root {
             --code-font-family: 'Roboto Mono', monospace;
             --code-font-size: 13px;
@@ -28,7 +27,7 @@
             --code-padding: 10px;
         }
 
-        /* --- EDITOR --- */
+        /* --- EDITOR WRAPPER --- */
         .code-wrapper {
             position: relative;
             flex: 1;
@@ -37,6 +36,7 @@
             display: flex;
         }
 
+        /* Números de línea */
         .line-numbers-container {
             width: 45px;
             background-color: #1e1e1e;
@@ -60,6 +60,7 @@
             white-space: pre;
         }
 
+        /* Estilos base para capas del editor */
         .editor-layer {
             font-family: var(--code-font-family) !important;
             font-size: var(--code-font-size) !important;
@@ -78,37 +79,43 @@
             left: 0;
         }
 
-        /* Capa 1: Backdrop (Highlights) */
+        /* Capa 1: Backdrop (DONDE VIVE EL RESALTADO) */
         #code-backdrop {
             z-index: 1;
-            color: transparent;
-            background-color: transparent;
+            /* Importante: el texto es invisible, pero el fondo de <mark> se ve */
+            color: transparent; 
+            background-color: transparent; 
             pointer-events: none;
             overflow: hidden;
         }
 
-        /* Capa 2: Textarea (Input) */
+        /* Capa 2: Textarea (DONDE ESCRIBES) */
         textarea#html-code {
             z-index: 2;
-            background: transparent;
+            /* CRÍTICO: Fondo transparente para ver el backdrop debajo */
+            background-color: transparent !important;
+            background: transparent !important;
             color: #d4d4d4;
             resize: none;
             outline: none;
             overflow: auto;
-            padding-bottom: 40px !important; 
+            padding-bottom: 40px !important;
         }
 
-        /* Resaltado de selección */
+        /* ESTILO DEL RESALTADO (ALTO CONTRASTE) */
         mark.selection-highlight {
-            background-color: #264f78;
+            /* Amarillo semitransparente fuerte */
+            background-color: rgba(255, 215, 0, 0.4) !important;
+            /* Borde inferior sólido para destacar más */
+            border-bottom: 2px solid #ffd700;
             color: transparent;
-            border-radius: 0;
+            border-radius: 2px;
             display: inline;
             padding: 0;
             line-height: var(--code-line-height) !important;
         }
 
-        /* --- AUTOCOMPLETADO (NUEVO) --- */
+        /* --- AUTOCOMPLETADO --- */
         #suggestions-box {
             position: absolute;
             background-color: #252526;
@@ -132,45 +139,22 @@
             align-items: center;
             justify-content: space-between;
         }
+        .suggestion-item:hover, .suggestion-item.active { background-color: #04395e; color: white; }
 
-        .suggestion-item:hover, .suggestion-item.active {
-            background-color: #04395e;
-            color: white;
-        }
-
-        /* Elemento espejo para calcular posición del cursor */
+        /* Espejo cursor */
         #cursor-mirror {
-            visibility: hidden;
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            white-space: pre;
-            font-family: var(--code-font-family);
-            font-size: var(--code-font-size);
-            line-height: var(--code-line-height);
-            padding: var(--code-padding);
-            width: 100%;
-            overflow: hidden;
+            visibility: hidden; position: absolute; top: 0; left: 0; pointer-events: none;
+            white-space: pre; font-family: var(--code-font-family); font-size: var(--code-font-size);
+            line-height: var(--code-line-height); padding: var(--code-padding); width: 100%; overflow: hidden;
         }
 
         /* --- PREVIEW --- */
         #preview-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            position: relative;
+            flex: 1; display: flex; flex-direction: column; background-color: white; position: relative;
         }
-        
-        #preview-iframe {
-            flex: 1;
-            border: none;
-            width: 100%;
-            height: 100%;
-            background: white;
-        }
+        #preview-iframe { flex: 1; border: none; width: 100%; height: 100%; background: white; }
 
+        /* Scrollbars */
         ::-webkit-scrollbar { width: 12px; height: 12px; }
         ::-webkit-scrollbar-track { background: #1e1e1e; }
         ::-webkit-scrollbar-thumb { background: #4a4a4a; border: 3px solid #1e1e1e; border-radius: 6px; }
@@ -181,14 +165,14 @@
     <!-- Header -->
     <header class="h-12 bg-[#2d2d2d] border-b border-[#1e1e1e] flex items-center justify-between px-4 shrink-0 shadow-sm z-20">
         <div class="flex items-center gap-3">
-            <i class="fa-solid fa-wand-magic-sparkles text-yellow-400"></i>
-            <span class="text-xs text-gray-400 font-semibold tracking-wide">EDITOR V12 FINAL</span>
+            <i class="fa-solid fa-check-double text-green-500"></i>
+            <span class="text-xs text-gray-400 font-semibold tracking-wide">EDITOR V14 (SYNC FIX)</span>
             <div class="h-4 w-px bg-gray-600 mx-1"></div>
             <input type="text" id="filename" value="index.html" class="bg-transparent border-none text-gray-200 text-sm focus:outline-none w-32 font-mono placeholder-gray-600">
             
             <div class="flex items-center gap-1 ml-2 border-l border-gray-700 pl-2">
-                <button onclick="undo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition" title="Undo"><i class="fa-solid fa-rotate-left text-xs"></i></button>
-                <button onclick="redo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition" title="Redo"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+                <button onclick="undo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition"><i class="fa-solid fa-rotate-left text-xs"></i></button>
+                <button onclick="redo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition"><i class="fa-solid fa-rotate-right text-xs"></i></button>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -208,9 +192,11 @@
                 <pre id="line-numbers">1</pre>
             </div>
             <div class="relative flex-1 overflow-hidden">
+                <!-- Capa Backdrop (Highlights) -->
                 <div id="code-backdrop" class="editor-layer"></div>
+                <!-- Capa Textarea (Input) -->
                 <textarea id="html-code" class="editor-layer" spellcheck="false"></textarea>
-                <!-- UI Autocompletado -->
+                
                 <div id="suggestions-box"></div>
                 <div id="cursor-mirror"></div>
             </div>
@@ -218,9 +204,7 @@
 
         <!-- PREVIEW -->
         <div id="preview-container" class="w-1/2">
-            <div class="bg-gray-100 border-b border-gray-200 text-gray-400 text-[10px] uppercase px-3 py-1 font-bold tracking-wider select-none flex justify-between">
-                <span>Vista Previa Interactiva</span>
-            </div>
+            <div class="bg-gray-100 border-b border-gray-200 text-gray-400 text-[10px] uppercase px-3 py-1 font-bold tracking-wider select-none">Vista Previa Interactiva</div>
             <iframe id="preview-iframe"></iframe>
         </div>
 
@@ -232,12 +216,11 @@
         <div class="flex gap-4 font-mono">
             <span>Ln <span id="ln-display">1</span>, Col <span id="col-display">1</span></span>
             <span>HTML5</span>
-            <span>UTF-8</span>
         </div>
     </footer>
 
     <script>
-        // --- Referencias ---
+        // Referencias
         const codeInput = document.getElementById('html-code');
         const codeBackdrop = document.getElementById('code-backdrop');
         const lineNumbers = document.getElementById('line-numbers');
@@ -247,26 +230,19 @@
 
         const LINE_HEIGHT = 20;
         
-        // --- Datos Autocompletado ---
-        const htmlTags = ['div','p','span','a','img','h1','h2','h3','ul','ol','li','table','tr','td','form','input','button','label','br','hr','style','script','header','footer','nav','section','article'];
+        // Autocompletado Data
+        const htmlTags = ['div','p','span','a','img','h1','h2','h3','ul','ol','li','table','tr','td','form','input','button','label','br','hr','style','script','header','footer','nav','section','article','strong','em'];
         const tagAttributes = {
-            'a': ['href','target','class','id'],
-            'img': ['src','alt','width','height','class'],
-            'input': ['type','placeholder','value','name','required'],
-            'div': ['class','id','style'],
-            'p': ['class','style'],
-            'button': ['type','onclick','class']
+            'a': ['href','target','class','id'], 'img': ['src','alt','width','height','class'],
+            'input': ['type','placeholder','value','name','required'], 'div': ['class','id','style'],
+            'p': ['class','style'], 'button': ['type','onclick','class']
         };
 
-        // --- Estado ---
-        let historyStack = [];
-        let historyIndex = -1;
-        let isSyncing = false;
-        let sourceTextMap = [];
-        let currentSuggestions = [];
-        let selectedSuggestionIndex = 0;
+        // Estado
+        let historyStack = []; let historyIndex = -1; let isSyncing = false;
+        let sourceTextMap = []; let currentSuggestions = []; let selectedSuggestionIndex = 0;
 
-        // --- Inicialización ---
+        // Contenido Inicial
         const initialContent = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -278,21 +254,17 @@
     </style>
 </head>
 <body>
-    <h1>Editor V12 Completo</h1>
+    <h1>Editor V14: Sincronización Corregida</h1>
     
     <div class="hint">
-        <p><strong>Novedad 1:</strong> Haz clic aquí (sin seleccionar). Verás que el código salta y se ilumina.</p>
+        <p><strong>Problema arreglado:</strong> Antes, el texto en el &lt;head&gt; (como los estilos) confundía al sistema de selección.</p>
     </div>
 
-    <div class="hint">
-        <p><strong>Novedad 2:</strong> Ve al código y escribe "<strong>&lt;</strong>". ¡El autocompletado ha vuelto!</p>
-    </div>
-
-    <p>Texto repetido para probar sync:</p>
+    <p>Ahora puedes seleccionar cualquier elemento repetido y marcará el correcto:</p>
     <ul>
-        <li>Elemento A</li>
-        <li>Elemento A</li>
-        <li>Elemento A (Clicame)</li>
+        <li>Item A (Uno)</li>
+        <li>Item A (Dos)</li>
+        <li>Item A (Tres)</li>
     </ul>
 </body>
 </html>`;
@@ -308,211 +280,7 @@
             }, 0);
         }
 
-        // --- 1. Autocompletado (Restaurado) ---
-        codeInput.addEventListener('keydown', (e) => {
-            if (suggestionsBox.style.display === 'block') {
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    selectedSuggestionIndex = (selectedSuggestionIndex + 1) % currentSuggestions.length;
-                    renderSuggestions();
-                    return;
-                }
-                if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    selectedSuggestionIndex = (selectedSuggestionIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
-                    renderSuggestions();
-                    return;
-                }
-                if (e.key === 'Enter' || e.key === 'Tab') {
-                    e.preventDefault();
-                    selectSuggestion(currentSuggestions[selectedSuggestionIndex]);
-                    return;
-                }
-                if (e.key === 'Escape') {
-                    hideSuggestions();
-                    return;
-                }
-            }
-        });
-
-        codeInput.addEventListener('keyup', (e) => {
-            if (['ArrowUp','ArrowDown','Enter','Escape','ArrowLeft','ArrowRight'].includes(e.key)) return;
-            handleAutocompleteTrigger();
-        });
-
-        function handleAutocompleteTrigger() {
-            const cursor = codeInput.selectionStart;
-            const text = codeInput.value;
-            const textBefore = text.substring(0, cursor);
-
-            // Detectar etiqueta <ta...
-            const tagMatch = textBefore.match(/<([a-zA-Z0-9]*)$/);
-            // Detectar atributo <div cl...
-            const attrMatch = textBefore.match(/<([a-zA-Z0-9]+)\s+([^>]*)$/);
-
-            if (tagMatch) {
-                const query = tagMatch[1].toLowerCase();
-                let matches = htmlTags.filter(t => t.startsWith(query));
-                
-                // Cierre inteligente
-                const stack = getOpenTagsStack(textBefore);
-                if (stack.length > 0) {
-                    const toClose = stack[stack.length - 1];
-                    if (('/' + toClose + '>').startsWith(query) || query === '') {
-                        matches.unshift('/' + toClose + '>');
-                    }
-                }
-                showSuggestions(matches, 'tag', cursor - query.length);
-            } 
-            else if (attrMatch) {
-                const tagName = attrMatch[1].toLowerCase();
-                const existingAttrs = attrMatch[2];
-                const currentAttrMatch = existingAttrs.match(/([a-zA-Z0-9-]*)$/);
-                const query = currentAttrMatch ? currentAttrMatch[1].toLowerCase() : "";
-                
-                const specific = tagAttributes[tagName] || [];
-                const global = ['class','id','style','title'];
-                const all = [...new Set([...specific, ...global])];
-                const matches = all.filter(a => a.startsWith(query));
-                
-                showSuggestions(matches, 'attr', cursor - query.length);
-            } else {
-                hideSuggestions();
-            }
-        }
-
-        function getOpenTagsStack(html) {
-            const stack = [];
-            const regex = /<\/?([a-z0-9]+)[^>]*>/gi;
-            let match;
-            while ((match = regex.exec(html)) !== null) {
-                const tagName = match[1].toLowerCase();
-                if (['br','hr','img','input','meta','link'].includes(tagName)) continue;
-                if (match[0].startsWith('</')) {
-                    if (stack.length && stack[stack.length-1] === tagName) stack.pop();
-                } else {
-                    stack.push(tagName);
-                }
-            }
-            return stack;
-        }
-
-        function showSuggestions(list, type, startIndex) {
-            if (list.length === 0) { hideSuggestions(); return; }
-            currentSuggestions = list;
-            selectedSuggestionIndex = 0;
-            
-            const coords = getCaretCoordinates();
-            suggestionsBox.style.left = (coords.left + 45) + 'px';
-            suggestionsBox.style.top = (coords.top + 20) + 'px';
-            suggestionsBox.style.display = 'block';
-            suggestionsBox.dataset.startIndex = startIndex;
-            suggestionsBox.dataset.type = type;
-            renderSuggestions();
-        }
-
-        function renderSuggestions() {
-            const html = currentSuggestions.map((item, index) => {
-                const active = index === selectedSuggestionIndex ? 'active' : '';
-                return `<div class="suggestion-item ${active}" onclick="selectSuggestion('${item}')"><span>${item}</span></div>`;
-            }).join('');
-            suggestionsBox.innerHTML = html;
-        }
-
-        window.selectSuggestion = function(value) {
-            const start = parseInt(suggestionsBox.dataset.startIndex);
-            const type = suggestionsBox.dataset.type;
-            const text = codeInput.value;
-            let insertion = value;
-            if (type === 'attr') insertion += '=""';
-            if (type === 'tag' && !value.startsWith('/')) insertion += '';
-
-            const newText = text.substring(0, start) + insertion + text.substring(codeInput.selectionStart);
-            codeInput.value = newText;
-            
-            let newCursor = start + insertion.length;
-            if (type === 'attr') newCursor -= 1;
-            
-            codeInput.focus();
-            codeInput.setSelectionRange(newCursor, newCursor);
-            hideSuggestions();
-            renderPreviewFromCode(); // Update preview
-        };
-
-        function hideSuggestions() { suggestionsBox.style.display = 'none'; }
-
-        function getCaretCoordinates() {
-            const cursor = codeInput.selectionStart;
-            const text = codeInput.value.substring(0, cursor);
-            cursorMirror.textContent = text;
-            const span = document.createElement('span');
-            span.textContent = '|';
-            cursorMirror.appendChild(span);
-            return { top: span.offsetTop - codeInput.scrollTop, left: span.offsetLeft - codeInput.scrollLeft };
-        }
-
-        // --- 2. Sync Visual -> Código (Clic y Selección) ---
-
-        function rebuildSourceMap() {
-            const html = codeInput.value;
-            sourceTextMap = [];
-            const regex = /(>)([^<]+)(<)/g;
-            let match;
-            while ((match = regex.exec(html)) !== null) {
-                const content = match[2];
-                if (content.trim().length > 0) {
-                    sourceTextMap.push({ text: content, start: match.index + 1, end: match.index + 1 + content.length });
-                }
-            }
-        }
-
-        function handleVisualSelection(doc) {
-            const sel = doc.getSelection();
-            if (sel.rangeCount === 0) return;
-
-            const range = sel.getRangeAt(0);
-            const node = range.startContainer;
-
-            // Si no es nodo de texto, salir
-            if (node.nodeType !== Node.TEXT_NODE) return;
-
-            // 1. Encontrar índice ordinal del nodo
-            const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
-                acceptNode: n => n.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-            });
-
-            let nodeIndex = 0;
-            let found = false;
-            while (walker.nextNode()) {
-                if (walker.currentNode === node) { found = true; break; }
-                nodeIndex++;
-            }
-
-            if (found && sourceTextMap[nodeIndex]) {
-                const mapEntry = sourceTextMap[nodeIndex];
-                
-                // 2. Calcular inicio y fin
-                let startCode, endCode;
-
-                if (sel.isCollapsed) {
-                    // CLIC SIMPLE: Resaltar todo el bloque de texto para orientar al usuario
-                    startCode = mapEntry.start;
-                    endCode = mapEntry.end;
-                } else {
-                    // SELECCIÓN DE RANGO
-                    startCode = mapEntry.start + range.startOffset;
-                    endCode = startCode + range.toString().length;
-                    // Clamp
-                    startCode = Math.max(mapEntry.start, Math.min(startCode, mapEntry.end));
-                    endCode = Math.max(startCode, Math.min(endCode, mapEntry.end));
-                }
-
-                updateHighlights(startCode, endCode, true);
-            }
-        }
-
-        // --- 3. Resto del Core (Sync Code->Visual, Iframe, etc.) ---
-
+        // --- CORE: HIGHLIGHTING ---
         function updateHighlights(start = -1, end = -1, doScroll = false) {
             const text = codeInput.value;
             const escape = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -526,175 +294,258 @@
             const sel = escape(text.slice(start, end));
             const after = escape(text.slice(end));
 
+            // Inyectar HTML con la marca
             codeBackdrop.innerHTML = before + `<mark class="selection-highlight">${sel}</mark>` + after;
 
             if (doScroll) {
                 const linesBefore = text.slice(0, start).split('\n').length;
                 const targetPixel = (linesBefore * LINE_HEIGHT) - (codeInput.clientHeight / 2);
-                if (Math.abs(targetPixel - codeInput.scrollTop) > 50) {
-                     codeInput.scrollTo({ top: Math.max(0, targetPixel), behavior: 'smooth' });
+                const safeTarget = Math.max(0, targetPixel);
+                
+                codeInput.scrollTop = safeTarget;
+                codeBackdrop.scrollTop = safeTarget; 
+                lineNumbers.style.transform = `translateY(-${safeTarget}px)`;
+            }
+        }
+
+        // --- MAPEO DE FUENTE (FIXED: SOLO BODY) ---
+        function rebuildSourceMap() {
+            const html = codeInput.value;
+            sourceTextMap = [];
+            
+            // 1. Encontrar dónde empieza el <body>
+            // Cualquier texto antes de esto se ignora para el mapa visual
+            const bodyMatch = html.match(/<body[^>]*>/i);
+            const bodyStartIndex = bodyMatch ? bodyMatch.index + bodyMatch[0].length : 0;
+            const bodyEndMatch = html.match(/<\/body>/i);
+            const bodyEndIndex = bodyEndMatch ? bodyEndMatch.index : html.length;
+
+            // 2. Escanear solo el contenido del BODY
+            // Usamos un índice global para que coincida con el textarea completo
+            const regex = /(>)([^<]+)(<)/g;
+            regex.lastIndex = bodyStartIndex; // Empezar búsqueda después de <body>
+
+            let match;
+            while ((match = regex.exec(html)) !== null) {
+                // Si nos pasamos del body, parar
+                if (match.index >= bodyEndIndex) break;
+
+                const content = match[2];
+                // Solo mapear si tiene texto visible (igual que TreeWalker)
+                if (content.trim().length > 0) {
+                    sourceTextMap.push({ 
+                        text: content, 
+                        start: match.index + 1, 
+                        end: match.index + 1 + content.length 
+                    });
                 }
             }
         }
 
-        function getIframeDoc() { return previewIframe.contentDocument || previewIframe.contentWindow.document; }
+        function handleVisualSelection(doc) {
+            const sel = doc.getSelection();
+            if (sel.rangeCount === 0) return;
+            const range = sel.getRangeAt(0);
+            const node = range.startContainer;
 
-        function writeToIframe(html, fullRewrite = false) {
-            const doc = getIframeDoc();
-            if (!doc) return;
-            if (fullRewrite) {
-                doc.open(); doc.write(html); doc.close();
-                setupIframeListeners();
-            } else {
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, 'text/html');
-                const oldStyles = doc.head.querySelectorAll('style');
-                oldStyles.forEach(s => s.remove());
-                const newStyles = newDoc.head.querySelectorAll('style');
-                newStyles.forEach(s => doc.head.appendChild(s.cloneNode(true)));
-                if (doc.body.innerHTML !== newDoc.body.innerHTML) doc.body.innerHTML = newDoc.body.innerHTML;
-                doc.body.contentEditable = true;
-                doc.body.style.outline = 'none';
+            if (node.nodeType !== Node.TEXT_NODE) return;
+
+            // Encontrar índice ordinal del nodo en el visual
+            const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+                acceptNode: n => n.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+            });
+
+            let nodeIndex = 0; let found = false;
+            while (walker.nextNode()) {
+                if (walker.currentNode === node) { found = true; break; }
+                nodeIndex++;
+            }
+
+            // Mapear al código
+            if (found && sourceTextMap[nodeIndex]) {
+                const mapEntry = sourceTextMap[nodeIndex];
+                let startCode, endCode;
+
+                if (sel.isCollapsed) {
+                    startCode = mapEntry.start;
+                    endCode = mapEntry.end;
+                } else {
+                    // Mapeo relativo dentro del nodo
+                    startCode = mapEntry.start + range.startOffset;
+                    endCode = startCode + range.toString().length;
+                    
+                    // Clamp de seguridad
+                    startCode = Math.max(mapEntry.start, Math.min(startCode, mapEntry.end));
+                    endCode = Math.max(startCode, Math.min(endCode, mapEntry.end));
+                }
+                
+                updateHighlights(startCode, endCode, true);
+            }
+        }
+
+        // --- AUTOCOMPLETADO ---
+        codeInput.addEventListener('keydown', (e) => {
+            if (suggestionsBox.style.display === 'block') {
+                if (['ArrowDown','ArrowUp','Enter','Tab','Escape'].includes(e.key)) {
+                    if(e.key === 'Escape') { hideSuggestions(); return; }
+                    e.preventDefault();
+                    if(e.key === 'ArrowDown') selectedSuggestionIndex = (selectedSuggestionIndex + 1) % currentSuggestions.length;
+                    if(e.key === 'ArrowUp') selectedSuggestionIndex = (selectedSuggestionIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
+                    if(e.key === 'Enter' || e.key === 'Tab') selectSuggestion(currentSuggestions[selectedSuggestionIndex]);
+                    renderSuggestions();
+                }
+            }
+        });
+        codeInput.addEventListener('keyup', (e) => {
+            if (!['ArrowDown','ArrowUp','Enter','Tab','Escape','ArrowLeft','ArrowRight'].includes(e.key)) handleAutocompleteTrigger();
+        });
+
+        function handleAutocompleteTrigger() {
+            const cursor = codeInput.selectionStart;
+            const textBefore = codeInput.value.substring(0, cursor);
+            const tagMatch = textBefore.match(/<([a-zA-Z0-9]*)$/);
+            const attrMatch = textBefore.match(/<([a-zA-Z0-9]+)\s+([^>]*)$/);
+
+            if (tagMatch) {
+                const query = tagMatch[1].toLowerCase();
+                let matches = htmlTags.filter(t => t.startsWith(query));
+                const stack = getOpenTagsStack(textBefore);
+                if (stack.length > 0) {
+                    const toClose = stack[stack.length - 1];
+                    if (('/' + toClose + '>').startsWith(query)) matches.unshift('/' + toClose + '>');
+                }
+                showSuggestions(matches, 'tag', cursor - query.length);
+            } else if (attrMatch) {
+                const tagName = attrMatch[1].toLowerCase();
+                const currentAttr = attrMatch[2].match(/([a-zA-Z0-9-]*)$/);
+                const query = currentAttr ? currentAttr[1].toLowerCase() : "";
+                const all = [...new Set([...(tagAttributes[tagName]||[]), 'class','id','style'])];
+                showSuggestions(all.filter(a => a.startsWith(query)), 'attr', cursor - query.length);
+            } else { hideSuggestions(); }
+        }
+
+        function getOpenTagsStack(html) {
+            const stack = []; const regex = /<\/?([a-z0-9]+)[^>]*>/gi; let match;
+            while ((match = regex.exec(html)) !== null) {
+                const t = match[1].toLowerCase();
+                if(['br','hr','img','input'].includes(t)) continue;
+                match[0].startsWith('</') ? (stack.length && stack[stack.length-1]===t && stack.pop()) : stack.push(t);
+            }
+            return stack;
+        }
+
+        function showSuggestions(list, type, idx) {
+            if(!list.length) { hideSuggestions(); return; }
+            currentSuggestions = list; selectedSuggestionIndex = 0;
+            const coords = getCaretCoordinates();
+            suggestionsBox.style.left = (coords.left + 45) + 'px';
+            suggestionsBox.style.top = (coords.top + 20) + 'px';
+            suggestionsBox.style.display = 'block';
+            suggestionsBox.dataset.startIndex = idx; suggestionsBox.dataset.type = type;
+            renderSuggestions();
+        }
+        function renderSuggestions() {
+            suggestionsBox.innerHTML = currentSuggestions.map((item, i) => 
+                `<div class="suggestion-item ${i===selectedSuggestionIndex?'active':''}" onclick="selectSuggestion('${item}')"><span>${item}</span></div>`
+            ).join('');
+        }
+        window.selectSuggestion = (val) => {
+            const start = parseInt(suggestionsBox.dataset.startIndex);
+            const type = suggestionsBox.dataset.type;
+            let insert = val + (type==='attr'?'=""':'');
+            codeInput.value = codeInput.value.substring(0, start) + insert + codeInput.value.substring(codeInput.selectionStart);
+            let newCursor = start + insert.length - (type==='attr'?1:0);
+            codeInput.focus(); codeInput.setSelectionRange(newCursor, newCursor);
+            hideSuggestions(); renderPreviewFromCode();
+        };
+        function hideSuggestions() { suggestionsBox.style.display = 'none'; }
+        function getCaretCoordinates() {
+            const c = codeInput.selectionStart; cursorMirror.textContent = codeInput.value.substring(0, c);
+            const s = document.createElement('span'); s.textContent='|'; cursorMirror.appendChild(s);
+            return { top: s.offsetTop - codeInput.scrollTop, left: s.offsetLeft - codeInput.scrollLeft };
+        }
+
+        // --- IFRAME & SYNC ---
+        function getIframeDoc() { return previewIframe.contentDocument || previewIframe.contentWindow.document; }
+        function writeToIframe(html, full) {
+            const doc = getIframeDoc(); if(!doc)return;
+            if(full) { doc.open(); doc.write(html); doc.close(); setupIframeListeners(); }
+            else {
+                const p = new DOMParser(); const n = p.parseFromString(html,'text/html');
+                if(doc.body.innerHTML !== n.body.innerHTML) doc.body.innerHTML = n.body.innerHTML;
+                const os=doc.head.querySelectorAll('style'); os.forEach(s=>s.remove());
+                n.head.querySelectorAll('style').forEach(s=>doc.head.appendChild(s.cloneNode(true)));
             }
             rebuildSourceMap();
         }
-
         function setupIframeListeners() {
-            const doc = getIframeDoc();
-            if (!doc) return;
-            doc.body.contentEditable = true;
-            doc.body.style.outline = 'none';
+            const doc = getIframeDoc(); if(!doc)return;
+            doc.body.contentEditable=true; doc.body.style.outline='none';
             doc.addEventListener('input', () => { updateCodeFromVisual(); saveHistory(); });
-            // Sync Selección y Clic
             doc.addEventListener('selectionchange', () => handleVisualSelection(doc));
-            doc.addEventListener('click', () => {
-                 if(doc.body.contentEditable !== 'true') doc.body.contentEditable = true;
-            });
+            doc.addEventListener('click', () => { if(doc.body.contentEditable!=='true') doc.body.contentEditable=true; });
+        }
+        function updateCodeFromVisual() {
+            if(isSyncing)return; isSyncing=true;
+            const doc=getIframeDoc(); const curr=codeInput.value; const nb=doc.body.innerHTML;
+            const reg=/(<body[^>]*>)([\s\S]*?)(<\/body>)/i;
+            if(curr.match(reg)) codeInput.value=curr.replace(reg,`$1\n${nb}\n$3`);
+            updateLineNumbers(); rebuildSourceMap(); isSyncing=false;
         }
 
         // Sync Code -> Visual
-        function syncCodeToVisual() {
-            const cursor = codeInput.selectionStart;
-            let targetMapIndex = -1;
-            for (let i = 0; i < sourceTextMap.length; i++) {
-                if (cursor >= sourceTextMap[i].start && cursor <= sourceTextMap[i].end) {
-                    targetMapIndex = i; break;
-                }
-            }
-            if (targetMapIndex !== -1) {
+        codeInput.addEventListener('click', () => {
+            const c = codeInput.selectionStart;
+            // Solo buscar en el mapa si estamos dentro del body
+            const idx = sourceTextMap.findIndex(m => c >= m.start && c <= m.end);
+            if(idx !== -1) {
                 const doc = getIframeDoc();
-                const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
-                    acceptNode: n => n.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-                });
-                let idx = 0;
-                while(walker.nextNode()) {
-                    if (idx === targetMapIndex) { highlightDomNode(walker.currentNode); return; }
-                    idx++;
+                const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, { acceptNode: n => n.textContent.trim().length>0?1:3 });
+                let i=0; while(walker.nextNode()) {
+                    if(i===idx) { 
+                        const p=walker.currentNode.parentElement; p.scrollIntoView({behavior:'smooth',block:'center'});
+                        p.style.outline='3px solid gold'; setTimeout(()=>p.style.outline='none',1000);
+                        return;
+                    }
+                    i++;
                 }
             }
-        }
-
-        function highlightDomNode(textNode) {
-            const parent = textNode.parentElement;
-            if(!parent) return;
-            parent.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            parent.style.transition = 'outline 0.2s';
-            parent.style.outline = '3px solid rgba(255, 200, 0, 0.6)';
-            setTimeout(() => parent.style.outline = 'none', 1000);
-        }
-
-        function updateCodeFromVisual() {
-            if (isSyncing) return;
-            isSyncing = true;
-            const doc = getIframeDoc();
-            const currentCode = codeInput.value;
-            const newBody = doc.body.innerHTML;
-            const regex = /(<body[^>]*>)([\s\S]*?)(<\/body>)/i;
-            if (currentCode.match(regex)) codeInput.value = currentCode.replace(regex, `$1\n${newBody}\n$3`);
-            updateLineNumbers();
-            rebuildSourceMap();
-            isSyncing = false;
-        }
-
-        // Events
-        codeInput.addEventListener('input', () => {
-            renderPreviewFromCode(); updateLineNumbers(); saveHistory(); rebuildSourceMap();
         });
-        codeInput.addEventListener('click', syncCodeToVisual);
-        codeInput.addEventListener('keyup', (e) => {
-            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) syncCodeToVisual();
-            updateStatus();
-        });
+
+        // Eventos Generales
+        codeInput.addEventListener('input', () => { if(!isSyncing) {isSyncing=true; writeToIframe(codeInput.value, false); updateHighlights(); isSyncing=false;} updateLineNumbers(); saveHistory(); rebuildSourceMap(); });
         codeInput.addEventListener('scroll', () => {
             codeBackdrop.scrollTop = codeInput.scrollTop;
             codeBackdrop.scrollLeft = codeInput.scrollLeft;
             lineNumbers.style.transform = `translateY(-${codeInput.scrollTop}px)`;
         });
 
-        function renderPreviewFromCode() {
-            if (isSyncing) return;
-            isSyncing = true;
-            writeToIframe(codeInput.value, false);
-            updateHighlights();
-            isSyncing = false;
-        }
-        function updateLineNumbers() {
-            lineNumbers.textContent = Array(codeInput.value.split('\n').length).fill(0).map((_, i) => i + 1).join('\n');
-        }
-        function updateStatus() {
-            const val = codeInput.value;
-            const sel = codeInput.selectionStart;
-            const line = val.substring(0, sel).split('\n').length;
-            const col = sel - val.lastIndexOf('\n', sel - 1);
-            document.getElementById('ln-display').innerText = line;
-            document.getElementById('col-display').innerText = col;
-        }
-        
-        // History & Utils
+        // Utils
+        function updateLineNumbers() { lineNumbers.textContent = Array(codeInput.value.split('\n').length).fill(0).map((_,i)=>i+1).join('\n'); }
         function saveHistory() {
-            const content = codeInput.value;
-            if (historyStack.length > 0 && historyStack[historyIndex] === content) return;
-            historyStack = historyStack.slice(0, historyIndex + 1);
-            historyStack.push(content);
-            historyIndex++;
+            const c = codeInput.value; if(historyStack[historyIndex]===c)return;
+            historyStack = historyStack.slice(0, historyIndex+1); historyStack.push(c); historyIndex++;
         }
-        window.undo = () => { if(historyIndex>0) { historyIndex--; restoreState(); } };
-        window.redo = () => { if(historyIndex<historyStack.length-1) { historyIndex++; restoreState(); } };
-        function restoreState() {
-            codeInput.value = historyStack[historyIndex];
-            renderPreviewFromCode(); updateLineNumbers(); updateHighlights(); rebuildSourceMap();
-        }
-
-        window.formatSourceCode = function() {
-            let indent=0; const tab="    ";
-            const tokens = codeInput.value.replace(/>\s*</g, "><").replace(/</g, "~::~<").replace(/\s*~::~<\s*/g, "\n<").split('\n');
-            let fmt = "";
-            tokens.forEach(line => {
-                line=line.trim(); if(!line)return;
-                if(line.match(/^<\//)) indent=Math.max(0,indent-1);
-                fmt += tab.repeat(indent)+line+"\n";
-                if(!/^<\//.test(line) && !/^(<img|<br|<hr|<input|<meta|<link)/.test(line) && /^<[a-z0-9]+/.test(line)) indent++;
-            });
-            codeInput.value = fmt.trim();
-            renderPreviewFromCode(); updateLineNumbers(); saveHistory(); rebuildSourceMap();
+        window.undo = () => { if(historyIndex>0) { historyIndex--; restore(); } };
+        window.redo = () => { if(historyIndex<historyStack.length-1) { historyIndex++; restore(); } };
+        function restore() { codeInput.value = historyStack[historyIndex]; writeToIframe(codeInput.value, false); updateHighlights(); updateLineNumbers(); rebuildSourceMap(); }
+        window.formatSourceCode = () => {
+            let indent=0, tab="    ", tokens=codeInput.value.replace(/>\s*</g,"><").replace(/</g,"~::~<").replace(/\s*~::~<\s*/g,"\n<").split('\n'), fmt="";
+            tokens.forEach(l=>{ l=l.trim(); if(!l)return; if(l.match(/^<\//))indent=Math.max(0,indent-1); fmt+=tab.repeat(indent)+l+"\n"; if(!/^<\//.test(l)&&!/^(<img|<br|<hr|<input)/.test(l)&&/^<[a-z0-9]+/.test(l))indent++; });
+            codeInput.value=fmt.trim(); writeToIframe(codeInput.value,false); updateLineNumbers(); saveHistory(); rebuildSourceMap();
         };
 
+        // File IO
         document.getElementById('file-upload').addEventListener('change', (e) => {
             const f=e.target.files[0]; if(!f)return;
-            const r=new FileReader();
-            r.onload=(ev)=>{
-                codeInput.value=ev.target.result; 
-                document.getElementById('filename').value=f.name;
-                writeToIframe(codeInput.value, true);
-                updateLineNumbers(); saveHistory(); rebuildSourceMap();
-            };
-            r.readAsText(f);
+            const r=new FileReader(); r.onload=(ev)=>{
+                codeInput.value=ev.target.result; document.getElementById('filename').value=f.name;
+                writeToIframe(codeInput.value, true); updateLineNumbers(); saveHistory(); rebuildSourceMap();
+            }; r.readAsText(f);
         });
         window.downloadFile = () => {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([codeInput.value], {type: 'text/html'}));
-            a.download = document.getElementById('filename').value || 'index.html';
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([codeInput.value], {type:'text/html'}));
+            a.download = document.getElementById('filename').value||'index.html'; a.click();
         };
 
         init();
