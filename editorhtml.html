@@ -3,552 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor HTML V14 - Sync Fix</title>
+    <title>Editor HTML Pro con Sincronización Visual</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@400;600&display=swap');
-
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1e1e1e;
-            color: #e0e0e0;
-            height: 100vh;
-            overflow: hidden;
+        /* Estilos personalizados para el scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
         }
 
-        /* Variables de Alineación */
-        :root {
-            --code-font-family: 'Roboto Mono', monospace;
-            --code-font-size: 13px;
-            --code-line-height: 20px;
-            --code-padding: 10px;
+        /* Editor Styles specific */
+        .editor-container {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            line-height: 1.5;
+            font-size: 14px;
         }
-
-        /* --- EDITOR WRAPPER --- */
-        .code-wrapper {
-            position: relative;
-            flex: 1;
-            overflow: hidden;
-            background-color: #1e1e1e;
-            display: flex;
-        }
-
-        /* Números de línea */
-        .line-numbers-container {
-            width: 45px;
-            background-color: #1e1e1e;
-            border-right: 1px solid #333;
-            z-index: 5;
-            overflow: hidden;
-            flex-shrink: 0;
-            position: relative;
-        }
-
+        
         #line-numbers {
-            font-family: var(--code-font-family);
-            font-size: var(--code-font-size);
-            line-height: var(--code-line-height);
-            padding-top: var(--code-padding);
-            padding-right: 8px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            line-height: 1.5;
+            font-size: 14px;
             text-align: right;
-            color: #6e7681;
-            margin: 0;
+            color: #64748b;
+            padding-right: 10px;
+            padding-top: 10px;
             user-select: none;
-            white-space: pre;
         }
 
-        /* Estilos base para capas del editor */
-        .editor-layer {
-            font-family: var(--code-font-family) !important;
-            font-size: var(--code-font-size) !important;
-            line-height: var(--code-line-height) !important;
-            padding: var(--code-padding) !important;
-            margin: 0;
-            border: 0;
-            tab-size: 4;
+        textarea#code-input {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            line-height: 1.5;
+            font-size: 14px;
             white-space: pre;
             overflow-wrap: normal;
-            word-break: normal;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* Capa 1: Backdrop (DONDE VIVE EL RESALTADO) */
-        #code-backdrop {
-            z-index: 1;
-            /* Importante: el texto es invisible, pero el fondo de <mark> se ve */
-            color: transparent; 
-            background-color: transparent; 
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        /* Capa 2: Textarea (DONDE ESCRIBES) */
-        textarea#html-code {
-            z-index: 2;
-            /* CRÍTICO: Fondo transparente para ver el backdrop debajo */
-            background-color: transparent !important;
-            background: transparent !important;
-            color: #d4d4d4;
-            resize: none;
+            overflow-x: scroll;
+            tab-size: 4;
             outline: none;
-            overflow: auto;
-            padding-bottom: 40px !important;
+            border: none;
+            resize: none;
+            background: transparent;
+            color: #e2e8f0;
+            padding-top: 10px;
         }
 
-        /* ESTILO DEL RESALTADO (ALTO CONTRASTE) */
-        mark.selection-highlight {
-            /* Amarillo semitransparente fuerte */
-            background-color: rgba(255, 215, 0, 0.4) !important;
-            /* Borde inferior sólido para destacar más */
-            border-bottom: 2px solid #ffd700;
-            color: transparent;
-            border-radius: 2px;
-            display: inline;
-            padding: 0;
-            line-height: var(--code-line-height) !important;
+        /* Resaltado de selección en textarea */
+        ::selection {
+            background-color: #facc15; /* Amarillo intenso */
+            color: #000;
         }
 
-        /* --- AUTOCOMPLETADO --- */
-        #suggestions-box {
+        /* Autocomplete dropdown */
+        #autocomplete-list {
             position: absolute;
-            background-color: #252526;
-            border: 1px solid #454545;
+            background-color: #1e293b;
+            border: 1px solid #475569;
             border-radius: 4px;
-            width: 220px;
-            max-height: 200px;
+            z-index: 50;
+            max-height: 150px;
             overflow-y: auto;
             display: none;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            font-family: var(--code-font-family);
-            font-size: 12px;
+            width: 200px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
         }
-
         .suggestion-item {
-            padding: 6px 10px;
+            padding: 8px 12px;
             cursor: pointer;
-            color: #cccccc;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            color: #cbd5e1;
         }
-        .suggestion-item:hover, .suggestion-item.active { background-color: #04395e; color: white; }
-
-        /* Espejo cursor */
-        #cursor-mirror {
-            visibility: hidden; position: absolute; top: 0; left: 0; pointer-events: none;
-            white-space: pre; font-family: var(--code-font-family); font-size: var(--code-font-size);
-            line-height: var(--code-line-height); padding: var(--code-padding); width: 100%; overflow: hidden;
+        .suggestion-item:hover, .suggestion-item.active {
+            background-color: #3b82f6;
+            color: white;
         }
-
-        /* --- PREVIEW --- */
-        #preview-container {
-            flex: 1; display: flex; flex-direction: column; background-color: white; position: relative;
-        }
-        #preview-iframe { flex: 1; border: none; width: 100%; height: 100%; background: white; }
-
-        /* Scrollbars */
-        ::-webkit-scrollbar { width: 12px; height: 12px; }
-        ::-webkit-scrollbar-track { background: #1e1e1e; }
-        ::-webkit-scrollbar-thumb { background: #4a4a4a; border: 3px solid #1e1e1e; border-radius: 6px; }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="bg-slate-900 text-slate-200 h-screen flex flex-col overflow-hidden">
 
-    <!-- Header -->
-    <header class="h-12 bg-[#2d2d2d] border-b border-[#1e1e1e] flex items-center justify-between px-4 shrink-0 shadow-sm z-20">
+    <!-- Header / Toolbar -->
+    <header class="bg-slate-800 border-b border-slate-700 p-3 flex justify-between items-center shadow-md z-10">
         <div class="flex items-center gap-3">
-            <i class="fa-solid fa-check-double text-green-500"></i>
-            <span class="text-xs text-gray-400 font-semibold tracking-wide">EDITOR V14 (SYNC FIX)</span>
-            <div class="h-4 w-px bg-gray-600 mx-1"></div>
-            <input type="text" id="filename" value="index.html" class="bg-transparent border-none text-gray-200 text-sm focus:outline-none w-32 font-mono placeholder-gray-600">
-            
-            <div class="flex items-center gap-1 ml-2 border-l border-gray-700 pl-2">
-                <button onclick="undo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition"><i class="fa-solid fa-rotate-left text-xs"></i></button>
-                <button onclick="redo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition"><i class="fa-solid fa-rotate-right text-xs"></i></button>
-            </div>
+            <i class="fa-solid fa-code text-blue-500 text-xl"></i>
+            <h1 class="font-bold text-lg tracking-wide text-blue-100">DevHTML <span class="text-xs font-normal text-slate-400">Editor</span></h1>
         </div>
-        <div class="flex items-center gap-2">
-            <input type="file" id="file-upload" class="hidden">
-            <button onclick="document.getElementById('file-upload').click()" class="bg-[#3e3e3e] hover:bg-[#4e4e4e] text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-2"><i class="fa-solid fa-folder-open"></i> Abrir</button>
-            <button onclick="formatSourceCode()" class="bg-[#3e3e3e] hover:bg-[#4e4e4e] text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-2"><i class="fa-solid fa-indent"></i> Formatear</button>
-            <button onclick="downloadFile()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-2 shadow-md"><i class="fa-solid fa-download"></i> Descargar</button>
+        
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('file-input').click()" class="btn-tool" title="Abrir Archivo">
+                <i class="fa-solid fa-folder-open"></i>
+            </button>
+            <input type="file" id="file-input" class="hidden" accept=".html,.htm,.txt">
+
+            <button onclick="downloadFile()" class="btn-tool" title="Descargar">
+                <i class="fa-solid fa-download"></i>
+            </button>
+            
+            <div class="w-px h-8 bg-slate-600 mx-2"></div>
+            
+            <button onclick="undo()" class="btn-tool" title="Deshacer (Ctrl+Z)">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+            <button onclick="redo()" class="btn-tool" title="Rehacer (Ctrl+Y)">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+
+            <div class="w-px h-8 bg-slate-600 mx-2"></div>
+
+            <button onclick="formatCode()" class="btn-tool" title="Formatear Código">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </button>
         </div>
     </header>
 
-    <!-- Main -->
-    <main class="flex-1 flex overflow-hidden">
+    <!-- Main Content Split View -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         
-        <!-- EDITOR -->
-        <div class="w-1/2 flex border-r border-[#1e1e1e] relative bg-[#1e1e1e]">
-            <div class="line-numbers-container">
-                <pre id="line-numbers">1</pre>
+        <!-- Editor Section -->
+        <section class="flex-1 flex flex-col border-r border-slate-700 bg-slate-900 relative min-w-[300px]">
+            <div class="flex justify-between items-center bg-slate-800 px-4 py-1 text-xs text-slate-400 uppercase tracking-wider font-semibold">
+                <span>Código Fuente</span>
+                <span id="sync-status" class="text-green-500 hidden transition-opacity duration-300"><i class="fa-solid fa-link"></i> Sync</span>
             </div>
-            <div class="relative flex-1 overflow-hidden">
-                <!-- Capa Backdrop (Highlights) -->
-                <div id="code-backdrop" class="editor-layer"></div>
-                <!-- Capa Textarea (Input) -->
-                <textarea id="html-code" class="editor-layer" spellcheck="false"></textarea>
+            
+            <div class="relative flex-1 flex overflow-hidden editor-container">
+                <!-- Line Numbers -->
+                <div id="line-numbers" class="w-12 bg-slate-900 border-r border-slate-800 shrink-0 overflow-hidden">
+                    1
+                </div>
                 
-                <div id="suggestions-box"></div>
-                <div id="cursor-mirror"></div>
+                <!-- Code Area -->
+                <textarea id="code-input" class="flex-1 p-2 bg-transparent outline-none z-10" spellcheck="false" placeholder="<!-- Escribe tu HTML aquí -->"></textarea>
+                
+                <!-- Autocomplete Container -->
+                <div id="autocomplete-list"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- PREVIEW -->
-        <div id="preview-container" class="w-1/2">
-            <div class="bg-gray-100 border-b border-gray-200 text-gray-400 text-[10px] uppercase px-3 py-1 font-bold tracking-wider select-none">Vista Previa Interactiva</div>
-            <iframe id="preview-iframe"></iframe>
-        </div>
+        <!-- Preview Section -->
+        <section class="flex-1 flex flex-col bg-white relative min-w-[300px]">
+            <div class="flex justify-between items-center bg-slate-200 px-4 py-1 text-xs text-slate-600 uppercase tracking-wider font-semibold border-b border-slate-300">
+                <span>Vista Previa Interactiva</span>
+                <span class="text-slate-500">Iframe</span>
+            </div>
+            <iframe id="preview-frame" class="w-full h-full bg-white border-none" sandbox="allow-scripts allow-modals allow-same-origin"></iframe>
+        </section>
 
     </main>
 
     <!-- Footer -->
-    <footer class="h-6 bg-[#007acc] text-white text-[10px] flex items-center justify-between px-3 shrink-0 select-none">
-        <span id="status-msg">Listo</span>
-        <div class="flex gap-4 font-mono">
-            <span>Ln <span id="ln-display">1</span>, Col <span id="col-display">1</span></span>
-            <span>HTML5</span>
-        </div>
+    <footer class="bg-slate-800 text-slate-400 text-xs p-2 border-t border-slate-700 flex justify-between">
+        <div id="cursor-position">Ln 1, Col 1</div>
+        <div>HTML5 • UTF-8 • <span id="node-count">0 Nodos</span></div>
     </footer>
 
+    <!-- Tailwind Helper Styles for Buttons -->
+    <style>
+        .btn-tool {
+            @apply p-2 rounded text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200 w-10 h-10 flex items-center justify-center;
+        }
+    </style>
+
     <script>
-        // Referencias
-        const codeInput = document.getElementById('html-code');
-        const codeBackdrop = document.getElementById('code-backdrop');
+        // --- Variables Globales ---
+        const textarea = document.getElementById('code-input');
         const lineNumbers = document.getElementById('line-numbers');
-        const previewIframe = document.getElementById('preview-iframe');
-        const suggestionsBox = document.getElementById('suggestions-box');
-        const cursorMirror = document.getElementById('cursor-mirror');
+        const iframe = document.getElementById('preview-frame');
+        const cursorPosDisplay = document.getElementById('cursor-position');
+        const autocompleteList = document.getElementById('autocomplete-list');
+        const nodeCountDisplay = document.getElementById('node-count');
+        const syncStatus = document.getElementById('sync-status');
 
-        const LINE_HEIGHT = 20;
-        
-        // Autocompletado Data
-        const htmlTags = ['div','p','span','a','img','h1','h2','h3','ul','ol','li','table','tr','td','form','input','button','label','br','hr','style','script','header','footer','nav','section','article','strong','em'];
-        const tagAttributes = {
-            'a': ['href','target','class','id'], 'img': ['src','alt','width','height','class'],
-            'input': ['type','placeholder','value','name','required'], 'div': ['class','id','style'],
-            'p': ['class','style'], 'button': ['type','onclick','class']
-        };
+        let historyStack = [];
+        let historyIndex = -1;
+        const maxHistory = 50;
 
-        // Estado
-        let historyStack = []; let historyIndex = -1; let isSyncing = false;
-        let sourceTextMap = []; let currentSuggestions = []; let selectedSuggestionIndex = 0;
+        // Tags HTML comunes para autocompletado
+        const htmlTags = [
+            'div', 'span', 'p', 'h1', 'h2', 'h3', 'section', 'article', 'nav', 'header', 'footer',
+            'ul', 'ol', 'li', 'a', 'img', 'button', 'input', 'form', 'label', 'table', 'tr', 'td',
+            'script', 'style', 'link', 'meta', 'title', 'head', 'body'
+        ];
 
-        // Contenido Inicial
-        const initialContent = `<!DOCTYPE html>
-<html lang="es">
+        // --- Inicialización ---
+        const defaultHTML = `<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Documento de Prueba</title>
     <style>
         body { font-family: sans-serif; padding: 20px; color: #333; }
-        h1 { color: #d97706; }
-        .hint { background: #fffbeb; padding: 10px; border-left: 4px solid #d97706; margin-bottom: 10px; }
+        h1 { color: #2563eb; }
+        p { line-height: 1.6; }
+        .highlight { background: #fef08a; padding: 2px 5px; border-radius: 4px; }
+        li { margin-bottom: 5px; }
     </style>
 </head>
 <body>
-    <h1>Editor V14: Sincronización Corregida</h1>
+    <h1>Hola Mundo</h1>
+    <p>Este es un editor con <strong>sincronización bidireccional</strong>.</p>
     
-    <div class="hint">
-        <p><strong>Problema arreglado:</strong> Antes, el texto en el &lt;head&gt; (como los estilos) confundía al sistema de selección.</p>
-    </div>
-
-    <p>Ahora puedes seleccionar cualquier elemento repetido y marcará el correcto:</p>
+    <h3>Prueba de Selección:</h3>
     <ul>
-        <li>Item A (Uno)</li>
-        <li>Item A (Dos)</li>
-        <li>Item A (Tres)</li>
+        <li>1. Selecciona "Hola Mundo" en el código (izquierda).</li>
+        <li>2. Verás que se resalta en el visual (derecha).</li>
+        <li>3. Ahora selecciona esta lista en el visual.</li>
+        <li>4. Verás que se resalta el código.</li>
     </ul>
+    
+    <button onclick="alert('Funciona!')">Click Me</button>
 </body>
 </html>`;
 
-        function init() {
-            codeInput.value = initialContent;
-            setTimeout(() => {
-                writeToIframe(initialContent, true);
-                setupIframeListeners();
-                updateLineNumbers();
-                saveHistory();
-                rebuildSourceMap();
-            }, 0);
+        textarea.value = defaultHTML;
+        
+        // --- Funciones Core del Editor ---
+
+        function updateLineNumbers() {
+            const lines = textarea.value.split('\n').length;
+            lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => `<div>${i + 1}</div>`).join('');
         }
 
-        // --- CORE: HIGHLIGHTING ---
-        function updateHighlights(start = -1, end = -1, doScroll = false) {
-            const text = codeInput.value;
-            const escape = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            
-            if (start < 0 || end <= start) {
-                codeBackdrop.textContent = text;
-                return;
-            }
-
-            const before = escape(text.slice(0, start));
-            const sel = escape(text.slice(start, end));
-            const after = escape(text.slice(end));
-
-            // Inyectar HTML con la marca
-            codeBackdrop.innerHTML = before + `<mark class="selection-highlight">${sel}</mark>` + after;
-
-            if (doScroll) {
-                const linesBefore = text.slice(0, start).split('\n').length;
-                const targetPixel = (linesBefore * LINE_HEIGHT) - (codeInput.clientHeight / 2);
-                const safeTarget = Math.max(0, targetPixel);
-                
-                codeInput.scrollTop = safeTarget;
-                codeBackdrop.scrollTop = safeTarget; 
-                lineNumbers.style.transform = `translateY(-${safeTarget}px)`;
-            }
+        function updateCursorPosition() {
+            const text = textarea.value;
+            const cursorPos = textarea.selectionStart;
+            const lines = text.substr(0, cursorPos).split("\n");
+            const currentLine = lines.length;
+            const currentCol = lines[lines.length - 1].length + 1;
+            cursorPosDisplay.innerText = `Ln ${currentLine}, Col ${currentCol}`;
         }
 
-        // --- MAPEO DE FUENTE (FIXED: SOLO BODY) ---
-        function rebuildSourceMap() {
-            const html = codeInput.value;
-            sourceTextMap = [];
-            
-            // 1. Encontrar dónde empieza el <body>
-            // Cualquier texto antes de esto se ignora para el mapa visual
-            const bodyMatch = html.match(/<body[^>]*>/i);
-            const bodyStartIndex = bodyMatch ? bodyMatch.index + bodyMatch[0].length : 0;
-            const bodyEndMatch = html.match(/<\/body>/i);
-            const bodyEndIndex = bodyEndMatch ? bodyEndMatch.index : html.length;
-
-            // 2. Escanear solo el contenido del BODY
-            // Usamos un índice global para que coincida con el textarea completo
-            const regex = /(>)([^<]+)(<)/g;
-            regex.lastIndex = bodyStartIndex; // Empezar búsqueda después de <body>
-
-            let match;
-            while ((match = regex.exec(html)) !== null) {
-                // Si nos pasamos del body, parar
-                if (match.index >= bodyEndIndex) break;
-
-                const content = match[2];
-                // Solo mapear si tiene texto visible (igual que TreeWalker)
-                if (content.trim().length > 0) {
-                    sourceTextMap.push({ 
-                        text: content, 
-                        start: match.index + 1, 
-                        end: match.index + 1 + content.length 
-                    });
-                }
-            }
-        }
-
-        function handleVisualSelection(doc) {
-            const sel = doc.getSelection();
-            if (sel.rangeCount === 0) return;
-            const range = sel.getRangeAt(0);
-            const node = range.startContainer;
-
-            if (node.nodeType !== Node.TEXT_NODE) return;
-
-            // Encontrar índice ordinal del nodo en el visual
-            const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
-                acceptNode: n => n.textContent.trim().length > 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-            });
-
-            let nodeIndex = 0; let found = false;
-            while (walker.nextNode()) {
-                if (walker.currentNode === node) { found = true; break; }
-                nodeIndex++;
-            }
-
-            // Mapear al código
-            if (found && sourceTextMap[nodeIndex]) {
-                const mapEntry = sourceTextMap[nodeIndex];
-                let startCode, endCode;
-
-                if (sel.isCollapsed) {
-                    startCode = mapEntry.start;
-                    endCode = mapEntry.end;
-                } else {
-                    // Mapeo relativo dentro del nodo
-                    startCode = mapEntry.start + range.startOffset;
-                    endCode = startCode + range.toString().length;
-                    
-                    // Clamp de seguridad
-                    startCode = Math.max(mapEntry.start, Math.min(startCode, mapEntry.end));
-                    endCode = Math.max(startCode, Math.min(endCode, mapEntry.end));
-                }
-                
-                updateHighlights(startCode, endCode, true);
-            }
-        }
-
-        // --- AUTOCOMPLETADO ---
-        codeInput.addEventListener('keydown', (e) => {
-            if (suggestionsBox.style.display === 'block') {
-                if (['ArrowDown','ArrowUp','Enter','Tab','Escape'].includes(e.key)) {
-                    if(e.key === 'Escape') { hideSuggestions(); return; }
-                    e.preventDefault();
-                    if(e.key === 'ArrowDown') selectedSuggestionIndex = (selectedSuggestionIndex + 1) % currentSuggestions.length;
-                    if(e.key === 'ArrowUp') selectedSuggestionIndex = (selectedSuggestionIndex - 1 + currentSuggestions.length) % currentSuggestions.length;
-                    if(e.key === 'Enter' || e.key === 'Tab') selectSuggestion(currentSuggestions[selectedSuggestionIndex]);
-                    renderSuggestions();
-                }
-            }
-        });
-        codeInput.addEventListener('keyup', (e) => {
-            if (!['ArrowDown','ArrowUp','Enter','Tab','Escape','ArrowLeft','ArrowRight'].includes(e.key)) handleAutocompleteTrigger();
-        });
-
-        function handleAutocompleteTrigger() {
-            const cursor = codeInput.selectionStart;
-            const textBefore = codeInput.value.substring(0, cursor);
-            const tagMatch = textBefore.match(/<([a-zA-Z0-9]*)$/);
-            const attrMatch = textBefore.match(/<([a-zA-Z0-9]+)\s+([^>]*)$/);
-
-            if (tagMatch) {
-                const query = tagMatch[1].toLowerCase();
-                let matches = htmlTags.filter(t => t.startsWith(query));
-                const stack = getOpenTagsStack(textBefore);
-                if (stack.length > 0) {
-                    const toClose = stack[stack.length - 1];
-                    if (('/' + toClose + '>').startsWith(query)) matches.unshift('/' + toClose + '>');
-                }
-                showSuggestions(matches, 'tag', cursor - query.length);
-            } else if (attrMatch) {
-                const tagName = attrMatch[1].toLowerCase();
-                const currentAttr = attrMatch[2].match(/([a-zA-Z0-9-]*)$/);
-                const query = currentAttr ? currentAttr[1].toLowerCase() : "";
-                const all = [...new Set([...(tagAttributes[tagName]||[]), 'class','id','style'])];
-                showSuggestions(all.filter(a => a.startsWith(query)), 'attr', cursor - query.length);
-            } else { hideSuggestions(); }
-        }
-
-        function getOpenTagsStack(html) {
-            const stack = []; const regex = /<\/?([a-z0-9]+)[^>]*>/gi; let match;
-            while ((match = regex.exec(html)) !== null) {
-                const t = match[1].toLowerCase();
-                if(['br','hr','img','input'].includes(t)) continue;
-                match[0].startsWith('</') ? (stack.length && stack[stack.length-1]===t && stack.pop()) : stack.push(t);
-            }
-            return stack;
-        }
-
-        function showSuggestions(list, type, idx) {
-            if(!list.length) { hideSuggestions(); return; }
-            currentSuggestions = list; selectedSuggestionIndex = 0;
-            const coords = getCaretCoordinates();
-            suggestionsBox.style.left = (coords.left + 45) + 'px';
-            suggestionsBox.style.top = (coords.top + 20) + 'px';
-            suggestionsBox.style.display = 'block';
-            suggestionsBox.dataset.startIndex = idx; suggestionsBox.dataset.type = type;
-            renderSuggestions();
-        }
-        function renderSuggestions() {
-            suggestionsBox.innerHTML = currentSuggestions.map((item, i) => 
-                `<div class="suggestion-item ${i===selectedSuggestionIndex?'active':''}" onclick="selectSuggestion('${item}')"><span>${item}</span></div>`
-            ).join('');
-        }
-        window.selectSuggestion = (val) => {
-            const start = parseInt(suggestionsBox.dataset.startIndex);
-            const type = suggestionsBox.dataset.type;
-            let insert = val + (type==='attr'?'=""':'');
-            codeInput.value = codeInput.value.substring(0, start) + insert + codeInput.value.substring(codeInput.selectionStart);
-            let newCursor = start + insert.length - (type==='attr'?1:0);
-            codeInput.focus(); codeInput.setSelectionRange(newCursor, newCursor);
-            hideSuggestions(); renderPreviewFromCode();
-        };
-        function hideSuggestions() { suggestionsBox.style.display = 'none'; }
-        function getCaretCoordinates() {
-            const c = codeInput.selectionStart; cursorMirror.textContent = codeInput.value.substring(0, c);
-            const s = document.createElement('span'); s.textContent='|'; cursorMirror.appendChild(s);
-            return { top: s.offsetTop - codeInput.scrollTop, left: s.offsetLeft - codeInput.scrollLeft };
-        }
-
-        // --- IFRAME & SYNC ---
-        function getIframeDoc() { return previewIframe.contentDocument || previewIframe.contentWindow.document; }
-        function writeToIframe(html, full) {
-            const doc = getIframeDoc(); if(!doc)return;
-            if(full) { doc.open(); doc.write(html); doc.close(); setupIframeListeners(); }
-            else {
-                const p = new DOMParser(); const n = p.parseFromString(html,'text/html');
-                if(doc.body.innerHTML !== n.body.innerHTML) doc.body.innerHTML = n.body.innerHTML;
-                const os=doc.head.querySelectorAll('style'); os.forEach(s=>s.remove());
-                n.head.querySelectorAll('style').forEach(s=>doc.head.appendChild(s.cloneNode(true)));
-            }
-            rebuildSourceMap();
-        }
-        function setupIframeListeners() {
-            const doc = getIframeDoc(); if(!doc)return;
-            doc.body.contentEditable=true; doc.body.style.outline='none';
-            doc.addEventListener('input', () => { updateCodeFromVisual(); saveHistory(); });
-            doc.addEventListener('selectionchange', () => handleVisualSelection(doc));
-            doc.addEventListener('click', () => { if(doc.body.contentEditable!=='true') doc.body.contentEditable=true; });
-        }
-        function updateCodeFromVisual() {
-            if(isSyncing)return; isSyncing=true;
-            const doc=getIframeDoc(); const curr=codeInput.value; const nb=doc.body.innerHTML;
-            const reg=/(<body[^>]*>)([\s\S]*?)(<\/body>)/i;
-            if(curr.match(reg)) codeInput.value=curr.replace(reg,`$1\n${nb}\n$3`);
-            updateLineNumbers(); rebuildSourceMap(); isSyncing=false;
-        }
-
-        // Sync Code -> Visual
-        codeInput.addEventListener('click', () => {
-            const c = codeInput.selectionStart;
-            // Solo buscar en el mapa si estamos dentro del body
-            const idx = sourceTextMap.findIndex(m => c >= m.start && c <= m.end);
-            if(idx !== -1) {
-                const doc = getIframeDoc();
-                const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, { acceptNode: n => n.textContent.trim().length>0?1:3 });
-                let i=0; while(walker.nextNode()) {
-                    if(i===idx) { 
-                        const p=walker.currentNode.parentElement; p.scrollIntoView({behavior:'smooth',block:'center'});
-                        p.style.outline='3px solid gold'; setTimeout(()=>p.style.outline='none',1000);
-                        return;
-                    }
-                    i++;
-                }
-            }
-        });
-
-        // Eventos Generales
-        codeInput.addEventListener('input', () => { if(!isSyncing) {isSyncing=true; writeToIframe(codeInput.value, false); updateHighlights(); isSyncing=false;} updateLineNumbers(); saveHistory(); rebuildSourceMap(); });
-        codeInput.addEventListener('scroll', () => {
-            codeBackdrop.scrollTop = codeInput.scrollTop;
-            codeBackdrop.scrollLeft = codeInput.scrollLeft;
-            lineNumbers.style.transform = `translateY(-${codeInput.scrollTop}px)`;
-        });
-
-        // Utils
-        function updateLineNumbers() { lineNumbers.textContent = Array(codeInput.value.split('\n').length).fill(0).map((_,i)=>i+1).join('\n'); }
         function saveHistory() {
-            const c = codeInput.value; if(historyStack[historyIndex]===c)return;
-            historyStack = historyStack.slice(0, historyIndex+1); historyStack.push(c); historyIndex++;
+            if (historyIndex === -1 || historyStack[historyIndex] !== textarea.value) {
+                if (historyIndex < historyStack.length - 1) {
+                    historyStack = historyStack.slice(0, historyIndex + 1);
+                }
+                historyStack.push(textarea.value);
+                if (historyStack.length > maxHistory) historyStack.shift();
+                else historyIndex++;
+            }
         }
-        window.undo = () => { if(historyIndex>0) { historyIndex--; restore(); } };
-        window.redo = () => { if(historyIndex<historyStack.length-1) { historyIndex++; restore(); } };
-        function restore() { codeInput.value = historyStack[historyIndex]; writeToIframe(codeInput.value, false); updateHighlights(); updateLineNumbers(); rebuildSourceMap(); }
-        window.formatSourceCode = () => {
-            let indent=0, tab="    ", tokens=codeInput.value.replace(/>\s*</g,"><").replace(/</g,"~::~<").replace(/\s*~::~<\s*/g,"\n<").split('\n'), fmt="";
-            tokens.forEach(l=>{ l=l.trim(); if(!l)return; if(l.match(/^<\//))indent=Math.max(0,indent-1); fmt+=tab.repeat(indent)+l+"\n"; if(!/^<\//.test(l)&&!/^(<img|<br|<hr|<input)/.test(l)&&/^<[a-z0-9]+/.test(l))indent++; });
-            codeInput.value=fmt.trim(); writeToIframe(codeInput.value,false); updateLineNumbers(); saveHistory(); rebuildSourceMap();
-        };
 
-        // File IO
-        document.getElementById('file-upload').addEventListener('change', (e) => {
-            const f=e.target.files[0]; if(!f)return;
-            const r=new FileReader(); r.onload=(ev)=>{
-                codeInput.value=ev.target.result; document.getElementById('filename').value=f.name;
-                writeToIframe(codeInput.value, true); updateLineNumbers(); saveHistory(); rebuildSourceMap();
-            }; r.readAsText(f);
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                textarea.value = historyStack[historyIndex];
+                updateAll(false);
+            }
+        }
+
+        function redo() {
+            if (historyIndex < historyStack.length - 1) {
+                historyIndex++;
+                textarea.value = historyStack[historyIndex];
+                updateAll(false);
+            }
+        }
+
+        // --- Lógica de Sincronización y Renderizado ---
+
+        function updatePreview() {
+            const content = textarea.value;
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            
+            // Script inyectado para gestionar la comunicación bidireccional desde el Iframe
+            const scriptHelper = `
+                <script>
+                    // 1. Visual -> Code (Detectar selección en el iframe)
+                    document.addEventListener('selectionchange', () => {
+                        const sel = window.getSelection();
+                        if (!sel.rangeCount) return;
+                        const text = sel.toString();
+                        if (text.length > 1) {
+                            window.parent.postMessage({ type: 'syncFromVisual', text: text }, '*');
+                        }
+                    });
+
+                    // 2. Code -> Visual (Función expuesta para recibir orden del padre)
+                    window.highlightText = function(text) {
+                        if (!text) return;
+                        
+                        // Usamos window.find() para buscar y seleccionar texto
+                        // Sintaxis: find(text, caseSensitive, backward, wrapAround, wholeWord, searchInFrames, showDialog)
+                        
+                        // Limpiar selección previa
+                        window.getSelection().removeAllRanges();
+                        
+                        // Buscar
+                        const found = window.find(text, false, false, true, false, true, false);
+                        
+                        if (found) {
+                            // Asegurarnos que sea visible (scroll)
+                            const sel = window.getSelection();
+                            if (sel.rangeCount > 0) {
+                                const range = sel.getRangeAt(0);
+                                if (range && range.startContainer.parentElement) {
+                                    range.startContainer.parentElement.scrollIntoView({
+                                        behavior: "smooth", 
+                                        block: "center"
+                                    });
+                                }
+                            }
+                        }
+                    };
+                    
+                    document.addEventListener('submit', (e) => e.preventDefault());
+                <\/script>
+            `;
+
+            let finalContent = content;
+            if (content.includes('</body>')) {
+                finalContent = content.replace('</body>', scriptHelper + '</body>');
+            } else {
+                finalContent += scriptHelper;
+            }
+
+            doc.open();
+            doc.write(finalContent);
+            doc.close();
+
+            nodeCountDisplay.innerText = `${doc.querySelectorAll('*').length} Nodos`;
+        }
+
+        function updateAll(saveToHistory = true) {
+            updateLineNumbers();
+            updatePreview();
+            if (saveToHistory) saveHistory();
+        }
+
+        // --- Event Listeners del Editor (Code -> Visual) ---
+
+        // Función para enviar selección del código al iframe
+        function syncEditorToVisual() {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+
+            // Solo sincronizar si hay texto seleccionado y no es solo espacios
+            if (selectedText.length > 0 && selectedText.trim().length > 0) {
+                if (iframe.contentWindow && iframe.contentWindow.highlightText) {
+                    iframe.contentWindow.highlightText(selectedText);
+                    
+                    // Feedback visual
+                    syncStatus.classList.remove('hidden');
+                    setTimeout(() => syncStatus.classList.add('hidden'), 1000);
+                }
+            }
+        }
+
+        textarea.addEventListener('mouseup', syncEditorToVisual); // Al soltar click tras seleccionar
+        textarea.addEventListener('keyup', (e) => {
+            if (e.shiftKey && (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End')) {
+                syncEditorToVisual(); // Al seleccionar con teclado
+            }
         });
-        window.downloadFile = () => {
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([codeInput.value], {type:'text/html'}));
-            a.download = document.getElementById('filename').value||'index.html'; a.click();
-        };
 
-        init();
+
+        // --- Event Listeners Generales ---
+
+        textarea.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = textarea.scrollTop;
+        });
+
+        textarea.addEventListener('input', (e) => {
+            updateLineNumbers();
+            if (this.debounceTimer) clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(() => {
+                updatePreview();
+                saveHistory();
+            }, 500);
+            handleAutocomplete(e);
+        });
+
+        textarea.addEventListener('keyup', updateCursorPosition);
+        textarea.addEventListener('click', updateCursorPosition);
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                document.execCommand('insertText', false, '    ');
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                undo();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                e.preventDefault();
+                redo();
+            }
+        });
+
+        // --- Autocompletado ---
+
+        function handleAutocomplete(e) {
+            const cursorPos = textarea.selectionStart;
+            const text = textarea.value;
+            const charBefore = text.substring(cursorPos - 1, cursorPos);
+            
+            if (charBefore === '<') {
+                showSuggestions(cursorPos);
+            } else {
+                if ([' ', '>'].includes(charBefore)) {
+                    autocompleteList.style.display = 'none';
+                }
+            }
+        }
+
+        function showSuggestions(pos) {
+            autocompleteList.innerHTML = '';
+            htmlTags.forEach(tag => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerText = tag;
+                div.onclick = () => insertTag(tag, pos);
+                autocompleteList.appendChild(div);
+            });
+            autocompleteList.style.bottom = '40px'; 
+            autocompleteList.style.left = '60px';
+            autocompleteList.style.display = 'block';
+        }
+
+        function insertTag(tag, pos) {
+            const text = textarea.value;
+            const before = text.substring(0, pos);
+            const after = text.substring(pos);
+            const newText = before + tag + '>' + `</${tag}>` + after;
+            textarea.value = newText;
+            const newCursorPos = pos + tag.length + 1;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+            autocompleteList.style.display = 'none';
+            textarea.focus();
+            updateAll();
+        }
+
+        // --- Recepción de Mensajes (Visual -> Code) ---
+
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'syncFromVisual') {
+                const textToFind = event.data.text;
+                findAndSelectInEditor(textToFind);
+            }
+        });
+
+        function findAndSelectInEditor(text) {
+            if (!text || text.trim() === '') return;
+            const code = textarea.value;
+            const index = code.indexOf(text); // Buscar primera coincidencia
+            
+            if (index !== -1) {
+                // Desactivar temporalmente el listener de mouseup para evitar bucle infinito
+                // aunque la lógica de texto seleccionado lo previene naturalmente.
+                textarea.focus();
+                textarea.setSelectionRange(index, index + text.length);
+                
+                const lines = code.substr(0, index).split('\n').length;
+                const lineHeight = 21; 
+                const scrollTo = (lines * lineHeight) - (textarea.clientHeight / 2);
+                textarea.scrollTop = scrollTo > 0 ? scrollTo : 0;
+                
+                syncStatus.classList.remove('hidden');
+                setTimeout(() => syncStatus.classList.add('hidden'), 1000);
+            }
+        }
+
+        // --- Utilidades ---
+
+        function formatCode() {
+            let xml = textarea.value;
+            let formatted = '';
+            let reg = /(>)(<)(\/*)/g;
+            xml = xml.replace(reg, '$1\r\n$2$3');
+            let pad = 0;
+            const nodes = xml.split('\r\n');
+            for(let i = 0; i < nodes.length; i++) {
+                let node = nodes[i];
+                let indent = 0;
+                if (node.match( /.+<\/\w[^>]*>$/ )) indent = 0;
+                else if (node.match( /^<\/\w/ )) { if (pad != 0) pad -= 1; }
+                else if (node.match( /^<\w[^>]*[^\/]>.*$/ )) indent = 1;
+                else indent = 0;
+                let padding = '';
+                for (let j = 0; j < pad; j++) padding += '    ';
+                formatted += padding + node + '\r\n';
+                pad += indent;
+            }
+            textarea.value = formatted.trim();
+            updateAll();
+        }
+
+        function downloadFile() {
+            const blob = new Blob([textarea.value], {type: "text/html"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "index.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                textarea.value = e.target.result;
+                updateAll();
+            };
+            reader.readAsText(file);
+        });
+
+        // Inicio
+        saveHistory();
+        updateAll(false);
+
     </script>
 </body>
 </html>
