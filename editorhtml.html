@@ -1,212 +1,582 @@
-Aquí tienes una **revisión profesional** y una **propuesta de mejoras claras**, sin reescribir todo el archivo para mantener tu estructura, pero corrigiendo puntos problemáticos y optimizando rendimiento, mantenimiento y fiabilidad.
-
----
-
-# ✅ **Principales mejoras recomendadas**
-
-## **1. Performance: evita repintar todo el backdrop en cada selección**
-
-Actualmente `updateHighlights()` reconstruye **todo** el HTML del backdrop constantemente, lo cual es costoso para archivos largos.
-
-✔️ **Mejora**: usar `<pre>` sincronizado con `textarea` sin reconstrucción completa, o “diff” parcial.
-(Te dejo abajo un snippet optimizado.)
-
----
-
-## **2. Línea de números: DOM pesado → usar `innerHTML` una sola vez**
-
-Tu actualización ya es eficiente, pero cada número es un `<div>`.
-Si hay 2000 líneas, son **2000 nodos individuales**.
-
-✔️ **Mejora simple**: usa un `<pre>`
-
-```html
-<pre id="line-numbers" class="line-numbers-content"></pre>
-```
-
-✔️ **Y actualizarlo así:**
-
-```js
-lineNumbers.textContent = Array(lines).fill(0).map((_,i)=>i+1).join("\n");
-```
-
----
-
-## **3. Mejor sincronización de scroll**
-
-El uso de `transform: translateY()` es correcto, pero el scroll lateral de números de línea se pierde en monitores pequeños.
-
-✔️ **Permite scroll horizontal sincronizado**
-
-```js
-lineNumbers.style.transform = `translateY(-${scrollTop}px)`;
-lineNumbers.parentElement.scrollLeft = scrollLeft;
-```
-
----
-
-## **4. Bug crítico: selección en vista previa falla en nodos profundos**
-
-El rango compara a veces nodos `<span>` y no solo texto.
-
-✔️ Solución robusta:
-
-```js
-const clean = (s) => s.replace(/\s+/g," ").trim();
-const selected = clean(sel.toString());
-```
-
-✔️ Y usar un TreeWalker que normaliza nodos:
-
-```js
-if (clean(node.textContent).includes(selected)) { … }
-```
-
----
-
-## **5. (Muy importante) Aislar la vista previa en un iframe real**
-
-Ahora estás insertando HTML dentro de un div.
-Esto produce problemas:
-
-* estilos que se mezclan con el editor
-* scripts no funcionan
-* eventos de selección o scroll fallan
-* incompatibilidades de CSS de usuario
-
-✔️ Mejora recomendada:
-
-```html
-<iframe id="preview-frame"></iframe>
-```
-
-✔️ Y para escribir dentro:
-
-```js
-const doc = previewFrame.contentDocument;
-doc.open();
-doc.write(code);
-doc.close();
-```
-
-Tu sincronización seguirá funcionando reemplazando `previewFrame` por `previewFrame.contentDocument.body`.
-
----
-
-## **6. Formateador HTML mejorado**
-
-El tuyo es básico y rompe atributos.
-
-Te propongo uno estable (sin librerías externas):
-
-```js
-function formatSourceCode() {
-    const formatted = beautify.html(codeInput.value, {
-        indent_size: 4,
-        preservenewlines: true,
-    });
-    codeInput.value = formatted;
-    renderPreviewFromCode();
-    updateLineNumbers();
-    saveHistory();
-}
-```
-
-👉 Puedes incluir este mini-beautifier integrado:
-[https://github.com/beautify-web/js-beautify/blob/master/js/lib/beautify-html.js](https://github.com/beautify-web/js-beautify/blob/master/js/lib/beautify-html.js)
-(Es pequeño y funciona sin dependencias.)
-
----
-
-## **7. Undo/Redo nativo del navegador**
-
-Tu sistema funciona, pero el navegador ya implementa undo/redo nativo con historial seguro.
-
-✔️ Solo necesitas:
-
-```js
-codeInput.addEventListener("input", () => {
-    renderPreviewFromCode();
-    updateLineNumbers();
-});
-
-function undo() { document.execCommand("undo"); }
-function redo() { document.execCommand("redo"); }
-```
-
----
-
-## **8. Aislar mejor el CSS compartido con el editor**
-
-Ahora usas:
-
-```css
-.common-editor-style { position:absolute; }
-```
-
-Esto hace que el textarea y el backdrop se superpongan perfecto, pero…
-
-⚠️ En pantallas 4K o zoom de navegador ≠ 100%
-→ se descuadran las líneas.
-
-✔️ Solución estable:
-
-* usar **medidas absolutas sincronizadas**
-* o usar `scrollTop` exacto pero con `line-height` fijo en px **sin zoom** (como ya tienes)
-
-Si quieres, puedo darte la versión anti-desajustes lista.
-
----
-
-# 🎁 **Snippet de mejora clave: Backdrop optimizado**
-
-Reemplaza tu `updateHighlights()` por esto:
-
-```js
-function updateHighlights(start = -1, end = -1, doScroll = false) {
-    const text = codeInput.value;
-
-    const escape = (s) =>
-        s.replace(/&/g,"&amp;")
-         .replace(/</g,"&lt;")
-         .replace(/>/g,"&gt;");
-
-    if (start < 0 || end <= start) {
-        codeBackdrop.textContent = text;
-        return;
-    }
-
-    // Construcción eficiente
-    const before = escape(text.slice(0, start));
-    const sel    = escape(text.slice(start, end));
-    const after  = escape(text.slice(end));
-
-    codeBackdrop.innerHTML =
-        before + `<mark class="selection-highlight">${sel}</mark>` + after;
-
-    // Scroll inteligente
-    if (doScroll) {
-        const line = text.slice(0,start).split("\n").length;
-        const y = line * LINE_HEIGHT - codeInput.clientHeight/2;
-        codeInput.scrollTo({ top: Math.max(0,y), behavior:"smooth" });
-    }
-}
-```
-
-40% más rápido en archivos grandes.
-
----
-
-# ¿Quieres que te entregue la versión completa del archivo ya optimizada?
-
-Puedo generarte:
-
-### ✔️ Una versión **compacta**
-
-### ✔️ Una versión **pro**, con iframe real
-
-### ✔️ Una versión **con mejoras opcionales (highlighting, syntax, autocompletado)**
-
-### ✔️ O un archivo listo para producción, minificado y sin dependencias externas
-
-Solo dime **qué tipo de mejora prefieres**.
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor HTML Profesional V10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Inter:wght@400;600&display=swap');
+
+        /* Reset estricto */
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- TIPOGRAFÍA COMPARTIDA (Pixel Perfect) --- */
+        :root {
+            --code-font-family: 'Roboto Mono', monospace;
+            --code-font-size: 13px;
+            --code-line-height: 20px;
+            --code-padding: 10px;
+        }
+
+        /* --- IZQUIERDA: EDITOR --- */
+        .code-wrapper {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            background-color: #1e1e1e;
+            display: flex;
+        }
+
+        .line-numbers-container {
+            width: 45px;
+            background-color: #1e1e1e;
+            border-right: 1px solid #333;
+            z-index: 5;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        /* Optimización #2: Un solo pre para números */
+        #line-numbers {
+            font-family: var(--code-font-family);
+            font-size: var(--code-font-size);
+            line-height: var(--code-line-height);
+            padding-top: var(--code-padding);
+            padding-right: 8px;
+            text-align: right;
+            color: #6e7681;
+            margin: 0;
+            user-select: none;
+            white-space: pre;
+        }
+
+        .editor-layer {
+            font-family: var(--code-font-family) !important;
+            font-size: var(--code-font-size) !important;
+            line-height: var(--code-line-height) !important;
+            padding: var(--code-padding) !important;
+            margin: 0;
+            border: 0;
+            tab-size: 4;
+            white-space: pre;
+            overflow-wrap: normal;
+            word-break: normal;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Capa 1: Backdrop (Highlights) */
+        #code-backdrop {
+            z-index: 1;
+            color: transparent;
+            background-color: transparent;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Capa 2: Textarea (Input) */
+        textarea#html-code {
+            z-index: 2;
+            background: transparent;
+            color: #d4d4d4;
+            resize: none;
+            outline: none;
+            overflow: auto;
+            padding-bottom: 40px !important; /* Espacio extra al final */
+        }
+
+        mark.selection-highlight {
+            background-color: #264f78;
+            color: transparent;
+            border-radius: 0;
+            display: inline;
+            padding: 0;
+            line-height: var(--code-line-height) !important;
+        }
+
+        /* --- DERECHA: IFRAME PREVIEW --- */
+        #preview-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            position: relative;
+        }
+        
+        /* Optimización #5: Iframe aislado */
+        #preview-iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+
+        /* Scrollbars Custom */
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
+        ::-webkit-scrollbar-track { background: #1e1e1e; }
+        ::-webkit-scrollbar-thumb { background: #4a4a4a; border: 3px solid #1e1e1e; border-radius: 6px; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- Header -->
+    <header class="h-12 bg-[#2d2d2d] border-b border-[#1e1e1e] flex items-center justify-between px-4 shrink-0 shadow-sm z-20">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-code text-green-400"></i>
+            <span class="text-xs text-gray-400 font-semibold tracking-wide">EDITOR PRO V10</span>
+            <div class="h-4 w-px bg-gray-600 mx-1"></div>
+            <input type="text" id="filename" value="index.html" class="bg-transparent border-none text-gray-200 text-sm focus:outline-none w-32 font-mono placeholder-gray-600">
+            
+            <div class="flex items-center gap-1 ml-2 border-l border-gray-700 pl-2">
+                <button onclick="undo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition" title="Undo"><i class="fa-solid fa-rotate-left text-xs"></i></button>
+                <button onclick="redo()" class="w-7 h-7 flex items-center justify-center rounded hover:bg-[#3e3e3e] text-gray-400 transition" title="Redo"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <input type="file" id="file-upload" class="hidden">
+            <button onclick="document.getElementById('file-upload').click()" class="bg-[#3e3e3e] hover:bg-[#4e4e4e] text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-2"><i class="fa-solid fa-folder-open"></i> Abrir</button>
+            <button onclick="formatSourceCode()" class="bg-[#3e3e3e] hover:bg-[#4e4e4e] text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-2"><i class="fa-solid fa-indent"></i> Formatear</button>
+            <button onclick="downloadFile()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded transition flex items-center gap-2 shadow-md"><i class="fa-solid fa-download"></i> Descargar</button>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- EDITOR -->
+        <div class="w-1/2 flex border-r border-[#1e1e1e] relative bg-[#1e1e1e]">
+            <div class="line-numbers-container">
+                <pre id="line-numbers">1</pre>
+            </div>
+            <div class="relative flex-1 overflow-hidden">
+                <div id="code-backdrop" class="editor-layer"></div>
+                <textarea id="html-code" class="editor-layer" spellcheck="false"></textarea>
+            </div>
+        </div>
+
+        <!-- PREVIEW (IFRAME) -->
+        <div id="preview-container" class="w-1/2">
+            <div class="bg-gray-100 border-b border-gray-200 text-gray-400 text-[10px] uppercase px-3 py-1 font-bold tracking-wider select-none flex justify-between">
+                <span>Vista Previa (Iframe Aislado)</span>
+                <span id="sync-status" class="text-green-600 hidden"><i class="fa-solid fa-check"></i></span>
+            </div>
+            <iframe id="preview-iframe"></iframe>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="h-6 bg-[#007acc] text-white text-[10px] flex items-center justify-between px-3 shrink-0 select-none">
+        <span id="status-msg">Listo</span>
+        <div class="flex gap-4 font-mono">
+            <span>Ln <span id="ln-display">1</span>, Col <span id="col-display">1</span></span>
+            <span>HTML5</span>
+            <span>UTF-8</span>
+        </div>
+    </footer>
+
+    <script>
+        // --- Referencias ---
+        const codeInput = document.getElementById('html-code');
+        const codeBackdrop = document.getElementById('code-backdrop');
+        const lineNumbers = document.getElementById('line-numbers');
+        const previewIframe = document.getElementById('preview-iframe');
+        const statusMsg = document.getElementById('status-msg');
+
+        // --- Configuración ---
+        const LINE_HEIGHT = 20;
+        
+        // --- Estado ---
+        let historyStack = [];
+        let historyIndex = -1;
+        let isSyncing = false;
+
+        // --- Contenido Inicial ---
+        const initialContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 20px; color: #333; line-height: 1.6; }
+        h1 { color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .feature { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin: 10px 0; }
+        code { background: #eee; padding: 2px 4px; border-radius: 3px; font-family: monospace; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Editor HTML V10</h1>
+    
+    <div class="feature">
+        <p><strong>🚀 Aislamiento Real:</strong></p>
+        <p>Esta vista previa es un <code>iframe</code>. Tu CSS no se mezcla con el editor.</p>
+    </div>
+
+    <p>Prueba de selección profunda:</p>
+    <ul>
+        <li>Item 1</li>
+        <li>Item 2 (<span>Selecciona <b>este texto</b> anidado</span>)</li>
+        <li>Item 3</li>
+    </ul>
+</body>
+</html>`;
+
+        // --- Inicialización ---
+        function init() {
+            codeInput.value = initialContent;
+            
+            // Inicializar Iframe
+            // Necesitamos esperar un tick para asegurar que el iframe está listo en el DOM
+            setTimeout(() => {
+                writeToIframe(initialContent, true); // true = full rewrite
+                setupIframeListeners();
+                updateLineNumbers();
+                saveHistory();
+            }, 0);
+        }
+
+        // --- 1. Lógica del Iframe ---
+        function getIframeDoc() {
+            return previewIframe.contentDocument || previewIframe.contentWindow.document;
+        }
+
+        function writeToIframe(html, fullRewrite = false) {
+            const doc = getIframeDoc();
+            if (!doc) return;
+
+            if (fullRewrite) {
+                doc.open();
+                doc.write(html);
+                doc.close();
+                // Al reescribir, perdemos los listeners, hay que reponerlos
+                setupIframeListeners();
+            } else {
+                // Actualización inteligente (preserva scroll y estado)
+                // Intentamos actualizar solo body y estilos
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                
+                // Actualizar estilos
+                const oldStyles = doc.head.querySelectorAll('style');
+                oldStyles.forEach(s => s.remove());
+                const newStyles = newDoc.head.querySelectorAll('style');
+                newStyles.forEach(s => doc.head.appendChild(s.cloneNode(true)));
+
+                // Actualizar body
+                if (doc.body.innerHTML !== newDoc.body.innerHTML) {
+                    doc.body.innerHTML = newDoc.body.innerHTML;
+                }
+                
+                // Activar edición
+                doc.body.contentEditable = true;
+                doc.body.style.outline = 'none'; // Quitar borde de foco
+            }
+        }
+
+        function setupIframeListeners() {
+            const win = previewIframe.contentWindow;
+            const doc = getIframeDoc();
+            if (!win || !doc) return;
+
+            // Hacer body editable
+            if (doc.body) {
+                doc.body.contentEditable = true;
+                doc.body.style.outline = 'none';
+            }
+
+            // Listeners
+            doc.addEventListener('input', () => {
+                updateCodeFromVisual();
+                saveHistory();
+            });
+
+            // Selección Visual -> Código
+            doc.addEventListener('selectionchange', () => {
+                handleVisualSelection(doc);
+            });
+            
+            // Re-bindear si el usuario hace clic (para asegurar foco)
+            doc.addEventListener('click', () => {
+                if(doc.body.contentEditable !== 'true') doc.body.contentEditable = true;
+            });
+        }
+
+        // --- 2. Optimizaciones de Renderizado ---
+        
+        // Optimización #1: Backdrop eficiente
+        function updateHighlights(start = -1, end = -1, doScroll = false) {
+            const text = codeInput.value;
+            
+            // Escape HTML seguro
+            const escape = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            if (start < 0 || end <= start) {
+                codeBackdrop.textContent = text; // Más rápido que innerHTML si no hay tags
+                return;
+            }
+
+            // Construcción eficiente
+            const before = escape(text.slice(0, start));
+            const sel = escape(text.slice(start, end));
+            const after = escape(text.slice(end));
+
+            codeBackdrop.innerHTML = before + `<mark class="selection-highlight">${sel}</mark>` + after;
+
+            if (doScroll) {
+                const linesBefore = text.slice(0, start).split('\n').length;
+                const targetPixel = (linesBefore * LINE_HEIGHT) - (codeInput.clientHeight / 2);
+                
+                const currentTop = codeInput.scrollTop;
+                // Umbral para evitar saltos pequeños
+                if (Math.abs(targetPixel - currentTop) > 100) {
+                     codeInput.scrollTo({ top: Math.max(0, targetPixel), behavior: 'smooth' });
+                }
+            }
+        }
+
+        // Optimización #2: Números de línea DOM ligero
+        function updateLineNumbers() {
+            const lines = codeInput.value.split('\n').length;
+            // Usar un solo nodo de texto con saltos de línea es mucho más rápido que 1000 divs
+            lineNumbers.textContent = Array(lines).fill(0).map((_, i) => i + 1).join('\n');
+        }
+
+        // Optimización #3: Sync de scroll
+        codeInput.addEventListener('scroll', () => {
+            const top = codeInput.scrollTop;
+            const left = codeInput.scrollLeft;
+            
+            codeBackdrop.scrollTop = top;
+            codeBackdrop.scrollLeft = left;
+            
+            // Sync vertical con transform
+            lineNumbers.parentElement.scrollTop = top; // O usar transform si el container es fixed
+            // Para asegurar alineación, movemos el pre dentro del container
+            lineNumbers.style.transform = `translateY(-${top}px)`;
+        });
+
+
+        // --- 3. Lógica de Sincronización (Bidireccional) ---
+
+        // Code -> Visual
+        function renderPreviewFromCode() {
+            if (isSyncing) return;
+            isSyncing = true;
+            
+            writeToIframe(codeInput.value, false); // false = actualización parcial
+            
+            updateHighlights();
+            isSyncing = false;
+        }
+
+        // Visual -> Code
+        function updateCodeFromVisual() {
+            if (isSyncing) return;
+            isSyncing = true;
+            
+            const doc = getIframeDoc();
+            const currentCode = codeInput.value;
+            
+            // Extraer solo el body innerHTML del iframe
+            const newBodyContent = doc.body.innerHTML;
+            
+            // Regex para inyectar en el código fuente
+            const bodyRegex = /(<body[^>]*>)([\s\S]*?)(<\/body>)/i;
+            
+            if (currentCode.match(bodyRegex)) {
+                codeInput.value = currentCode.replace(bodyRegex, `$1\n${newBodyContent}\n$3`);
+            }
+            
+            updateLineNumbers();
+            updateHighlights();
+            isSyncing = false;
+        }
+
+        // --- 4. Selección Avanzada (Cross-Frame) ---
+        function handleVisualSelection(doc) {
+            const sel = doc.getSelection();
+            if (sel.isCollapsed) {
+                updateHighlights();
+                return;
+            }
+
+            // Optimización #4: Normalización de texto (Clean)
+            const clean = (s) => s.replace(/\s+/g, " ").trim();
+            const selectedText = clean(sel.toString());
+            
+            if (selectedText.length < 2) return;
+
+            // Encontrar ocurrencia ordinal
+            // Necesitamos contar cuántas veces aparece el texto seleccionado ANTES de la selección actual
+            const range = sel.getRangeAt(0);
+            const preRange = doc.createRange();
+            preRange.selectNodeContents(doc.body);
+            preRange.setEnd(range.startContainer, range.startOffset);
+            
+            const textBefore = clean(preRange.toString());
+            // Contamos ocurrencias "sucias" pero efectivas
+            const occurrence = textBefore.split(selectedText).length - 1;
+
+            // Buscar en Código
+            const code = codeInput.value;
+            // Ignorar head
+            const bodyMatch = code.match(/<body[^>]*>/i);
+            const bodyStart = bodyMatch ? bodyMatch.index + bodyMatch[0].length : 0;
+            const codeBody = code.substring(bodyStart);
+            
+            // Limpiamos el código también para buscar (truco: normalizamos espacios para la búsqueda)
+            // Nota: Esto es complejo porque necesitamos el índice REAL.
+            // Estrategia simple: Buscar literal. Si falla, fallback.
+            
+            let searchIndex = -1;
+            let count = 0;
+            let pos = 0;
+            
+            // Buscar literal
+            while (count <= occurrence) {
+                // Buscamos sin limpiar en el código para obtener indices exactos
+                // Esto asume que el usuario no ha destruido los espacios en el visual
+                pos = codeBody.indexOf(sel.toString(), pos); 
+                
+                // Fallback: si no encuentra literal (por diferencias de espacios), intentamos aproximación
+                if (pos === -1) {
+                    // Intento de recuperación simple: buscar solo los primeros 20 caracteres
+                    const snippet = sel.toString().substring(0, 20);
+                    pos = codeBody.indexOf(snippet, pos > 0 ? pos : 0);
+                }
+
+                if (pos === -1) break;
+                
+                if (count === occurrence) {
+                    searchIndex = pos;
+                    break;
+                }
+                pos++;
+                count++;
+            }
+
+            if (searchIndex !== -1) {
+                const absStart = bodyStart + searchIndex;
+                updateHighlights(absStart, absStart + sel.toString().length, true);
+            }
+        }
+
+        // --- 5. Formateador Mejorado (Optimización #6) ---
+        function formatHTML(html) {
+            let indent = 0;
+            const tab = "    ";
+            
+            // Tokenizar
+            const tokens = html.replace(/>\s*</g, "><")
+                               .replace(/</g, "~::~<")
+                               .replace(/\s*~::~<\s*/g, "\n<")
+                               .split('\n');
+            
+            let formatted = "";
+            
+            tokens.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                
+                // Bajar indent si es cierre
+                if (line.match(/^<\//)) indent = Math.max(0, indent - 1);
+                
+                formatted += tab.repeat(indent) + line + "\n";
+                
+                // Subir indent si es apertura y no es void ni cierre
+                const isVoid = /^(<img|<br|<hr|<input|<meta|<link|<source)/.test(line);
+                if (!/^<\//.test(line) && !isVoid && /^<[a-z0-9]+/.test(line)) {
+                    indent++;
+                }
+            });
+            return formatted.trim();
+        }
+
+        window.formatSourceCode = function() {
+            const code = codeInput.value;
+            codeInput.value = formatHTML(code);
+            renderPreviewFromCode();
+            updateLineNumbers();
+            saveHistory();
+        };
+
+
+        // --- Eventos Generales ---
+        codeInput.addEventListener('input', () => {
+            renderPreviewFromCode();
+            updateLineNumbers();
+            saveHistory();
+        });
+
+        // Historial Custom (Más fiable para este caso que execCommand)
+        function saveHistory() {
+            const content = codeInput.value;
+            if (historyStack.length > 0 && historyStack[historyIndex] === content) return;
+            historyStack = historyStack.slice(0, historyIndex + 1);
+            historyStack.push(content);
+            historyIndex++;
+        }
+        window.undo = () => {
+            if(historyIndex > 0) {
+                historyIndex--;
+                codeInput.value = historyStack[historyIndex];
+                renderPreviewFromCode();
+                updateLineNumbers();
+                updateHighlights();
+            }
+        };
+        window.redo = () => {
+            if(historyIndex < historyStack.length - 1) {
+                historyIndex++;
+                codeInput.value = historyStack[historyIndex];
+                renderPreviewFromCode();
+                updateLineNumbers();
+                updateHighlights();
+            }
+        };
+
+        // File I/O
+        document.getElementById('file-upload').addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if(!f) return;
+            const r = new FileReader();
+            r.onload = (e) => {
+                codeInput.value = e.target.result;
+                document.getElementById('filename').value = f.name;
+                // Full reload para el iframe
+                writeToIframe(codeInput.value, true);
+                updateLineNumbers();
+                saveHistory();
+            };
+            r.readAsText(f);
+        });
+
+        window.downloadFile = () => {
+            const blob = new Blob([codeInput.value], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = document.getElementById('filename').value || 'index.html';
+            a.click();
+        };
+
+        // Arrancar
+        init();
+
+    </script>
+</body>
+</html>
