@@ -33,6 +33,7 @@
             font-family: 'Fira Code', 'Courier New', monospace;
             line-height: 1.5;
             font-size: 14px;
+            position: relative; /* Necesario para contexto */
         }
         
         #line-numbers {
@@ -41,30 +42,41 @@
             font-size: 14px;
             text-align: right;
             color: #64748b;
-            padding-right: 10px;
-            padding-top: 10px;
+            padding: 10px 10px 10px 0; /* Padding ajustado */
             user-select: none;
+            box-sizing: border-box;
+            width: 45px; /* Ancho fijo para estabilidad */
         }
 
         textarea#code-input {
             font-family: 'Fira Code', 'Courier New', monospace;
             line-height: 1.5;
             font-size: 14px;
-            white-space: pre;
-            overflow-wrap: normal;
-            overflow-x: scroll;
+            
+            /* --- CAMBIOS PARA WORD WRAP (SALTO DE LÍNEA) --- */
+            white-space: pre-wrap;       /* Permite que el texto baje si no cabe */
+            word-break: break-word;      /* Rompe palabras largas si es necesario */
+            overflow-wrap: break-word;   /* Estándar moderno */
+            overflow-x: hidden;          /* Ocultamos scroll horizontal */
+            overflow-y: scroll;          /* Scroll vertical siempre visible para evitar saltos de layout */
+            
             tab-size: 4;
             outline: none;
             border: none;
             resize: none;
             background: transparent;
             color: #e2e8f0;
-            padding-top: 10px;
+            
+            /* Padding y Box Sizing cruciales para la medición exacta */
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box; 
+            padding-left: 10px;
         }
 
-        /* Resaltado de selección en textarea */
+        /* Resaltado de selección */
         ::selection {
-            background-color: #facc15; /* Amarillo intenso */
+            background-color: #facc15; 
             color: #000;
         }
 
@@ -134,18 +146,18 @@
         <!-- Editor Section -->
         <section class="flex-1 flex flex-col border-r border-slate-700 bg-slate-900 relative min-w-[300px]">
             <div class="flex justify-between items-center bg-slate-800 px-4 py-1 text-xs text-slate-400 uppercase tracking-wider font-semibold">
-                <span>Código Fuente</span>
+                <span>Código Fuente (Word Wrap Activo)</span>
                 <span id="sync-status" class="text-green-500 hidden transition-opacity duration-300"><i class="fa-solid fa-link"></i> Sync</span>
             </div>
             
             <div class="relative flex-1 flex overflow-hidden editor-container">
                 <!-- Line Numbers -->
-                <div id="line-numbers" class="w-12 bg-slate-900 border-r border-slate-800 shrink-0 overflow-hidden">
-                    1
+                <div id="line-numbers" class="bg-slate-900 border-r border-slate-800 shrink-0 overflow-hidden">
+                    <!-- Numbers injected by JS -->
                 </div>
                 
                 <!-- Code Area -->
-                <textarea id="code-input" class="flex-1 p-2 bg-transparent outline-none z-10" spellcheck="false" placeholder="<!-- Escribe tu HTML aquí -->"></textarea>
+                <textarea id="code-input" class="flex-1 bg-transparent outline-none z-10" spellcheck="false" placeholder="<!-- Escribe tu HTML aquí -->"></textarea>
                 
                 <!-- Autocomplete Container -->
                 <div id="autocomplete-list"></div>
@@ -190,7 +202,7 @@
         let historyIndex = -1;
         const maxHistory = 50;
 
-        // Tags HTML comunes para autocompletado
+        // Tags HTML comunes
         const htmlTags = [
             'div', 'span', 'p', 'h1', 'h2', 'h3', 'section', 'article', 'nav', 'header', 'footer',
             'ul', 'ol', 'li', 'a', 'img', 'button', 'input', 'form', 'label', 'table', 'tr', 'td',
@@ -198,43 +210,97 @@
         ];
 
         // --- Inicialización ---
+        // Texto con líneas largas para probar el wrap
         const defaultHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Documento de Prueba</title>
+    <title>Prueba de Salto de Línea</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; color: #333; }
-        h1 { color: #2563eb; }
+        body { font-family: sans-serif; padding: 20px; color: #333; max-width: 800px; margin: 0 auto; }
+        h1 { color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         p { line-height: 1.6; }
-        .highlight { background: #fef08a; padding: 2px 5px; border-radius: 4px; }
-        li { margin-bottom: 5px; }
+        .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Hola Mundo</h1>
-    <p>Este es un editor con <strong>sincronización bidireccional</strong>.</p>
+    <h1>Editor con Word Wrap Inteligente</h1>
     
-    <h3>Prueba de Selección:</h3>
-    <ul>
-        <li>1. Selecciona "Hola Mundo" en el código (izquierda).</li>
-        <li>2. Verás que se resalta en el visual (derecha).</li>
-        <li>3. Ahora selecciona esta lista en el visual.</li>
-        <li>4. Verás que se resalta el código.</li>
-    </ul>
+    <div class="box">
+        <p>Esta es una línea de código extremadamente larga que está diseñada específicamente para probar si la funcionalidad de "word wrap" (salto de línea automático) funciona correctamente en el editor de código. Si todo va bien, deberías ver que esta línea se dobla en múltiples renglones en el panel izquierdo, y lo más importante: <strong>el número de línea correspondiente a la izquierda debería tener la altura correcta para abarcar todo este bloque de texto</strong> sin desalinear los números siguientes.</p>
+    </div>
+
+    <p>Intenta escribir más texto largo aquí para ver cómo los números se ajustan dinámicamente...</p>
     
-    <button onclick="alert('Funciona!')">Click Me</button>
+    <button onclick="alert('¡El wrap funciona!')">Probar Botón</button>
 </body>
 </html>`;
 
         textarea.value = defaultHTML;
         
-        // --- Funciones Core del Editor ---
+        // --- Core: Sincronización de Líneas con Wrap ---
 
         function updateLineNumbers() {
-            const lines = textarea.value.split('\n').length;
-            lineNumbers.innerHTML = Array(lines).fill(0).map((_, i) => `<div>${i + 1}</div>`).join('');
+            const text = textarea.value;
+            const lines = text.split('\n');
+            
+            // 1. "Mirror Element": Creamos un clon invisible para medir alturas reales
+            let mirror = document.getElementById('code-mirror');
+            if (!mirror) {
+                mirror = document.createElement('div');
+                mirror.id = 'code-mirror';
+                document.body.appendChild(mirror);
+                
+                // Copiar estilos CRÍTICOS del textarea al mirror
+                const style = window.getComputedStyle(textarea);
+                mirror.style.fontFamily = style.fontFamily;
+                mirror.style.fontSize = style.fontSize;
+                mirror.style.lineHeight = style.lineHeight;
+                mirror.style.padding = style.padding;
+                mirror.style.boxSizing = style.boxSizing;
+                mirror.style.whiteSpace = 'pre-wrap';      // Mismo comportamiento wrap
+                mirror.style.wordBreak = 'break-word';
+                mirror.style.overflowWrap = 'break-word';
+                mirror.style.position = 'absolute';
+                mirror.style.visibility = 'hidden';
+                mirror.style.top = '0';
+                mirror.style.left = '0';
+            }
+            
+            // Actualizar ancho del mirror para que coincida con el área útil del textarea
+            // Usamos clientWidth que excluye el scrollbar, asegurando medición exacta
+            mirror.style.width = textarea.clientWidth + 'px';
+            mirror.innerHTML = '';
+            
+            let lineNumbersHTML = '';
+
+            // 2. Medir cada línea
+            lines.forEach((line, index) => {
+                const div = document.createElement('div');
+                // Usamos textContent y un espacio si está vacío para mantener altura mínima
+                div.textContent = line || ' '; 
+                
+                // Estilos para simular comportamiento de texto
+                div.style.whiteSpace = 'pre-wrap';
+                div.style.wordBreak = 'break-word';
+                div.style.overflowWrap = 'break-word';
+                
+                mirror.appendChild(div);
+                
+                // Medir la altura calculada por el navegador
+                const height = div.offsetHeight;
+                
+                // Generar el número con esa altura exacta
+                lineNumbersHTML += `<div style="height: ${height}px; display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 5px;">${index + 1}</div>`;
+            });
+
+            lineNumbers.innerHTML = lineNumbersHTML;
         }
+        
+        // Recalcular alturas si cambia el tamaño de la ventana (cambia el wrap point)
+        window.addEventListener('resize', updateLineNumbers);
+
+        // --- Funciones Editor Estándar ---
 
         function updateCursorPosition() {
             const text = textarea.value;
@@ -272,16 +338,14 @@
             }
         }
 
-        // --- Lógica de Sincronización y Renderizado ---
+        // --- Sincronización Iframe ---
 
         function updatePreview() {
             const content = textarea.value;
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             
-            // Script inyectado para gestionar la comunicación bidireccional desde el Iframe
             const scriptHelper = `
                 <script>
-                    // 1. Visual -> Code (Detectar selección en el iframe)
                     document.addEventListener('selectionchange', () => {
                         const sel = window.getSelection();
                         if (!sel.rangeCount) return;
@@ -291,21 +355,11 @@
                         }
                     });
 
-                    // 2. Code -> Visual (Función expuesta para recibir orden del padre)
                     window.highlightText = function(text) {
                         if (!text) return;
-                        
-                        // Usamos window.find() para buscar y seleccionar texto
-                        // Sintaxis: find(text, caseSensitive, backward, wrapAround, wholeWord, searchInFrames, showDialog)
-                        
-                        // Limpiar selección previa
                         window.getSelection().removeAllRanges();
-                        
-                        // Buscar
                         const found = window.find(text, false, false, true, false, true, false);
-                        
                         if (found) {
-                            // Asegurarnos que sea visible (scroll)
                             const sel = window.getSelection();
                             if (sel.rangeCount > 0) {
                                 const range = sel.getRangeAt(0);
@@ -318,7 +372,6 @@
                             }
                         }
                     };
-                    
                     document.addEventListener('submit', (e) => e.preventDefault());
                 <\/script>
             `;
@@ -343,35 +396,28 @@
             if (saveToHistory) saveHistory();
         }
 
-        // --- Event Listeners del Editor (Code -> Visual) ---
+        // --- Event Listeners ---
 
-        // Función para enviar selección del código al iframe
         function syncEditorToVisual() {
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const selectedText = textarea.value.substring(start, end);
 
-            // Solo sincronizar si hay texto seleccionado y no es solo espacios
             if (selectedText.length > 0 && selectedText.trim().length > 0) {
                 if (iframe.contentWindow && iframe.contentWindow.highlightText) {
                     iframe.contentWindow.highlightText(selectedText);
-                    
-                    // Feedback visual
                     syncStatus.classList.remove('hidden');
                     setTimeout(() => syncStatus.classList.add('hidden'), 1000);
                 }
             }
         }
 
-        textarea.addEventListener('mouseup', syncEditorToVisual); // Al soltar click tras seleccionar
+        textarea.addEventListener('mouseup', syncEditorToVisual);
         textarea.addEventListener('keyup', (e) => {
             if (e.shiftKey && (e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End')) {
-                syncEditorToVisual(); // Al seleccionar con teclado
+                syncEditorToVisual();
             }
         });
-
-
-        // --- Event Listeners Generales ---
 
         textarea.addEventListener('scroll', () => {
             lineNumbers.scrollTop = textarea.scrollTop;
@@ -447,30 +493,26 @@
             updateAll();
         }
 
-        // --- Recepción de Mensajes (Visual -> Code) ---
-
+        // --- Sync Visual -> Code ---
         window.addEventListener('message', (event) => {
             if (event.data.type === 'syncFromVisual') {
-                const textToFind = event.data.text;
-                findAndSelectInEditor(textToFind);
+                findAndSelectInEditor(event.data.text);
             }
         });
 
         function findAndSelectInEditor(text) {
             if (!text || text.trim() === '') return;
             const code = textarea.value;
-            const index = code.indexOf(text); // Buscar primera coincidencia
+            const index = code.indexOf(text); 
             
             if (index !== -1) {
-                // Desactivar temporalmente el listener de mouseup para evitar bucle infinito
-                // aunque la lógica de texto seleccionado lo previene naturalmente.
                 textarea.focus();
                 textarea.setSelectionRange(index, index + text.length);
                 
-                const lines = code.substr(0, index).split('\n').length;
-                const lineHeight = 21; 
-                const scrollTo = (lines * lineHeight) - (textarea.clientHeight / 2);
-                textarea.scrollTop = scrollTo > 0 ? scrollTo : 0;
+                // Scroll lógico (aproximado porque ahora las líneas tienen altura variable)
+                // Usamos blur/focus para intentar forzar al navegador a mostrar el cursor
+                textarea.blur();
+                textarea.focus();
                 
                 syncStatus.classList.remove('hidden');
                 setTimeout(() => syncStatus.classList.add('hidden'), 1000);
