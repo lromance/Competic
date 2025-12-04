@@ -209,30 +209,39 @@
             'script', 'style', 'link', 'meta', 'title', 'head', 'body'
         ];
 
+        // --- Utilidad Regex ---
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
         // --- Inicialización ---
-        // Texto con líneas largas para probar el wrap
         const defaultHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Prueba de Salto de Línea</title>
+    <title>Prueba de Ocurrencias</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; color: #333; max-width: 800px; margin: 0 auto; }
-        h1 { color: #2563eb; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        p { line-height: 1.6; }
-        .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        body { font-family: sans-serif; padding: 20px; color: #333; }
+        .box { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        strong { color: #d32f2f; }
     </style>
 </head>
 <body>
-    <h1>Editor con Word Wrap Inteligente</h1>
+    <h1>Prueba de Selección Repetida</h1>
     
     <div class="box">
-        <p>Esta es una línea de código extremadamente larga que está diseñada específicamente para probar si la funcionalidad de "word wrap" (salto de línea automático) funciona correctamente en el editor de código. Si todo va bien, deberías ver que esta línea se dobla en múltiples renglones en el panel izquierdo, y lo más importante: <strong>el número de línea correspondiente a la izquierda debería tener la altura correcta para abarcar todo este bloque de texto</strong> sin desalinear los números siguientes.</p>
+        <p>Texto repetido 1: <strong>Hola Mundo</strong></p>
     </div>
 
-    <p>Intenta escribir más texto largo aquí para ver cómo los números se ajustan dinámicamente...</p>
-    
-    <button onclick="alert('¡El wrap funciona!')">Probar Botón</button>
+    <div class="box">
+        <p>Texto repetido 2: <strong>Hola Mundo</strong></p>
+    </div>
+
+    <div class="box">
+        <p>Texto repetido 3: <strong>Hola Mundo</strong></p>
+    </div>
+
+    <p>Instrucciones: Selecciona el tercer "Hola Mundo" en el visual y mira si se selecciona el correcto en el código.</p>
 </body>
 </html>`;
 
@@ -244,21 +253,19 @@
             const text = textarea.value;
             const lines = text.split('\n');
             
-            // 1. "Mirror Element": Creamos un clon invisible para medir alturas reales
             let mirror = document.getElementById('code-mirror');
             if (!mirror) {
                 mirror = document.createElement('div');
                 mirror.id = 'code-mirror';
                 document.body.appendChild(mirror);
                 
-                // Copiar estilos CRÍTICOS del textarea al mirror
                 const style = window.getComputedStyle(textarea);
                 mirror.style.fontFamily = style.fontFamily;
                 mirror.style.fontSize = style.fontSize;
                 mirror.style.lineHeight = style.lineHeight;
                 mirror.style.padding = style.padding;
                 mirror.style.boxSizing = style.boxSizing;
-                mirror.style.whiteSpace = 'pre-wrap';      // Mismo comportamiento wrap
+                mirror.style.whiteSpace = 'pre-wrap';
                 mirror.style.wordBreak = 'break-word';
                 mirror.style.overflowWrap = 'break-word';
                 mirror.style.position = 'absolute';
@@ -267,37 +274,26 @@
                 mirror.style.left = '0';
             }
             
-            // Actualizar ancho del mirror para que coincida con el área útil del textarea
-            // Usamos clientWidth que excluye el scrollbar, asegurando medición exacta
             mirror.style.width = textarea.clientWidth + 'px';
             mirror.innerHTML = '';
             
             let lineNumbersHTML = '';
 
-            // 2. Medir cada línea
             lines.forEach((line, index) => {
                 const div = document.createElement('div');
-                // Usamos textContent y un espacio si está vacío para mantener altura mínima
                 div.textContent = line || ' '; 
-                
-                // Estilos para simular comportamiento de texto
                 div.style.whiteSpace = 'pre-wrap';
                 div.style.wordBreak = 'break-word';
                 div.style.overflowWrap = 'break-word';
                 
                 mirror.appendChild(div);
-                
-                // Medir la altura calculada por el navegador
                 const height = div.offsetHeight;
-                
-                // Generar el número con esa altura exacta
                 lineNumbersHTML += `<div style="height: ${height}px; display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 5px;">${index + 1}</div>`;
             });
 
             lineNumbers.innerHTML = lineNumbersHTML;
         }
         
-        // Recalcular alturas si cambia el tamaño de la ventana (cambia el wrap point)
         window.addEventListener('resize', updateLineNumbers);
 
         // --- Funciones Editor Estándar ---
@@ -338,7 +334,7 @@
             }
         }
 
-        // --- Sincronización Iframe ---
+        // --- Sincronización Iframe (INCLUYE LÓGICA DE OCURRENCIAS) ---
 
         function updatePreview() {
             const content = textarea.value;
@@ -346,19 +342,60 @@
             
             const scriptHelper = `
                 <script>
+                    function escapeRegExp(string) {
+                        return string.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&');
+                    }
+
+                    // VISUAL -> CODE: Calcular índice de ocurrencia
                     document.addEventListener('selectionchange', () => {
                         const sel = window.getSelection();
                         if (!sel.rangeCount) return;
+                        
                         const text = sel.toString();
                         if (text.length > 1) {
-                            window.parent.postMessage({ type: 'syncFromVisual', text: text }, '*');
+                            // Calcular ocurrencia (cuántas veces aparece este texto ANTES de la selección actual)
+                            try {
+                                const range = sel.getRangeAt(0);
+                                const preSelectionRange = range.cloneRange();
+                                preSelectionRange.selectNodeContents(document.body);
+                                preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                                const textBefore = preSelectionRange.toString();
+                                
+                                // Contar coincidencias en el texto previo
+                                const regex = new RegExp(escapeRegExp(text), 'g');
+                                const matches = textBefore.match(regex);
+                                const occurrenceIndex = matches ? matches.length : 0;
+
+                                window.parent.postMessage({ 
+                                    type: 'syncFromVisual', 
+                                    text: text, 
+                                    occurrenceIndex: occurrenceIndex 
+                                }, '*');
+                            } catch(e) {
+                                // Fallback simple si falla el rango complejo
+                                window.parent.postMessage({ type: 'syncFromVisual', text: text, occurrenceIndex: 0 }, '*');
+                            }
                         }
                     });
 
-                    window.highlightText = function(text) {
+                    // CODE -> VISUAL: Buscar por N-ésima ocurrencia
+                    window.highlightText = function(text, occurrenceIndex) {
                         if (!text) return;
                         window.getSelection().removeAllRanges();
-                        const found = window.find(text, false, false, true, false, true, false);
+                        
+                        // Loop simple usando window.find para saltar ocurrencias
+                        // Reset cursor to start
+                        document.body.focus();
+                        window.getSelection().collapse(document.body, 0);
+
+                        let found = false;
+                        for (let i = 0; i <= occurrenceIndex; i++) {
+                             // find(text, caseSensitive, backward, wrapAround, wholeWord, searchInFrames, showDialog)
+                             // wrapAround debe ser false para poder iterar en orden
+                             found = window.find(text, false, false, false, false, true, false);
+                             if (!found) break; // Si no hay tantas ocurrencias, paramos en la última
+                        }
+
                         if (found) {
                             const sel = window.getSelection();
                             if (sel.rangeCount > 0) {
@@ -396,7 +433,7 @@
             if (saveToHistory) saveHistory();
         }
 
-        // --- Event Listeners ---
+        // --- Event Listeners y Sincronización CODE -> VISUAL ---
 
         function syncEditorToVisual() {
             const start = textarea.selectionStart;
@@ -404,8 +441,16 @@
             const selectedText = textarea.value.substring(start, end);
 
             if (selectedText.length > 0 && selectedText.trim().length > 0) {
+                // Calcular qué ocurrencia es esta selección en el código
+                const textBefore = textarea.value.substring(0, start);
+                const regex = new RegExp(escapeRegExp(selectedText), 'g');
+                const matches = textBefore.match(regex);
+                const occurrenceIndex = matches ? matches.length : 0;
+
                 if (iframe.contentWindow && iframe.contentWindow.highlightText) {
-                    iframe.contentWindow.highlightText(selectedText);
+                    // Enviamos texto E índice
+                    iframe.contentWindow.highlightText(selectedText, occurrenceIndex);
+                    
                     syncStatus.classList.remove('hidden');
                     setTimeout(() => syncStatus.classList.add('hidden'), 1000);
                 }
@@ -493,49 +538,53 @@
             updateAll();
         }
 
-        // --- Sync Visual -> Code ---
+        // --- Sync Visual -> Code (Recepción) ---
         window.addEventListener('message', (event) => {
             if (event.data.type === 'syncFromVisual') {
-                findAndSelectInEditor(event.data.text);
+                // Recibimos texto e índice
+                findAndSelectInEditor(event.data.text, event.data.occurrenceIndex);
             }
         });
 
-        function findAndSelectInEditor(text) {
+        function findAndSelectInEditor(text, occurrenceIndex) {
             if (!text || text.trim() === '') return;
             const code = textarea.value;
-            const index = code.indexOf(text); 
             
-            if (index !== -1) {
-                // 1. Seleccionar texto
+            // Buscar la N-ésima ocurrencia en el código
+            let searchPos = 0;
+            let foundIndex = -1;
+            
+            // Loop para encontrar la ocurrencia correcta
+            for (let i = 0; i <= occurrenceIndex; i++) {
+                foundIndex = code.indexOf(text, searchPos);
+                if (foundIndex === -1) break; 
+                searchPos = foundIndex + 1; // Avanzar para la siguiente búsqueda
+            }
+
+            // Fallback: Si no encontramos la N-ésima (por diferencias de HTML vs Texto), busca la primera
+            if (foundIndex === -1) {
+                foundIndex = code.indexOf(text);
+            }
+
+            if (foundIndex !== -1) {
                 textarea.focus();
-                textarea.setSelectionRange(index, index + text.length);
+                textarea.setSelectionRange(foundIndex, foundIndex + text.length);
                 
-                // 2. SCROLL PRECISO USANDO EL MIRROR
-                // Como tenemos word-wrap variable, usamos el mirror para medir 
-                // exactamente a qué altura de píxel cae el inicio del texto seleccionado.
+                // Scroll con Mirror
                 const mirror = document.getElementById('code-mirror');
                 if (mirror) {
-                    // Limpiamos temporalmente el mirror (usado para números de línea) para medir
                     mirror.innerHTML = '';
-                    
-                    // Recreamos el contenido exacto hasta el punto de selección
-                    const textBefore = code.substring(0, index);
+                    const textBefore = code.substring(0, foundIndex);
                     const preNode = document.createTextNode(textBefore);
                     mirror.appendChild(preNode);
-                    
-                    // Ponemos un marcador visible/invisible
                     const marker = document.createElement('span');
-                    marker.textContent = '|'; // Carácter para asegurar altura de línea
+                    marker.textContent = '|'; 
                     mirror.appendChild(marker);
                     
-                    // Medimos la altura exacta (offsetTop)
                     const top = marker.offsetTop;
-                    
-                    // Centramos el scroll: Posición del marcador - Mitad de altura del editor
                     const editorHeight = textarea.clientHeight;
                     textarea.scrollTop = top - (editorHeight / 2);
                     
-                    // 3. Restauramos la UI de números de línea inmediatamente
                     updateLineNumbers();
                 }
                 
