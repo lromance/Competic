@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprèn Funcions de Text a Google Sheets</title>
+    <style>
+        :root {
+            --primary-color: #0F9D58; /* Google Sheets Green */
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+            --code-bg: #e8f0fe;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 30px;
+            border-left: 5px solid var(--primary-color);
+            padding-left: 10px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 25px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        code {
+            background-color: var(--code-bg);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #c0392b;
+        }
+        .formula-box {
+            background-color: var(--code-bg);
+            border: 1px solid #bdc3c7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #2c3e50;
+        }
+        .example-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        .example-table th, .example-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .example-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        .exercise-section {
+            background-color: #eafaf1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+            border: 1px solid #c8e6c9;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #777;
+        }
+        .challenge {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Guia: Funcions de Text a Google Sheets</h1>
+    <p>Aquest material està dissenyat per aprendre a manipular text en fulls de càlcul. Utilitzarem els noms de les funcions en anglès (estàndard universal), tot i que Sheets els pot traduir automàticament segons la configuració.</p>
+
+    <div class="note">
+        <strong>Nota important sobre els separadors:</strong> En aquesta guia utilitzem el punt i coma <code>;</code> per separar els arguments de les fórmules (exemple: <code>=LEFT(A1; 2)</code>), ja que és el format estàndard quan el full de càlcul està configurat en regions europees (on la coma s'utilitza per als decimals).
+    </div>
+
+    <!-- 1. CADENES DE TEXT -->
+    <h2>1. Cadenes de text: Referències vs. Text Literal</h2>
+    <p>Per a Google Sheets, hi ha dues maneres principals d'indicar text dins d'una fórmula:</p>
+    
+    <h3>A. Referència a cel·la</h3>
+    <p>Indiquem la coordenada on es troba el text. No porta cometes.</p>
+    <div class="formula-box">=A1</div>
+    <p><em>Resultat: Mostra el contingut exacte de la cel·la A1.</em></p>
+
+    <h3>B. Text literal (Hardcoded)</h3>
+    <p>Quan escrivim text directament dins d'una fórmula, <strong>sempre ha d'anar entre cometes dobles</strong>.</p>
+    <div class="formula-box">="Hola Món"</div>
+    <p><em>Resultat: Escriu la paraula Hola Món.</em></p>
+
+    <hr>
+
+    <!-- 2. LEFT i RIGHT (1 caràcter) -->
+    <h2>2. Funcions LEFT i RIGHT (Un sol caràcter)</h2>
+    <p>Serveixen per extreure caràcters del principi (esquerra) o del final (dreta) d'una cel·la.</p>
+
+    <h3>LEFT (Esquerra)</h3>
+    <p>Si no especifiquem quants caràcters volem, per defecte n'agafa <strong>1</strong>.</p>
+    <table class="example-table">
+        <tr><th>Cel·la A1</th><th>Fórmula</th><th>Resultat</th></tr>
+        <tr><td>Barcelona</td><td><code>=LEFT(A1)</code></td><td>B</td></tr>
+    </table>
+
+    <h3>RIGHT (Dreta)</h3>
+    <p>Igual que l'anterior, però començant pel final.</p>
+    <table class="example-table">
+        <tr><th>Cel·la A1</th><th>Fórmula</th><th>Resultat</th></tr>
+        <tr><td>Barcelona</td><td><code>=RIGHT(A1)</code></td><td>a</td></tr>
+    </table>
+
+    <hr>
+
+    <!-- 3. LEFT i RIGHT (Diversos caràcters) -->
+    <h2>3. Funcions LEFT i RIGHT (Diversos caràcters)</h2>
+    <p>Podem afegir un segon argument per indicar quants caràcters volem extreure.</p>
+    <p><strong>Sintaxi:</strong> <code>=LEFT(text; número_de_caràcters)</code></p>
+
+    <table class="example-table">
+        <tr><th>Cel·la A2</th><th>Fórmula</th><th>Explicació</th><th>Resultat</th></tr>
+        <tr><td>Girona</td><td><code>=LEFT(A2; 3)</code></td><td>Agafa les 3 primeres lletres</td><td>Gir</td></tr>
+        <tr><td>Girona</td><td><code>=RIGHT(A2; 2)</code></td><td>Agafa les 2 últimes lletres</td><td>na</td></tr>
+    </table>
+
+    <hr>
+
+    <!-- 4. CONCAT -->
+    <h2>4. Funció CONCAT</h2>
+    <p>És la versió antiga i senzilla. Serveix per unir <strong>dos</strong> valors. No permet afegir separadors manualment de forma àgil ni unir molts elements.</p>
+    
+    <table class="example-table">
+        <tr><th>A1</th><th>B1</th><th>Fórmula</th><th>Resultat</th></tr>
+        <tr><td>Joan</td><td>Surià</td><td><code>=CONCAT(A1; B1)</code></td><td>JoanSurià</td></tr>
+    </table>
+    <p><em>Nota: El text queda enganxat perquè no hem posat cap espai.</em></p>
+
+    <hr>
+
+    <!-- 5. CONCATENATE -->
+    <h2>5. Funció CONCATENATE (Concatenar)</h2>
+    <p>És molt més potent. Permet unir tants elements com vulguis: cel·les, text fix, números, etc.</p>
+
+    <h3>Amb referències a cel·les</h3>
+    <div class="formula-box">=CONCATENATE(A1; B1; C1)</div>
+
+    <h3>Amb referències i text fix (Exemple pràctic)</h3>
+    <p>Si volem unir Nom i Cognom amb un espai al mig, hem d'afegir l'espai com a text literal <code>" "</code>.</p>
+    
+    <table class="example-table">
+        <tr><th>A1 (Nom)</th><th>B1 (Cognom)</th><th>Fórmula</th><th>Resultat</th></tr>
+        <tr><td>Maria</td><td>Vila</td><td><code>=CONCATENATE(A1; " "; B1)</code></td><td>Maria Vila</td></tr>
+        <tr><td>Maria</td><td>Vila</td><td><code>=CONCATENATE("L'alumna és: "; A1)</code></td><td>L'alumna és: Maria</td></tr>
+    </table>
+
+    <hr>
+
+    <!-- 6. ANIDAMENT -->
+    <h2>6. Anidament de Funcions (Nesting)</h2>
+    <p>L'anidament consisteix a posar una funció dins d'una altra. El resultat de la funció interior es converteix en l'argument de la funció exterior.</p>
+    
+    <p><strong>Objectiu:</strong> Crear un codi d'usuari agafant la primera lletra del Nom i les 3 primeres del Cognom.</p>
+    <ul>
+        <li>Nom (A1): <strong>P</strong>au</li>
+        <li>Cognom (B1): <strong>Cas</strong>als</li>
+    </ul>
+
+    <p><strong>Pas a pas:</strong></p>
+    <ol>
+        <li>Extreure lletra nom: <code>LEFT(A1; 1)</code> -> "P"</li>
+        <li>Extreure lletres cognom: <code>LEFT(B1; 3)</code> -> "Cas"</li>
+        <li>Unir-ho tot amb CONCATENATE.</li>
+    </ol>
+
+    <div class="formula-box">=CONCATENATE(LEFT(A1; 1); LEFT(B1; 3))</div>
+    <p><strong>Resultat:</strong> PCas</p>
+
+    <hr>
+
+    <!-- EXERCICIS AMPLIATS -->
+    <div class="exercise-section">
+        <h2>📝 Exercicis Pràctics Ampliats</h2>
+        <p>Copia la següent taula al teu full de càlcul (A1:E6) per realitzar els exercicis.</p>
+
+        <table class="example-table" style="background: white;">
+            <tr>
+                <th></th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+                <th>D</th>
+                <th>E</th>
+            </tr>
+            <tr>
+                <th>1</th>
+                <td><strong>ID_Empleat</strong></td>
+                <td><strong>Nom</strong></td>
+                <td><strong>Cognom</strong></td>
+                <td><strong>Departament</strong></td>
+                <td><strong>Any</strong></td>
+            </tr>
+            <tr>
+                <th>2</th>
+                <td>EMP-992</td>
+                <td>Anna</td>
+                <td>Soler</td>
+                <td>Vendes</td>
+                <td>2020</td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td>EMP-345</td>
+                <td>Marc</td>
+                <td>Duran</td>
+                <td>Logística</td>
+                <td>2022</td>
+            </tr>
+            <tr>
+                <th>4</th>
+                <td>EMP-120</td>
+                <td>Laia</td>
+                <td>Pons</td>
+                <td>Vendes</td>
+                <td>2019</td>
+            </tr>
+            <tr>
+                <th>5</th>
+                <td>ADM-001</td>
+                <td>Jordi</td>
+                <td>Vidal</td>
+                <td>Admin</td>
+                <td>2018</td>
+            </tr>
+            <tr>
+                <th>6</th>
+                <td>TEC-555</td>
+                <td>Sara</td>
+                <td>Mas</td>
+                <td>IT</td>
+                <td>2023</td>
+            </tr>
+        </table>
+
+        <h3>Nivell 1: Extracció Bàsica</h3>
+        <div class="challenge">
+            <ol>
+                <li><strong>Extreure el tipus d'empleat:</strong> A la columna F, utilitza <code>LEFT</code> per treure només les 3 primeres lletres de l'ID (Ex: "EMP", "ADM").</li>
+                <li><strong>Extreure el número d'ID:</strong> A la columna G, utilitza <code>RIGHT</code> per treure els 3 números finals de l'ID (Ex: "992").</li>
+            </ol>
+        </div>
+
+        <h3>Nivell 2: Unió de Textos</h3>
+        <div class="challenge">
+            <ol start="3">
+                <li><strong>Nom Complet:</strong> A la columna H, crea el format "Cognom, Nom". Recorda afegir la coma i l'espai entre mig.</li>
+                <li><strong>Missatge de Benvinguda:</strong> A la columna I, crea una frase que digui: "Hola [Nom], benvinguda al departament de [Departament]".</li>
+            </ol>
+        </div>
+
+        <h3>Nivell 3: Anidament i Creativitat</h3>
+        <div class="challenge">
+            <ol start="5">
+                <li>
+                    <strong>Generar Correu Corporatiu:</strong> A la columna J, crea un email automàticament.<br>
+                    Format: <em>1a lletra del Nom</em> + <em>Cognom complet</em> + <em>@empresa.com</em>.<br>
+                    Exemple: asoler@empresa.com
+                </li>
+                <li>
+                    <strong>Codi de Seguretat (Repte):</strong> A la columna K, volem crear un codi especial barrejant dades.<br>
+                    Format: <em>Últims 2 dígits de l'Any</em> + <em>Primeres 2 lletres del Departament</em> + <em>Última lletra del Nom</em>.<br>
+                    Exemple per a l'Anna (2020, Vendes): <strong>20Ve a</strong>
+                </li>
+                <li>
+                    <strong>Fitxa Resum:</strong> A la columna L, crea una fitxa en una sola cel·la amb text fix i variables.<br>
+                    Exemple esperat: "ID: 992 | Empleat: Soler (2020)"<br>
+                    <em>Pista: Hauràs d'utilitzar RIGHT per al número, i referències directes per al cognom i l'any, tot unit amb CONCATENATE i separadors com " | " i "(".</em>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="footer">
+        Creat per a l'aprenentatge de Google Sheets.
+    </div>
+</div>
+
+</body>
+</html>
