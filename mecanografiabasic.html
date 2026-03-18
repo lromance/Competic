@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mecanografia Interactiva - QWERTY Espanyol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap');
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .key {
+            height: 50px;
+            min-width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.1s;
+            user-select: none;
+        }
+
+        .key.active-press {
+            background: #3b82f6 !important;
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .key.target-hint {
+            border: 2px solid #eab308;
+            background: #422006;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .display-card {
+            font-family: 'JetBrains Mono', monospace;
+            background: #1e293b;
+            border: 2px solid #334155;
+            width: 150px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            line-height: 1;
+        }
+
+        .display-card.is-space {
+            font-size: 32px;
+            color: #94a3b8;
+        }
+
+        .status-correct { color: #22c55e; border-color: #22c55e; }
+        .status-error { color: #ef4444; border-color: #ef4444; }
+        .status-neutral { color: #f8fafc; }
+
+        .keyboard-container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto text-center flex-grow">
+        <h1 class="text-3xl font-bold mb-6 text-blue-400">Pràctica de Teclat QWERTY</h1>
+        
+        <!-- Selectores de Seqüència -->
+        <div class="flex flex-wrap justify-center gap-3 mb-10">
+            <button onclick="startSequence('series')" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition">1. Sèries de Teclat</button>
+            <button onclick="startSequence('alphabet')" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-medium transition">2. Abecedari A-Z / Z-A</button>
+            <button onclick="startSequence('random')" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg font-medium transition">3. Aleatori</button>
+        </div>
+
+        <!-- Pantalla de Lletres -->
+        <div class="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
+            <div>
+                <p class="text-sm text-slate-400 mb-2 uppercase tracking-widest">Escriu aquesta:</p>
+                <div id="targetDisplay" class="display-card text-yellow-400">-</div>
+            </div>
+            <div class="text-4xl text-slate-600 font-bold mt-6 hidden md:block">➔</div>
+            <div>
+                <p class="text-sm text-slate-400 mb-2 uppercase tracking-widest">La teva pulsació:</p>
+                <div id="userDisplay" class="display-card status-neutral">-</div>
+            </div>
+        </div>
+
+        <!-- Teclat Visual -->
+        <div class="keyboard-container bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-800">
+            <div id="keyboardRows" class="flex flex-col gap-2">
+                <!-- Generat per JS -->
+            </div>
+        </div>
+
+        <div class="mt-8 text-slate-500 text-sm">
+            <p>Prem les tecles al teu teclat físic per començar. No oblidis la <b>Ñ</b> i la <b>Ç</b>.</p>
+        </div>
+    </div>
+
+    <footer class="text-center">
+        (c) Luis Romance - <a href="http://www.cfalapau.cat" target="_blank" class="hover:text-blue-400 underline transition">www.cfalapau.cat</a>
+    </footer>
+
+    <script>
+        const targetDisplay = document.getElementById('targetDisplay');
+        const userDisplay = document.getElementById('userDisplay');
+        const keyboardRows = document.getElementById('keyboardRows');
+
+        // Configuració de tecles QWERTY Espanyol
+        const layout = [
+            ["º", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "'", "¡", "Backspace"],
+            ["Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "`", "+"],
+            ["Caps", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Ñ", "´", "Ç", "Enter"],
+            ["Shift", "<", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "-", "Shift"],
+            ["Space"]
+        ];
+
+        // Definició de seqüències
+        const sequences = {
+            series: "ASDFGHJKLÑ QWERTYUIOP ZXCVBNM,.- Ç´`+ ¡'0987654321º QAZ WSX EDC RFV TGB YHN UJM KIL OÑº Ç. P, QWERTYUIOP ASDFGHJKLÑ ZXCVBNM ZAQ XSW CDE VFR BGT NHY MJU LIK Ñ O P",
+            alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ ZYXWVUTSRQPONÑMLKJIHGFEDCBA",
+            random: "" 
+        };
+
+        let currentSequence = [];
+        let currentIndex = 0;
+
+        function initKeyboard() {
+            keyboardRows.innerHTML = '';
+            layout.forEach((row) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex gap-1 justify-center w-full";
+                row.forEach(key => {
+                    const keyDiv = document.createElement('div');
+                    keyDiv.className = "key flex-1 md:flex-none";
+                    keyDiv.textContent = key === "Space" ? "" : key;
+                    keyDiv.id = `key-${key.toUpperCase()}`;
+                    
+                    if(key === "Backspace") keyDiv.style.minWidth = "100px";
+                    if(key === "Tab") keyDiv.style.minWidth = "70px";
+                    if(key === "Caps") keyDiv.style.minWidth = "85px";
+                    if(key === "Enter") keyDiv.style.minWidth = "90px";
+                    if(key === "Shift") keyDiv.style.minWidth = "110px";
+                    if(key === "Space") {
+                        keyDiv.style.minWidth = "300px";
+                        keyDiv.classList.add("bg-slate-800");
+                    }
+
+                    rowDiv.appendChild(keyDiv);
+                });
+                keyboardRows.appendChild(rowDiv);
+            });
+        }
+
+        function startSequence(type) {
+            let text = "";
+            if (type === 'random') {
+                const chars = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZÇ0123456789";
+                for(let i=0; i<30; i++) text += chars.charAt(Math.floor(Math.random() * chars.length)) + (i % 5 === 0 ? " " : "");
+            } else {
+                text = sequences[type];
+            }
+
+            // Convertir el text en un array de caràcters mantenint espais segons la lògica de la seqüència
+            currentSequence = text.split('');
+            currentIndex = 0;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            if (currentIndex < currentSequence.length) {
+                const char = currentSequence[currentIndex];
+                
+                if (char === " ") {
+                    targetDisplay.textContent = "ESPAI";
+                    targetDisplay.classList.add('is-space');
+                } else {
+                    targetDisplay.textContent = char.toUpperCase();
+                    targetDisplay.classList.remove('is-space');
+                }
+
+                userDisplay.textContent = "-";
+                userDisplay.className = "display-card status-neutral";
+                userDisplay.classList.remove('is-space');
+                
+                document.querySelectorAll('.key').forEach(k => k.classList.remove('target-hint'));
+                const keyId = char === " " ? "key-SPACE" : `key-${char.toUpperCase()}`;
+                const keyElem = document.getElementById(keyId);
+                if (keyElem) keyElem.classList.add('target-hint');
+            } else {
+                targetDisplay.textContent = "FI!";
+                targetDisplay.classList.remove('is-space');
+                userDisplay.textContent = "🏆";
+                userDisplay.className = "display-card status-correct";
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            let keyPushed = e.key.toUpperCase();
+            if (e.code === "Space") keyPushed = " ";
+            
+            // Feedback visual tecla
+            const keyId = e.code === "Space" ? "key-SPACE" : `key-${keyPushed}`;
+            const visualKey = document.getElementById(keyId);
+            if (visualKey) {
+                visualKey.classList.add('active-press');
+                setTimeout(() => visualKey.classList.remove('active-press'), 150);
+            }
+
+            if (currentIndex >= currentSequence.length) return;
+
+            const targetChar = currentSequence[currentIndex].toUpperCase();
+            
+            // Ignorar tecles de control com Shift, Alt, etc.
+            if (e.key.length > 1 && e.code !== "Space") return;
+
+            // Mostrar el que l'usuari ha premut
+            if (keyPushed === " ") {
+                userDisplay.textContent = "ESPAI";
+                userDisplay.classList.add('is-space');
+            } else {
+                userDisplay.textContent = keyPushed;
+                userDisplay.classList.remove('is-space');
+            }
+
+            if (keyPushed === targetChar) {
+                userDisplay.className += " status-correct";
+                setTimeout(() => {
+                    currentIndex++;
+                    updateDisplay();
+                }, 150);
+            } else {
+                userDisplay.className += " status-error";
+            }
+        });
+
+        initKeyboard();
+        startSequence('series');
+
+    </script>
+</body>
+</html>
