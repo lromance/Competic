@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
 
-        /* Colores por dedos (más vibrantes para claridad) */
+        /* Colores por dedos */
         .finger-m-esq { border-bottom: 4px solid #f472b6 !important; } /* Petit Esq - Rosa */
         .finger-a-esq { border-bottom: 4px solid #a78bfa !important; } /* Anular Esq - Lila */
         .finger-p-esq { border-bottom: 4px solid #60a5fa !important; } /* Mig Esq - Blau */
@@ -74,7 +74,7 @@
             line-height: 1;
         }
 
-        .display-card.is-space {
+        .display-card.is-special {
             font-size: 28px;
             color: #94a3b8;
         }
@@ -147,7 +147,7 @@
     </div>
 
     <footer class="text-center">
-        (c) Luis Romance - COMPETIC - <a href="http://www.cfalapau.cat" target="_blank" class="hover:text-blue-400 underline transition">www.cfalapau.cat</a>
+        (c) Luis Romance - <a href="http://www.cfalapau.cat" target="_blank" class="hover:text-blue-400 underline transition">www.cfalapau.cat</a>
     </footer>
 
     <script>
@@ -156,7 +156,7 @@
         const fingerText = document.getElementById('fingerText');
         const keyboardRows = document.getElementById('keyboardRows');
 
-        // Mapeo de dedos actualizado con nombres más claros
+        // Mapeo de dedos
         const fingerMap = {
             "1": "m-esq", "Q": "m-esq", "A": "m-esq", "Z": "m-esq", "º": "m-esq",
             "2": "a-esq", "W": "a-esq", "S": "a-esq", "X": "a-esq",
@@ -197,6 +197,14 @@
 
         let currentSequence = [];
         let currentIndex = 0;
+
+        // Mapeo especial para teclas muertas (acentos)
+        const deadKeyMap = {
+            "Quote": "´",
+            "BracketLeft": "`",
+            "BracketRight": "+",
+            "Backslash": "Ç"
+        };
 
         function initKeyboard() {
             keyboardRows.innerHTML = '';
@@ -248,10 +256,16 @@
                 
                 if (char === " ") {
                     targetDisplay.textContent = "ESPAI";
-                    targetDisplay.classList.add('is-space');
+                    targetDisplay.classList.add('is-special');
+                } else if (char === "´") {
+                    targetDisplay.textContent = "ACCENT TANCAT";
+                    targetDisplay.classList.add('is-special');
+                } else if (char === "`") {
+                    targetDisplay.textContent = "ACCENT OBERT";
+                    targetDisplay.classList.add('is-special');
                 } else {
                     targetDisplay.textContent = upperChar;
-                    targetDisplay.classList.remove('is-space');
+                    targetDisplay.classList.remove('is-special');
                 }
 
                 userDisplay.textContent = "-";
@@ -276,7 +290,7 @@
                 if (keyElem) keyElem.classList.add('target-hint');
             } else {
                 targetDisplay.textContent = "FI!";
-                targetDisplay.classList.remove('is-space');
+                targetDisplay.classList.remove('is-special');
                 fingerText.textContent = "Molt bé! Has acabat.";
                 fingerText.style.color = "#22c55e";
                 fingerText.style.borderColor = "#22c55e";
@@ -285,11 +299,18 @@
         }
 
         window.addEventListener('keydown', (e) => {
+            // Prevenir comportamientos por defecto que puedan interferir
+            if (e.key === "Tab") e.preventDefault();
+
             let keyPushed = e.key.toUpperCase();
             if (e.code === "Space") keyPushed = " ";
             
-            const keyId = e.code === "Space" ? "key-SPACE" : `key-${keyPushed}`;
-            const visualKey = document.getElementById(keyId);
+            // Lógica para detectar teclas de acento incluso si son "Dead Keys"
+            if (e.code === "Quote") keyPushed = "´";
+            if (e.code === "BracketLeft") keyPushed = "`";
+
+            const keyIdForVisual = e.code === "Space" ? "key-SPACE" : `key-${keyPushed}`;
+            const visualKey = document.getElementById(keyIdForVisual);
             if (visualKey) {
                 visualKey.classList.add('active-press');
                 setTimeout(() => visualKey.classList.remove('active-press'), 150);
@@ -298,16 +319,26 @@
             if (currentIndex >= currentSequence.length) return;
 
             const targetChar = currentSequence[currentIndex].toUpperCase();
-            if (e.key.length > 1 && e.code !== "Space") return;
+            
+            // Saltar si es una tecla de sistema pura (Shift solo, Ctrl, etc)
+            if (e.key.length > 1 && e.code !== "Space" && e.code !== "Quote" && e.code !== "BracketLeft") return;
 
+            // Actualizar visualización del usuario
             if (keyPushed === " ") {
                 userDisplay.textContent = "ESPAI";
-                userDisplay.classList.add('is-space');
+                userDisplay.classList.add('is-special');
+            } else if (keyPushed === "´") {
+                userDisplay.textContent = "´";
+                userDisplay.classList.remove('is-special');
+            } else if (keyPushed === "`") {
+                userDisplay.textContent = "`";
+                userDisplay.classList.remove('is-special');
             } else {
                 userDisplay.textContent = keyPushed;
-                userDisplay.classList.remove('is-space');
+                userDisplay.classList.remove('is-special');
             }
 
+            // Validación de acierto
             if (keyPushed === targetChar) {
                 userDisplay.classList.remove('status-error');
                 userDisplay.classList.add('status-correct');
