@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mecanografia Interactiva - QWERTY Espanyol</title>
+    <title>Mecanografia Interactiva - QWERTY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap');
@@ -11,29 +11,28 @@
         body {
             background-color: #0f172a;
             color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
         }
 
-        /* Colores por dedos */
-        .finger-m-esq { border-bottom: 4px solid #f472b6 !important; } /* Petit Esq - Rosa */
-        .finger-a-esq { border-bottom: 4px solid #a78bfa !important; } /* Anular Esq - Lila */
-        .finger-p-esq { border-bottom: 4px solid #60a5fa !important; } /* Mig Esq - Blau */
-        .finger-i-esq { border-bottom: 4px solid #4ade80 !important; } /* Índex Esq - Verd */
-        
-        .finger-i-dre { border-bottom: 4px solid #4ade80 !important; } /* Índex Dre - Verd */
-        .finger-p-dre { border-bottom: 4px solid #60a5fa !important; } /* Mig Dre - Blau */
-        .finger-a-dre { border-bottom: 4px solid #a78bfa !important; } /* Anular Dre - Lila */
-        .finger-m-dre { border-bottom: 4px solid #f472b6 !important; } /* Petit Dre - Rosa */
-        
-        .finger-pulgar { border-bottom: 4px solid #facc15 !important; } /* Polzes - Groc */
+        /* Colors per dits */
+        .finger-m-esq { border-bottom: 4px solid #f472b6 !important; }
+        .finger-a-esq { border-bottom: 4px solid #a78bfa !important; }
+        .finger-p-esq { border-bottom: 4px solid #60a5fa !important; }
+        .finger-i-esq { border-bottom: 4px solid #4ade80 !important; }
+        .finger-i-dre { border-bottom: 4px solid #4ade80 !important; }
+        .finger-p-dre { border-bottom: 4px solid #60a5fa !important; }
+        .finger-a-dre { border-bottom: 4px solid #a78bfa !important; }
+        .finger-m-dre { border-bottom: 4px solid #f472b6 !important; }
+        .finger-pulgar { border-bottom: 4px solid #facc15 !important; }
 
         .key {
-            height: 54px;
-            min-width: 45px;
+            height: clamp(40px, 8vh, 54px);
+            min-width: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -41,15 +40,15 @@
             border: 1px solid #334155;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 14px;
-            transition: all 0.1s;
+            font-size: clamp(10px, 2vw, 14px);
+            transition: all 0.05s;
             user-select: none;
+            flex: 1;
         }
 
         .key.active-press {
             background: #3b82f6 !important;
-            transform: scale(0.95);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            transform: scale(0.92);
         }
 
         .key.target-hint {
@@ -62,92 +61,93 @@
             font-family: 'JetBrains Mono', monospace;
             background: #1e293b;
             border: 2px solid #334155;
-            width: 150px;
-            height: 180px;
+            width: clamp(100px, 20vw, 150px);
+            height: clamp(120px, 25vh, 180px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 100px;
+            font-size: clamp(40px, 10vw, 100px);
             border-radius: 12px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             text-align: center;
-            line-height: 1;
         }
 
         .display-card.is-special {
-            font-size: 28px;
+            font-size: clamp(16px, 4vw, 24px);
             color: #94a3b8;
+            padding: 10px;
         }
 
         .status-correct { color: #22c55e; border-color: #22c55e; }
         .status-error { color: #ef4444; border-color: #ef4444; }
         
         .finger-indicator {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
-            margin-top: 12px;
-            display: inline-block;
+            margin-top: 10px;
+            background: #1e293b;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
         .keyboard-container {
+            width: 100%;
             max-width: 900px;
             margin: 0 auto;
         }
 
         footer {
-            margin-top: auto;
-            padding: 2rem;
+            padding: 1rem;
             color: #64748b;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
         }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body class="p-2 md:p-6">
 
-    <div class="max-w-5xl mx-auto text-center flex-grow">
-        <h1 class="text-3xl font-bold mb-4 text-blue-400">Aprendre Mecanografia - Guia de Dits</h1>
-        
-        <div class="flex flex-wrap justify-center gap-2 mb-8">
-            <button onclick="startSequence('series')" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition">1. Sèries de Teclat</button>
-            <button onclick="startSequence('alphabet')" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition">2. Abecedari</button>
-            <button onclick="startSequence('random')" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm font-medium transition">3. Aleatori</button>
-        </div>
-
-        <div class="flex flex-col md:flex-row justify-center items-start gap-8 mb-10">
-            <div class="flex flex-col items-center">
-                <p class="text-xs text-slate-400 mb-2 uppercase tracking-tighter">Escriu aquesta:</p>
-                <div id="targetDisplay" class="display-card text-yellow-400">-</div>
-                <div id="fingerText" class="finger-indicator bg-slate-800 text-slate-300 mt-4 shadow-lg">Col·loca les mans a la fila base</div>
+    <div class="max-w-5xl mx-auto text-center flex-grow flex flex-col justify-between">
+        <header>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2 text-blue-400">Mecanografia Interactiva</h1>
+            <div class="flex flex-wrap justify-center gap-2 mb-4">
+                <button onclick="startSequence('series')" class="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">1. Sèries</button>
+                <button onclick="startSequence('alphabet')" class="bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">2. Abecedari</button>
+                <button onclick="startSequence('random')" class="bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">3. Aleatori</button>
             </div>
-            
-            <div class="hidden md:flex items-center h-44 text-slate-700">
-                <span class="text-5xl">➔</span>
+        </header>
+
+        <main>
+            <div class="flex justify-center items-center gap-4 md:gap-8 mb-6">
+                <div class="flex flex-col items-center">
+                    <p class="text-[10px] text-slate-400 mb-1 uppercase tracking-tighter">Objectiu:</p>
+                    <div id="targetDisplay" class="display-card text-yellow-400">-</div>
+                    <div id="fingerText" class="finger-indicator text-slate-300">Inicia una sèrie</div>
+                </div>
+                
+                <div class="hidden md:block text-slate-700 text-4xl">➔</div>
+
+                <div class="flex flex-col items-center">
+                    <p class="text-[10px] text-slate-400 mb-1 uppercase tracking-tighter">La teva tecla:</p>
+                    <div id="userDisplay" class="display-card text-slate-200">-</div>
+                </div>
             </div>
 
-            <div class="flex flex-col items-center">
-                <p class="text-xs text-slate-400 mb-2 uppercase tracking-tighter">La teva pulsació:</p>
-                <div id="userDisplay" class="display-card text-slate-200">-</div>
+            <div class="keyboard-container bg-slate-900 p-2 md:p-4 rounded-xl border border-slate-800">
+                <div id="keyboardRows" class="flex flex-col gap-1.5"></div>
             </div>
-        </div>
+        </main>
 
-        <div class="keyboard-container bg-slate-900 p-4 md:p-6 rounded-2xl shadow-2xl border border-slate-800">
-            <div id="keyboardRows" class="flex flex-col gap-2"></div>
-        </div>
-
-        <div class="mt-6 flex justify-center gap-6 text-[11px] font-bold uppercase tracking-widest text-slate-500">
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-pink-400 rounded-full"></span> Dit Petit</span>
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-violet-400 rounded-full"></span> Anular</span>
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-400 rounded-full"></span> Cor / Mig</span>
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded-full"></span> Índex</span>
-            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-yellow-400 rounded-full"></span> Polze</span>
-        </div>
+        <section class="mt-4 flex flex-wrap justify-center gap-3 text-[10px] font-bold uppercase text-slate-500">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-pink-400 rounded-full"></span> Petit</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-violet-400 rounded-full"></span> Anular</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-blue-400 rounded-full"></span> Mig</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full"></span> Índex</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-yellow-400 rounded-full"></span> Polze</span>
+        </section>
     </div>
 
     <footer class="text-center">
-        (c) Luis Romance - <a href="http://www.cfalapau.cat" target="_blank" class="hover:text-blue-400 underline transition">www.cfalapau.cat</a>
+        (c) Luis Romance - <a href="http://www.cfalapau.cat" target="_blank" class="underline">www.cfalapau.cat</a>
     </footer>
 
     <script>
@@ -156,9 +156,8 @@
         const fingerText = document.getElementById('fingerText');
         const keyboardRows = document.getElementById('keyboardRows');
 
-        // Mapeo de dedos
         const fingerMap = {
-            "1": "m-esq", "Q": "m-esq", "A": "m-esq", "Z": "m-esq", "º": "m-esq",
+            "1": "m-esq", "Q": "m-esq", "A": "m-esq", "Z": "m-esq", "º": "m-esq", "<": "m-esq",
             "2": "a-esq", "W": "a-esq", "S": "a-esq", "X": "a-esq",
             "3": "p-esq", "E": "p-esq", "D": "p-esq", "C": "p-esq",
             "4": "i-esq", "R": "i-esq", "F": "i-esq", "V": "i-esq", "5": "i-esq", "T": "i-esq", "G": "i-esq", "B": "i-esq",
@@ -166,19 +165,12 @@
             "8": "p-dre", "I": "p-dre", "K": "p-dre", ",": "p-dre",
             "9": "a-dre", "O": "a-dre", "L": "a-dre", ".": "a-dre",
             "0": "m-dre", "P": "m-dre", "Ñ": "m-dre", "-": "m-dre", "'": "m-dre", "¡": "m-dre", "Backspace": "m-dre", "`": "m-dre", "+": "m-dre", "´": "m-dre", "Ç": "m-dre",
-            "Space": "pulgar"
+            "Space": "pulgar", "Enter": "m-dre"
         };
 
         const fingerNames = {
-            "m-esq": "Mà Esquerra - Dit Petit",
-            "a-esq": "Mà Esquerra - Anular",
-            "p-esq": "Mà Esquerra - Dit del Mig",
-            "i-esq": "Mà Esquerra - Índex",
-            "i-dre": "Mà Dreta - Índex",
-            "p-dre": "Mà Dreta - Dit del Mig",
-            "a-dre": "Mà Dreta - Anular",
-            "m-dre": "Mà Dreta - Dit Petit",
-            "pulgar": "Qualsevol Polze"
+            "m-esq": "Petit Esquerre", "a-esq": "Anular Esquerre", "p-esq": "Mig Esquerre", "i-esq": "Índex Esquerre",
+            "i-dre": "Índex Dret", "p-dre": "Mig Dret", "a-dre": "Anular Dret", "m-dre": "Petit Dret", "pulgar": "Polze"
         };
 
         const layout = [
@@ -189,22 +181,15 @@
             ["Space"]
         ];
 
+        // Seqüències actualitzades sense espais intermedis molestos
         const sequences = {
-            series: "ASDFGHJKLÑ QWERTYUIOP ZXCVBNM,.- Ç´`+ ¡'0987654321º QAZ WSX EDC RFV TGB YHN UJM KIL OÑº Ç. P, QWERTYUIOP ASDFGHJKLÑ ZXCVBNM ZAQ XSW CDE VFR BGT NHY MJU LIK Ñ O P",
-            alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ ZYXWVUTSRQPONÑMLKJIHGFEDCBA",
+            series: "ASDFGHJKLÑ QWERTYUIOP ZXCVBNM,.- Ç´`+¡' 0987654321º QAZ WSX EDC RFV TGB YHN UJM KIL OÑº Ç. P, QWERTYUIOP ASDFGHJKLÑ ZXCVBNM ZAQ XSW CDE VFR BGT NHY MJU LIK ÑOP",
+            alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
             random: "" 
         };
 
         let currentSequence = [];
         let currentIndex = 0;
-
-        // Mapeo especial para teclas muertas (acentos)
-        const deadKeyMap = {
-            "Quote": "´",
-            "BracketLeft": "`",
-            "BracketRight": "+",
-            "Backslash": "Ç"
-        };
 
         function initKeyboard() {
             keyboardRows.innerHTML = '';
@@ -213,22 +198,18 @@
                 rowDiv.className = "flex gap-1 justify-center w-full";
                 row.forEach(key => {
                     const keyDiv = document.createElement('div');
-                    keyDiv.className = "key flex-1 md:flex-none";
-                    keyDiv.textContent = (key === "Space" || key === "Shift" || key === "Backspace") ? key : key;
-                    if(key === "Space") keyDiv.textContent = "";
+                    keyDiv.className = "key";
+                    keyDiv.textContent = key === "Space" ? "" : key;
+                    keyDiv.id = `key-${key.toUpperCase().replace('´', 'ACCENT').replace('`', 'OBERT')}`;
                     
-                    keyDiv.id = `key-${key.toUpperCase()}`;
-                    
-                    if (fingerMap[key]) {
-                        keyDiv.classList.add(`finger-${fingerMap[key]}`);
-                    }
+                    if (fingerMap[key]) keyDiv.classList.add(`finger-${fingerMap[key]}`);
 
-                    if(key === "Backspace") keyDiv.style.minWidth = "80px";
-                    if(key === "Tab") keyDiv.style.minWidth = "60px";
-                    if(key === "Caps") keyDiv.style.minWidth = "75px";
-                    if(key === "Enter") keyDiv.style.minWidth = "80px";
-                    if(key === "Shift") keyDiv.style.minWidth = "95px";
-                    if(key === "Space") keyDiv.style.minWidth = "300px";
+                    // Amples especials
+                    if(key === "Backspace") keyDiv.style.flex = "2";
+                    if(key === "Tab" || key === "Caps") keyDiv.style.flex = "1.5";
+                    if(key === "Enter") keyDiv.style.flex = "2";
+                    if(key === "Shift") keyDiv.style.flex = "2.5";
+                    if(key === "Space") keyDiv.style.flex = "8";
 
                     rowDiv.appendChild(keyDiv);
                 });
@@ -239,8 +220,10 @@
         function startSequence(type) {
             let text = "";
             if (type === 'random') {
-                const chars = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZÇ0123456789";
-                for(let i=0; i<30; i++) text += chars.charAt(Math.floor(Math.random() * chars.length)) + (i % 5 === 0 ? " " : "");
+                const chars = "ASDFGHJKLÑQWERTYUIOPZXCVBNM";
+                // Random sense espais intermedis, només un al final
+                for(let i=0; i<20; i++) text += chars.charAt(Math.floor(Math.random() * chars.length));
+                text += " "; 
             } else {
                 text = sequences[type];
             }
@@ -254,25 +237,25 @@
                 const char = currentSequence[currentIndex];
                 const upperChar = char.toUpperCase();
                 
+                targetDisplay.classList.remove('is-special');
                 if (char === " ") {
                     targetDisplay.textContent = "ESPAI";
                     targetDisplay.classList.add('is-special');
                 } else if (char === "´") {
-                    targetDisplay.textContent = "ACCENT TANCAT";
+                    targetDisplay.textContent = "ACCENT (´)";
                     targetDisplay.classList.add('is-special');
                 } else if (char === "`") {
-                    targetDisplay.textContent = "ACCENT OBERT";
+                    targetDisplay.textContent = "ACCENT (`)";
                     targetDisplay.classList.add('is-special');
                 } else {
                     targetDisplay.textContent = upperChar;
-                    targetDisplay.classList.remove('is-special');
                 }
 
                 userDisplay.textContent = "-";
                 userDisplay.className = "display-card text-slate-200 border-slate-700";
                 
-                const fingerKey = char === " " ? "Space" : upperChar;
-                const fingerCode = fingerMap[fingerKey];
+                // Pista de dit
+                const fingerCode = fingerMap[char === " " ? "Space" : upperChar];
                 if (fingerCode) {
                     fingerText.textContent = fingerNames[fingerCode];
                     const colors = {
@@ -281,71 +264,69 @@
                         "pulgar": "#facc15"
                     };
                     fingerText.style.color = colors[fingerCode];
-                    fingerText.style.borderColor = colors[fingerCode];
                 }
 
+                // Ressaltar tecla
                 document.querySelectorAll('.key').forEach(k => k.classList.remove('target-hint'));
-                const keyId = char === " " ? "key-SPACE" : `key-${upperChar}`;
-                const keyElem = document.getElementById(keyId);
+                let searchId = upperChar;
+                if(char === " ") searchId = "SPACE";
+                if(char === "´") searchId = "ACCENT";
+                if(char === "`") searchId = "OBERT";
+                const keyElem = document.getElementById(`key-${searchId}`);
                 if (keyElem) keyElem.classList.add('target-hint');
+                
             } else {
                 targetDisplay.textContent = "FI!";
-                targetDisplay.classList.remove('is-special');
-                fingerText.textContent = "Molt bé! Has acabat.";
+                fingerText.textContent = "Molt bé! Sèrie completada.";
                 fingerText.style.color = "#22c55e";
-                fingerText.style.borderColor = "#22c55e";
                 userDisplay.textContent = "🏆";
             }
         }
 
         window.addEventListener('keydown', (e) => {
-            // Prevenir comportamientos por defecto que puedan interferir
-            if (e.key === "Tab") e.preventDefault();
+            if (e.key === "Tab" || e.code === "Space") e.preventDefault();
+            if (currentIndex >= currentSequence.length) return;
 
             let keyPushed = e.key.toUpperCase();
             if (e.code === "Space") keyPushed = " ";
             
-            // Lógica para detectar teclas de acento incluso si son "Dead Keys"
-            if (e.code === "Quote") keyPushed = "´";
-            if (e.code === "BracketLeft") keyPushed = "`";
+            // Gestió d'accents (tecles mortes)
+            if (e.key === "Dead") {
+                if (e.code === "Quote") keyPushed = "´";
+                if (e.code === "BracketLeft") keyPushed = "`";
+            }
+            if (e.key === "´") keyPushed = "´";
+            if (e.key === "`") keyPushed = "`";
 
-            const keyIdForVisual = e.code === "Space" ? "key-SPACE" : `key-${keyPushed}`;
-            const visualKey = document.getElementById(keyIdForVisual);
+            // Animació visual tecla
+            let visualId = keyPushed;
+            if(keyPushed === " ") visualId = "SPACE";
+            if(keyPushed === "´") visualId = "ACCENT";
+            if(keyPushed === "`") visualId = "OBERT";
+            const visualKey = document.getElementById(`key-${visualId}`);
             if (visualKey) {
                 visualKey.classList.add('active-press');
-                setTimeout(() => visualKey.classList.remove('active-press'), 150);
+                setTimeout(() => visualKey.classList.remove('active-press'), 100);
             }
 
-            if (currentIndex >= currentSequence.length) return;
+            // Ignorar tecles de control com Shift, Alt, etc.
+            if (e.key.length > 1 && e.code !== "Space" && e.key !== "Dead") return;
 
-            const targetChar = currentSequence[currentIndex].toUpperCase();
-            
-            // Saltar si es una tecla de sistema pura (Shift solo, Ctrl, etc)
-            if (e.key.length > 1 && e.code !== "Space" && e.code !== "Quote" && e.code !== "BracketLeft") return;
-
-            // Actualizar visualización del usuario
+            // Feedback visual
+            userDisplay.classList.remove('is-special');
             if (keyPushed === " ") {
                 userDisplay.textContent = "ESPAI";
                 userDisplay.classList.add('is-special');
-            } else if (keyPushed === "´") {
-                userDisplay.textContent = "´";
-                userDisplay.classList.remove('is-special');
-            } else if (keyPushed === "`") {
-                userDisplay.textContent = "`";
-                userDisplay.classList.remove('is-special');
             } else {
                 userDisplay.textContent = keyPushed;
-                userDisplay.classList.remove('is-special');
             }
 
-            // Validación de acierto
+            // Validació
+            const targetChar = currentSequence[currentIndex].toUpperCase();
             if (keyPushed === targetChar) {
-                userDisplay.classList.remove('status-error');
-                userDisplay.classList.add('status-correct');
-                setTimeout(() => {
-                    currentIndex++;
-                    updateDisplay();
-                }, 150);
+                userDisplay.className = "display-card status-correct";
+                currentIndex++;
+                setTimeout(updateDisplay, 100);
             } else {
                 userDisplay.classList.add('status-error');
             }
@@ -353,7 +334,6 @@
 
         initKeyboard();
         startSequence('series');
-
     </script>
 </body>
 </html>
