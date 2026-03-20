@@ -12,11 +12,62 @@
             background-color: #0f172a;
             color: #f8fafc;
             font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
+            margin: 0;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
             overflow-x: hidden;
-            margin: 0;
+        }
+
+        /* Layout Panoràmic (Desktop) */
+        @media (min-width: 1024px) {
+            body {
+                flex-direction: row;
+            }
+            #sidebar {
+                width: 300px;
+                border-right: 1px solid #334155;
+                padding: 2rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 100vh;
+                position: sticky;
+                top: 0;
+            }
+            #main-content {
+                flex: 1;
+                padding: 1rem 2rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+
+        /* Layout Mòbil o Altura Petita */
+        @media (max-width: 1023px) {
+            #sidebar {
+                padding: 1rem;
+                border-bottom: 1px solid #334155;
+            }
+            #main-content {
+                padding: 1rem;
+                flex-grow: 1;
+            }
+            footer { display: none; } /* Amagat en mòbil per estalviar espai */
+        }
+
+        /* Ajustos per altura petita */
+        @media (max-height: 700px) {
+            .display-card {
+                height: clamp(80px, 15vh, 120px) !important;
+                width: clamp(80px, 15vw, 120px) !important;
+                font-size: clamp(30px, 6vw, 60px) !important;
+            }
+            h1 { font-size: 1.25rem !important; }
+            .keyboard-container { padding: 0.5rem !important; }
+            .key { height: clamp(30px, 6vh, 45px) !important; }
         }
 
         /* Colors per dits */
@@ -31,8 +82,8 @@
         .finger-pulgar { border-bottom: 4px solid #facc15 !important; }
 
         .key {
-            height: clamp(40px, 8vh, 54px);
-            min-width: 35px;
+            height: clamp(35px, 7vh, 50px);
+            min-width: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -40,7 +91,7 @@
             border: 1px solid #334155;
             border-radius: 6px;
             font-weight: 600;
-            font-size: clamp(10px, 2vw, 14px);
+            font-size: clamp(9px, 1.5vw, 13px);
             transition: all 0.05s;
             user-select: none;
             flex: 1;
@@ -53,42 +104,42 @@
 
         .key.target-hint {
             background: #422006;
-            outline: 3px solid #eab308;
+            outline: 2px solid #eab308;
             z-index: 10;
         }
 
         .display-card {
             font-family: 'JetBrains Mono', monospace;
             background: #1e293b;
-            border: 2px solid #334155;
-            width: clamp(100px, 20vw, 150px);
-            height: clamp(120px, 25vh, 180px);
+            border: 2px solid #475569;
+            width: clamp(100px, 15vw, 140px);
+            height: clamp(100px, 18vh, 160px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(40px, 10vw, 100px);
+            font-size: clamp(40px, 8vw, 80px);
             border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s;
         }
 
         .display-card.is-special {
-            font-size: clamp(16px, 4vw, 24px);
+            font-size: clamp(14px, 3vw, 20px) !important;
             color: #94a3b8;
-            padding: 10px;
         }
 
-        .status-correct { color: #22c55e; border-color: #22c55e; }
+        .status-correct { color: #22c55e; border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
         .status-error { color: #ef4444; border-color: #ef4444; }
         
         .finger-indicator {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
-            margin-top: 10px;
             background: #1e293b;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            min-width: 160px;
         }
 
         .keyboard-container {
@@ -96,59 +147,71 @@
             max-width: 900px;
             margin: 0 auto;
         }
-
-        footer {
-            padding: 1rem;
-            color: #64748b;
-            font-size: 0.75rem;
-        }
     </style>
 </head>
-<body class="p-2 md:p-6">
+<body>
 
-    <div class="max-w-5xl mx-auto text-center flex-grow flex flex-col justify-between">
-        <header>
-            <h1 class="text-2xl md:text-3xl font-bold mb-2 text-blue-400">Mecanografia Interactiva</h1>
-            <div class="flex flex-wrap justify-center gap-2 mb-4">
-                <button onclick="startSequence('series')" class="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">1. Sèries</button>
-                <button onclick="startSequence('alphabet')" class="bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">2. Abecedari</button>
-                <button onclick="startSequence('random')" class="bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">3. Aleatori</button>
+    <!-- Lateral / Header -->
+    <aside id="sidebar">
+        <div>
+            <h1 class="text-2xl font-bold mb-6 text-blue-400 leading-tight">Mecanografia<br>Interactiva</h1>
+            <div class="flex flex-col gap-3">
+                <button onclick="startSequence('series')" class="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition text-left flex items-center justify-between">
+                    <span>1. Sèries</span>
+                    <span class="text-blue-300 text-xs">A-Z</span>
+                </button>
+                <button onclick="startSequence('alphabet')" class="w-full bg-purple-600 hover:bg-purple-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition text-left flex items-center justify-between">
+                    <span>2. Abecedari</span>
+                    <span class="text-purple-300 text-xs">ABC</span>
+                </button>
+                <button onclick="startSequence('random')" class="w-full bg-indigo-600 hover:bg-indigo-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition text-left flex items-center justify-between">
+                    <span>3. Aleatori</span>
+                    <span class="text-indigo-300 text-xs">?</span>
+                </button>
             </div>
-        </header>
+        </div>
 
-        <main>
-            <div class="flex justify-center items-center gap-4 md:gap-8 mb-6">
-                <div class="flex flex-col items-center">
-                    <p class="text-[10px] text-slate-400 mb-1 uppercase tracking-tighter">Objectiu:</p>
+        <div class="hidden lg:block mt-8">
+            <p class="text-[10px] text-slate-500 font-bold uppercase mb-4 tracking-widest">Llegenda de dits</p>
+            <div class="grid grid-cols-1 gap-2 text-[10px] text-slate-400">
+                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-pink-400 rounded-full"></span> Petit</span>
+                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-violet-400 rounded-full"></span> Anular</span>
+                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-blue-400 rounded-full"></span> Mig</span>
+                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-green-400 rounded-full"></span> Índex</span>
+                <span class="flex items-center gap-2"><span class="w-2 h-2 bg-yellow-400 rounded-full"></span> Polzes (Espai)</span>
+            </div>
+        </div>
+
+        <footer class="mt-auto pt-6 text-[11px] text-slate-500">
+            (c) Luis Romance<br>
+            <a href="http://www.cfalapau.cat" target="_blank" class="hover:text-blue-400 transition underline">www.cfalapau.cat</a>
+        </footer>
+    </aside>
+
+    <!-- Contingut Principal -->
+    <main id="main-content">
+        <div class="flex flex-col items-center gap-4">
+            <div class="flex justify-center items-center gap-4 md:gap-12">
+                <div class="flex flex-col items-center gap-2">
+                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Objectiu</span>
                     <div id="targetDisplay" class="display-card text-yellow-400">-</div>
-                    <div id="fingerText" class="finger-indicator text-slate-300">Inicia una sèrie</div>
                 </div>
                 
-                <div class="hidden md:block text-slate-700 text-4xl">➔</div>
+                <div class="text-slate-700 text-2xl hidden sm:block">➔</div>
 
-                <div class="flex flex-col items-center">
-                    <p class="text-[10px] text-slate-400 mb-1 uppercase tracking-tighter">La teva tecla:</p>
+                <div class="flex flex-col items-center gap-2">
+                    <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">La teva tecla</span>
                     <div id="userDisplay" class="display-card text-slate-200">-</div>
                 </div>
             </div>
+            
+            <div id="fingerText" class="finger-indicator text-slate-300">Selecciona un mode</div>
+        </div>
 
-            <div class="keyboard-container bg-slate-900 p-2 md:p-4 rounded-xl border border-slate-800">
-                <div id="keyboardRows" class="flex flex-col gap-1.5"></div>
-            </div>
-        </main>
-
-        <section class="mt-4 flex flex-wrap justify-center gap-3 text-[10px] font-bold uppercase text-slate-500">
-            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-pink-400 rounded-full"></span> Petit</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-violet-400 rounded-full"></span> Anular</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-blue-400 rounded-full"></span> Mig</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full"></span> Índex</span>
-            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-yellow-400 rounded-full"></span> Polze</span>
-        </section>
-    </div>
-
-    <footer class="text-center">
-        (c) Luis Romance - <a href="http://www.cfalapau.cat" target="_blank" class="underline">www.cfalapau.cat</a>
-    </footer>
+        <div class="keyboard-container bg-slate-900/50 p-3 md:p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
+            <div id="keyboardRows" class="flex flex-col gap-1.5"></div>
+        </div>
+    </main>
 
     <script>
         const targetDisplay = document.getElementById('targetDisplay');
@@ -181,10 +244,9 @@
             ["Space"]
         ];
 
-        // Seqüències actualitzades sense espais intermedis molestos
         const sequences = {
-            series: "ASDFGHJKLÑ QWERTYUIOP ZXCVBNM,.- Ç´`+¡' 0987654321º QAZ WSX EDC RFV TGB YHN UJM KIL OÑº Ç. P, QWERTYUIOP ASDFGHJKLÑ ZXCVBNM ZAQ XSW CDE VFR BGT NHY MJU LIK ÑOP",
-            alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
+            series: "ASDFGHJKLÑ QWERTYUIOP ZXCVBNM,.- Ç´`+¡' 0987654321º QAZ WSX EDC RFV TGB YHN UJM KIL OÑº Ç. P, QWERTYUIOP ASDFGHJKLÑ ZXCVBNM ZAQ XSW CDE VFR BGT NHY MJU LIK ÑOP ",
+            alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ ",
             random: "" 
         };
 
@@ -204,7 +266,6 @@
                     
                     if (fingerMap[key]) keyDiv.classList.add(`finger-${fingerMap[key]}`);
 
-                    // Amples especials
                     if(key === "Backspace") keyDiv.style.flex = "2";
                     if(key === "Tab" || key === "Caps") keyDiv.style.flex = "1.5";
                     if(key === "Enter") keyDiv.style.flex = "2";
@@ -221,7 +282,6 @@
             let text = "";
             if (type === 'random') {
                 const chars = "ASDFGHJKLÑQWERTYUIOPZXCVBNM";
-                // Random sense espais intermedis, només un al final
                 for(let i=0; i<20; i++) text += chars.charAt(Math.floor(Math.random() * chars.length));
                 text += " "; 
             } else {
@@ -241,11 +301,8 @@
                 if (char === " ") {
                     targetDisplay.textContent = "ESPAI";
                     targetDisplay.classList.add('is-special');
-                } else if (char === "´") {
-                    targetDisplay.textContent = "ACCENT (´)";
-                    targetDisplay.classList.add('is-special');
-                } else if (char === "`") {
-                    targetDisplay.textContent = "ACCENT (`)";
+                } else if (char === "´" || char === "`") {
+                    targetDisplay.textContent = `ACCENT (${char})`;
                     targetDisplay.classList.add('is-special');
                 } else {
                     targetDisplay.textContent = upperChar;
@@ -254,7 +311,6 @@
                 userDisplay.textContent = "-";
                 userDisplay.className = "display-card text-slate-200 border-slate-700";
                 
-                // Pista de dit
                 const fingerCode = fingerMap[char === " " ? "Space" : upperChar];
                 if (fingerCode) {
                     fingerText.textContent = fingerNames[fingerCode];
@@ -266,7 +322,6 @@
                     fingerText.style.color = colors[fingerCode];
                 }
 
-                // Ressaltar tecla
                 document.querySelectorAll('.key').forEach(k => k.classList.remove('target-hint'));
                 let searchId = upperChar;
                 if(char === " ") searchId = "SPACE";
@@ -277,7 +332,7 @@
                 
             } else {
                 targetDisplay.textContent = "FI!";
-                fingerText.textContent = "Molt bé! Sèrie completada.";
+                fingerText.textContent = "Sèrie completada!";
                 fingerText.style.color = "#22c55e";
                 userDisplay.textContent = "🏆";
             }
@@ -290,7 +345,6 @@
             let keyPushed = e.key.toUpperCase();
             if (e.code === "Space") keyPushed = " ";
             
-            // Gestió d'accents (tecles mortes)
             if (e.key === "Dead") {
                 if (e.code === "Quote") keyPushed = "´";
                 if (e.code === "BracketLeft") keyPushed = "`";
@@ -298,7 +352,6 @@
             if (e.key === "´") keyPushed = "´";
             if (e.key === "`") keyPushed = "`";
 
-            // Animació visual tecla
             let visualId = keyPushed;
             if(keyPushed === " ") visualId = "SPACE";
             if(keyPushed === "´") visualId = "ACCENT";
@@ -309,10 +362,8 @@
                 setTimeout(() => visualKey.classList.remove('active-press'), 100);
             }
 
-            // Ignorar tecles de control com Shift, Alt, etc.
             if (e.key.length > 1 && e.code !== "Space" && e.key !== "Dead") return;
 
-            // Feedback visual
             userDisplay.classList.remove('is-special');
             if (keyPushed === " ") {
                 userDisplay.textContent = "ESPAI";
@@ -321,7 +372,6 @@
                 userDisplay.textContent = keyPushed;
             }
 
-            // Validació
             const targetChar = currentSequence[currentIndex].toUpperCase();
             if (keyPushed === targetChar) {
                 userDisplay.className = "display-card status-correct";
