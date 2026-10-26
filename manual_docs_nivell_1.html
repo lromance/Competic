@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ca" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Interactiu de Google Docs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for visual icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        docblue: {
+                            50: '#eef6ff',
+                            100: '#e0edff',
+                            500: '#2b7fff',
+                            600: '#1a5cff',
+                            700: '#1043e6',
+                            800: '#1437b8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+        .highlight-match {
+            background-color: #fef08a;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Principal -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-file-lines text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-tight">Google Docs <span class="text-blue-600">Guia Ràpida</span></h1>
+                    <p class="text-xs text-slate-500">Troba qualsevol funció sense conèixer la paraula tècnica</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Pills / Navigation -->
+            <nav class="hidden md:flex items-center gap-2 text-sm">
+                <a href="#intencions" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition font-medium">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i>Què vols fer?
+                </a>
+                <a href="#caracter" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition font-medium">Text</a>
+                <a href="#paragraf" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition font-medium">Paràgrafs</a>
+                <a href="#imatges" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition font-medium">Imatges</a>
+                <a href="#taules" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition font-medium">Taules</a>
+                <a href="#pagina" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition font-medium">Pàgina</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero / Search Section -->
+    <section class="bg-gradient-to-b from-blue-50/80 via-white to-slate-50 border-b border-slate-200/60 py-8 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                Com et puc ajudar amb el teu document avui?
+            </h2>
+            <p class="text-slate-600 text-sm sm:text-base mb-6 max-w-2xl mx-auto">
+                Cerca pel nom de la funció o descriu el que vols aconseguir (p. ex. <em>"posar la fulla horitzontal"</em>, <em>"lletra més grossa"</em>, <em>"esborrar taula"</em>).
+            </p>
+
+            <!-- Search Box -->
+            <div class="relative max-w-2xl mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="Escriu aquí el que vols fer o cercar..." 
+                    class="w-full pl-11 pr-10 py-3.5 bg-white border border-slate-300 rounded-2xl shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-800 text-base placeholder-slate-400 transition"
+                >
+                <button 
+                    id="clearSearch" 
+                    class="hidden absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+                    onclick="clearSearchInput()"
+                >
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Quick Filter Tags -->
+            <div class="flex flex-wrap justify-center gap-2 mt-4 text-xs">
+                <span class="text-slate-500 self-center font-medium mr-1">Exemples ràpids:</span>
+                <button onclick="setSearch('negreta')" class="bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-full hover:border-blue-300 hover:text-blue-600 transition">Negreta</button>
+                <button onclick="setSearch('girar fulla')" class="bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-full hover:border-blue-300 hover:text-blue-600 transition">Girar la pàgina</button>
+                <button onclick="setSearch('espai entre línies')" class="bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-full hover:border-blue-300 hover:text-blue-600 transition">Interlineat</button>
+                <button onclick="setSearch('número de pàgina')" class="bg-white border border-slate-200 text-slate-700 px-2.5 py-1 rounded-full hover:border-blue-300 hover:text-blue-600 transition">Paginació</button>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        
+        <!-- Guided "I Want To..." Selector Section -->
+        <section id="intencions" class="mb-12 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-amber-100 text-amber-700 p-2 rounded-lg">
+                    <i class="fa-solid fa-compass text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Assistent d'objectius: Què necessites fer?</h3>
+                    <p class="text-xs text-slate-500">Tria la frase que millor descrigui el teu objectiu actual</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="intentContainer">
+                <!-- Intent buttons injected or hardcoded -->
+                <button onclick="filterByTag('text-style')" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700"><i class="fa-solid fa-font text-blue-500 mr-2"></i>Canviar l'aspecte de la lletra</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition"></i>
+                </button>
+                <button onclick="filterByTag('space-align')" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700"><i class="fa-solid fa-align-left text-blue-500 mr-2"></i>Ajustar espais o centrar paràgrafs</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition"></i>
+                </button>
+                <button onclick="filterByTag('images')" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700"><i class="fa-regular fa-image text-blue-500 mr-2"></i>Afegir o retallar imatges</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition"></i>
+                </button>
+                <button onclick="filterByTag('tables')" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700"><i class="fa-solid fa-table text-blue-500 mr-2"></i>Crear o modificar quadres/taules</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition"></i>
+                </button>
+                <button onclick="filterByTag('page-setup')" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700"><i class="fa-regular fa-file-code text-blue-500 mr-2"></i>Configurar fulla (horitzontal, marges)</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition"></i>
+                </button>
+                <button onclick="filterByTag('tools')" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition flex items-center justify-between group">
+                    <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700"><i class="fa-solid fa-tools text-blue-500 mr-2"></i>Eines útils (comentaris, enllaços...)</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:translate-x-1 transition"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- No Results Warning -->
+        <div id="noResults" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 mb-8">
+            <i class="fa-solid fa-magnifying-glass-question text-4xl text-slate-300 mb-3"></i>
+            <h4 class="text-lg font-bold text-slate-700">No s'han trobat funcions</h4>
+            <p class="text-sm text-slate-500 mt-1 mb-4">Intenta cercar amb una altra paraula o revisa els filtres.</p>
+            <button onclick="resetFilters()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                Veure totes les funcions
+            </button>
+        </div>
+
+        <!-- Content Sections Container -->
+        <div id="cardsContainer" class="space-y-10">
+
+            <!-- Category 1: Format de Caràcter -->
+            <section id="caracter" class="category-block scroll-mt-20">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
+                    <div class="bg-blue-100 text-blue-700 p-2 rounded-lg font-bold">1</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Format de Caràcter (Estil del text)</h3>
+                        <p class="text-xs text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded inline-block mt-0.5 border border-blue-200">
+                            <i class="fa-solid fa-circle-info mr-1"></i>S'aplica NOMÉS al text seleccionat (lletres, paraules o frases)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- Tipus de font -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="text-style font tipografia lletra estil nom" data-keywords="font tipus nom lletra aparença estil arial times">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Tipus de Font</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">La tipografia o estil visual de les lletres (p. ex., Arial, Times New Roman).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per adaptar l'estil del text al tipus de document (formal, creatiu, educatiu).</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines superior, al desplegable on apareix el nom de la font actual.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text > Fes clic al desplegable de fonts > Tria la font desitjada.</div>
+                        </div>
+                    </div>
+
+                    <!-- Mida de font -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="text-style mida font gran petita punts" data-keywords="mida font gran petita punts número mesura">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Mida de Font</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">La grandària del text mesurada en punts.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per destacar títols, crear jerarquies visuals o ajustar la llegibilitat.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines, just al costat del tipus de font (número amb botons <code class="bg-slate-200 px-1 rounded">+</code> i <code class="bg-slate-200 px-1 rounded">-</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text > Canvia el número directament o prem els botons <code class="bg-slate-200 px-1 rounded">+</code> o <code class="bg-slate-200 px-1 rounded">-</code>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Negreta, Cursiva, Subratllat -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="text-style negreta cursiva subratllat gruix inclinada" data-keywords="negreta cursiva subratllat gruixut inclinat línia sota B I U bold italic underline">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Negreta, Cursiva i Subratllat</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines / Format</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">Estils d'èmfasi i ressaltat:</p>
+                        <ul class="list-disc pl-4 text-xs text-slate-600 mb-3 space-y-0.5">
+                            <li><strong>Negreta (B / N):</strong> Augmenta el gruix de la lletra.</li>
+                            <li><em>Cursiva (I / K):</em> Inclina la lletra cap a la dreta.</li>
+                            <li><span class="underline">Subratllat (U / S):</span> Afegeix una línia horitzontal sota el text.</li>
+                        </ul>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> La negreta s'usa per ressaltar paraules clau; la cursiva per a estrangerismes, títols d'obres o èmfasi suau; el subratllat per cridar l'atenció sobre termes específics.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines superior, representats per les icones <strong>B</strong>, <em>I</em>, <span class="underline">U</span> (o equivalents segons l'idioma). També al menú <em>Format > Text</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text > Clic a la icona corresponent.</div>
+                        </div>
+                        <div class="flex gap-1 text-[11px]">
+                            <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-mono">Ctrl+B</span>
+                            <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-mono">Ctrl+I</span>
+                            <span class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-mono">Ctrl+U</span>
+                        </div>
+                    </div>
+
+                    <!-- Color de font -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="text-style color font lletra acolorir" data-keywords="color font lletra traç pintar blau vermell verd">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Color de Font</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">El color del traç de les lletres.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per organitzar la informació, destacar Seccions o donar estil.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines, icona d'una lletra <strong class="text-blue-600">A</strong> amb una línia acolorida a sota.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text > Prem la icona de color de font > Selecciona el color a la paleta.</div>
+                        </div>
+                    </div>
+
+                    <!-- Ressaltat -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="text-style ressaltat fluorescent fons marcador" data-keywords="ressaltat fluorescent marcador fons groc pintar fons text">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Ressaltat (Fluorescent)</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Un fons de color darrere del text, similar a utilitzar un marcador o fluorescent.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per emfasitzar conceptes clau durant la lectura o revisió.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines, icona d'un llapis marcador / fluorescent.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text > Clic a la icona de ressaltat > Tria el color de fons.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Category 2: Format de Paràgraf -->
+            <section id="paragraf" class="category-block scroll-mt-20">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
+                    <div class="bg-indigo-100 text-indigo-700 p-2 rounded-lg font-bold">2</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Format de Paràgraf (Organització de blocs)</h3>
+                        <p class="text-xs text-indigo-700 font-semibold bg-indigo-50 px-2 py-0.5 rounded inline-block mt-0.5 border border-indigo-200">
+                            <i class="fa-solid fa-circle-info mr-1"></i>S’aplica a tot el paràgraf on és el cursor de text (encara que no hi hagi res seleccionat) o a tots els paràgrafs sencers encara que estiguin seleccionats en part.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- Alineació -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="space-align alineació centrar esquerra dreta justificar" data-keywords="alineació centrar esquerra dreta justificar marge orientació posició">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Alineació del text</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">L'orientació del paràgraf respecte als marges de la pàgina.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Tipus:</strong>
+                                <ul class="list-disc pl-4 mt-0.5 space-y-0.5">
+                                    <li><strong>Esquerra:</strong> Alinea el text al marge esquerre (per defecte).</li>
+                                    <li><strong>Centrada:</strong> Centra cada línia al mig de la pàgina (ideal per a títols).</li>
+                                    <li><strong>Dreta:</strong> Alinea el text al marge dret (per a dates o signatures).</li>
+                                    <li><strong>Justificada:</strong> Distribueix l'espaiat per alinear el text a l'esquerra i a la dreta simultàniament.</li>
+                                </ul>
+                            </div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines, grup d'icones d'alineació (línies horitzontals).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Col·loca el cursor al paràgraf (o selecciona diversos paràgrafs) > Prem l'alineació desitjada.</div>
+                        </div>
+                    </div>
+
+                    <!-- Interlineat -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="space-align interlineat espai linies separacio personalitzat" data-keywords="interlineat espai línies separació vertical doble senzill 1.15 1.5 personalitzat">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Interlineat</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Format</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">La distància vertical entre les línies de text d'un mateix paràgraf.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per millorar la llegibilitat (p. ex., interlineat de 1.15 o doble en treballs acadèmics).</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Icona amb una fletxa vertical de doble punta al costat de línies de text, o a <em>Format > Interlineat i espaiat entre paràgrafs</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Col·loca el cursor al paràgraf (o selecciona diversos paràgrafs) > Prem la icona d'interlineat > Tria una opció (Senzill, 1.15, 1.5, Doble).</div>
+                            <div class="mt-2 pt-2 border-t border-slate-200 text-indigo-700 font-medium">
+                                <strong>Per tenir més control:</strong> Selecciona el paràgraf > Prem la icona d'interlineat > Tria l’opció <em>Espaiat personalitzat</em> > Introdueix el número que t’interessi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Espai abans i després de paràgraf -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="space-align espai paragraf separacio blocs personalitzat" data-keywords="espai abans després paràgraf separació blocs enter retorn personalitzat">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Espai entre paràgrafs</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Format</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">La separació addicional que s'afegeix abans que comenci o després que acabi un paràgraf.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Evita haver de prémer la tecla Retorn moltes vegades per separar blocs de text.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Al menú desplegable de la icona d'Interlineat a la barra d'eines, o a <em>Format > Interlineat i espaiat entre paràgrafs</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Fes clic al paràgraf > Prem la icona d'interlineat > Selecciona <em>Afegeix espai abans del paràgraf</em> o <em>Afegeix espai després del paràgraf</em>.</div>
+                            <div class="mt-2 pt-2 border-t border-slate-200 text-indigo-700 font-medium">
+                                <strong>Per tenir més control:</strong> Selecciona el paràgraf > Prem la icona d'interlineat > Tria l’opció <em>Espaiat personalitzat</em> > Introdueix el número que t’interessi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Llistes -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="space-align llistes punts numeros checklist pics" data-keywords="llistes punts números checklist pics pics guions enumeració tasques caselles">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Llistes (Pics, Números, Caselles)</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Organitzadors visuals d'elements.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Tipus:</strong>
+                                <ul class="list-disc pl-4 mt-0.5 space-y-0.5">
+                                    <li><strong>Comprovació (Checklist):</strong> Elements amb una casella per marcar com a completats.</li>
+                                    <li><strong>De pics (Punts/Bullets):</strong> Llista no ordenada amb símbols visuals.</li>
+                                    <li><strong>Numerada:</strong> Llista ordenada amb números o lletres.</li>
+                                </ul>
+                            </div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines, hi ha icones de llistes a la part dreta.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text (les línies que vols transformar en llistes) > Prem el tipus de llista requerit.</div>
+                        </div>
+                    </div>
+
+                    <!-- Sagnat -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="space-align sagnat moure dreta esquerra nivell" data-keywords="sagnat moure dreta esquerra tabulació subnivell entrar desplaçar">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Augmentar i disminuir sagnat</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra d'eines</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Desplaçar el marge esquerre del paràgraf cap a la dreta (augmentar) o cap a l'esquerra (disminuir).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per crear jerarquies en llistes o destacar subseccions i citacions.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la barra d'eines, icones amb línies i una fletxa cap a la dreta <i class="fa-solid fa-indent text-slate-500"></i> o esquerra <i class="fa-solid fa-outdent text-slate-500"></i>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Situat al paràgraf o llista > Prem <em>Augmentar sagnat</em> o <em>Disminuir sagnat</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Columnes -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="space-align columnes diari revista dividir text" data-keywords="columnes diari revista dividir vertical blocs dues tres">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Columnes</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Menú Format</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Divisió del text de la pàgina en dues o més columnes verticals (estil diari o revista).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Al menú superior: <em>Format > Columnes</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text (o aplica-ho a tot el document) > <em>Format > Columnes</em> > Selecciona 1, 2 o 3 columnes.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Category 3: Imatges -->
+            <section id="imatges" class="category-block scroll-mt-20">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
+                    <div class="bg-emerald-100 text-emerald-700 p-2 rounded-lg font-bold">3</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Gestió d'Imatges</h3>
+                        <p class="text-xs text-slate-500">Gestió d'elements visuals dins del document</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- Inserir Imatge -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="images foto imatge carregar penjar ordinador web" data-keywords="inserir imatge foto imatge carregar penjar ordinador web drive camera URL">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Inserir Imatge</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Insereix / Barra</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Afegir un arxiu d'imatge (JPG, PNG, GIF) al document.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Al menú superior <em>Insereix > Imatge</em> o des de la icona d'imatge de la barra d'eines.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Insereix > Imatge</em> > Tria la font (Penja des de l'ordinador, Cerca a la web, Drive, Fotos, Per URL o Càmera).</div>
+                        </div>
+                    </div>
+
+                    <!-- Retallar Imatge -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="images retallar foto imatge tallar amagar border" data-keywords="retallar foto imatge tallar amagar vores ajustar recortar">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Retalla Imatge</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Doble clic</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Amagar les parts exteriors o no desitjades d'una imatge.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Seleccionant la imatge, a la barra d'eines apareix la icona de Retalla la imatge (dos angles rectes entrecreuats <i class="fa-solid fa-crop-simple text-slate-500"></i>), o fent doble clic sobre la imatge.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Fes doble clic a la imatge > Arrossega les barres negres de les cantonades/costats per delimitar la zona > Prem Enter.</div>
+                        </div>
+                    </div>
+
+                    <!-- Substituir Imatge -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="images substituir foto imatge canviar" data-keywords="substituir imatge foto canviar origen mantenir mida">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Substitueix Imatge</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Clic Dret / Barra</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Canviar la imatge actual per una altra mantenint la mida i l'alineació configurades.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Fent clic dret sobre la imatge > <em>Substitueix la imatge</em>, o a la barra superior d'opcions d'imatge.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Clic dret a la imatge > <em>Substitueix la imatge</em> > Tria l'origen de la nova imatge.</div>
+                        </div>
+                    </div>
+
+                    <!-- Opcions d'Imatge -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="images opcions panell ajust text mida rotacio" data-keywords="opcions imatge panell lateral ajust text darrere mida rotació transparència">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Opcions d'Imatge</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Panell Lateral</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Panell lateral per configurar l'ajust del text entorn de la imatge, la mida exacta, la rotació, el recolorat i la transparència.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Fent clic sobre la imatge > Botó de tres punts <code class="bg-slate-200 px-1 rounded">⋮</code> a la barra flotant > <em>Totes les opcions d'imatge</em>, o a <em>Format > Imatge > Opcions d'imatge</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona la imatge > Obre <em>Opcions d'imatge</em> > Ajusta els paràmetres al panell lateral dret (p. ex., <em>Ajust del text</em>: "Ajusta el text" o "Darrere del text").</div>
+                        </div>
+                    </div>
+
+                    <!-- Enllaç a Imatge -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="images enllaç link foto clicable url" data-keywords="enllaç imatge foto botó clicable url link ctrl+k cmd+k">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Insereix un enllaç a una imatge</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Ctrl+K</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Convertir una imatge en un botó clicable que redirigeix a una pàgina web o secció.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Seleccionant la imatge, icona de la cadena a la barra d'eines o amb la drecera <code class="bg-slate-200 px-1 rounded">Ctrl + K</code> (<code class="bg-slate-200 px-1 rounded">Cmd + K</code> a Mac).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Clic a la imatge > Prem la icona d'Enllaç > Enganxa l'adreça URL > Prem Aplica.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Category 4: Taules -->
+            <section id="taules" class="category-block scroll-mt-20">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
+                    <div class="bg-purple-100 text-purple-700 p-2 rounded-lg font-bold">4</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Gestió de Taules</h3>
+                        <p class="text-xs text-slate-500">Estructura de files i columnes per organitzar dades de forma matricial</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- Creació de Taula -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tables taula crear quadrícula files columnes" data-keywords="inserir taula crear quadrícula files columnes quadre dades">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Inserir Taula</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Menú Insereix</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Estructura de files i columnes per organitzar dades de forma matricial.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per presentar informació de manera clara, comparatives o xifres.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior: <em>Insereix > Taula</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Vés a <em>Insereix > Taula</em> > Arrossega el ratolí sobre la quadrícula per seleccionar el número de columnes i files desitjades (p. ex. 3x4) > Fes clic per crear-la.</div>
+                        </div>
+                    </div>
+
+                    <!-- Afegir i eliminar columnes o files -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tables afegir eliminar columna fila taula casella" data-keywords="afegir eliminar treure posar columna fila taula casella esquerra dreta a dalt a baix cel·la">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Afegir i eliminar columnes o files</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Clic Dret / Botons Flotants</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Modificar la mida de la taula afegint o traient noves línies verticals (columnes) o horitzontals (files).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Fent clic dret sobre qualsevol cel·la de la taula, o des dels botons ràpids flotants de la taula.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong>
+                                <ul class="list-disc pl-4 mt-0.5 space-y-1">
+                                    <li><strong>Per afegir:</strong> Fes clic dret a la cel·la de referència > Selecciona <em>Insereix una columna a l'esquerra</em>, <em>Insereix una columna a la dreta</em>, <em>Insereix una fila a sobre</em> o <em>Insereix una fila a sota</em>.</li>
+                                    <li><strong>Per eliminar:</strong> Fes clic dret a la cel·la de la columna o fila que vols esborrar > Selecciona <em>Elimina la columna</em> o <em>Elimina la fila</em>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Eliminar una taula sencera -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tables esborrar eliminar taula sencera suprimir" data-keywords="esborrar eliminar taula sencera treure suprimir netejar cel·la">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Eliminar una taula sencera</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Clic Dret</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Suprimir la taula completa i tot el contingut que hi ha a dins.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Fent clic dret a qualsevol punt de la taula.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Fes clic dret a qualsevol cel·la > Selecciona <em>Elimina la taula</em>.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Category 5: Format de Pàgina -->
+            <section id="pagina" class="category-block scroll-mt-20">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
+                    <div class="bg-rose-100 text-rose-700 p-2 rounded-lg font-bold">5</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Format de Pàgina</h3>
+                        <p class="text-xs text-slate-500">Permet configurar la disposició general del full de treball</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- Orientació -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="page-setup orientacio girar horitzontal vertical fulla" data-keywords="orientació girar horitzontal vertical fulla tombada girar la pagina paper">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Orientació</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Fitxer > Config. Pàgina</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">La posició del paper, ja sigui vertical (per defecte) o horitzontal.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Fitxer > Configuració de la pàgina</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Fitxer > Configuració de la pàgina</em> > A la pestanya "Pàgines", selecciona <strong>Vertical</strong> o <strong>Horitzontal</strong> > Prem <em>D'acord</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Mida -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="page-setup mida a4 carta paper" data-keywords="mida A4 carta letter A3 dimensions paper fulla">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Mida</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Fitxer > Config. Pàgina</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Les dimensions físiques del full (A4, Carta/Letter, A3, etc.).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Fitxer > Configuració de la pàgina</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Fitxer > Configuració de la pàgina</em> > Al desplegable <em>Mida del paper</em>, tria l'opció adequada (p. ex., A4) > Prem <em>D'acord</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Color -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="page-setup color fons pagina paper acolorir" data-keywords="color fons pàgina paper acolorir blanc groc verd pintar paper fitxer">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Color (Color de fons de pàgina)</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Fitxer > Config. Pàgina</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">El color de fons de tot el document (per defecte és blanc).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Fitxer > Configuració de la pàgina</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Fitxer > Configuració de la pàgina</em> > Clic a <em>Color de la pàgina</em> > Selecciona un color > Prem <em>D'acord</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Marges -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="page-setup marges espai vora centimetres" data-keywords="marges espai vora centímetres superior inferior esquerre dret regla fitxer">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Marges</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Fitxer > Config. Pàgina</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">L'espai en blanc entre el límit del paper i on comença el contingut (superior, inferior, esquerre i dret).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Fitxer > Configuració de la pàgina</em> (o ajustant la regla superior i lateral).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Fitxer > Configuració de la pàgina</em> > Introdueix els valors en centímetres a les caselles de marges (A dalt, A baix, Esquerra, Dreta) > Prem <em>D'acord</em>.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Category 6: Altres Funcions d'Edició -->
+            <section id="eines" class="category-block scroll-mt-20">
+                <div class="flex items-center gap-3 border-b border-slate-200 pb-3 mb-6">
+                    <div class="bg-amber-100 text-amber-700 p-2 rounded-lg font-bold">6</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Altres Funcions d'Edició i Elements</h3>
+                        <p class="text-xs text-slate-500">Eines addicionals per enriquir el document i facilitar-ne la gestió</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <!-- Enllaç -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools enllaç link web url" data-keywords="enllaç link web url ctrl+k cadena">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Enllaç</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Insereix</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Un text blau i subratllat que enllaça a un lloc web extern o a un altre punt del mateix document.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Icona de cadena a la barra d'eines, o al menú <em>Insereix > Enllaç</em> (<code class="bg-slate-200 px-1 rounded">Ctrl + K</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text > Prem la icona d'Enllaç > Enganxa la URL > Prem Aplica.</div>
+                        </div>
+                    </div>
+
+                    <!-- Comentari -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools comentari nota col·laboracio" data-keywords="comentari nota marge observacions suggeriments equip col·laboració ctrl+alt+m">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Comentari</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Insereix</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Nota al marge que permet fer observacions o suggeriments sense modificar el text original. Ideal per a treball col·laboratiu.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Icona d'una bústia de diàleg amb un <code class="bg-slate-200 px-1 rounded">+</code> a la barra d'eines, o a <em>Insereix > Comentari</em> (<code class="bg-slate-200 px-1 rounded">Ctrl + Alt + M</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text a comentar > Prem <em>Insereix comentari</em> > Escriu el missatge > Prem <em>Comenta</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Esborra el format -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools esborrar format netejar traure estil" data-keywords="esborrar format netejar treure estil treure colors treure negreta original ctrl+\">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Esborra el format</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Barra / Format</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Elimina tots els estils aplicats (font, mida, color, negreta...) i retorna el text al format predeterminat.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Barra d'eines, icona d’una <strong>T</strong> amb una línia creuada (a l'extrem dret) o a <em>Format > Esborra el format</em> (<code class="bg-slate-200 px-1 rounded">Ctrl + \</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Selecciona el text amb estils > Prem la icona <em>Esborra el format</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Inserir símbol -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools simbol caracters especials matemaics" data-keywords="inserir símbol caràcters especials matemàtics icones fletxes accents teclat">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Inserir símbol (Caràcters especials)</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Menú Insereix</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Inserció de símbols no presents al teclat estàndard (símbols matemàtics, icones, fletxes, lletres amb accents especials).</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Insereix > Caràcters especials</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Insereix > Caràcters especials</em> > Cerca el símbol per categories, escrivint al cercador o dibuixant-lo al panell > Fes clic sobre el símbol per inserir-lo.</div>
+                        </div>
+                    </div>
+
+                    <!-- Inserir línia horitzontal -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools linia horitzontal separacio" data-keywords="inserir línia horitzontal separació capítols seccions línia">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Inserir línia horitzontal</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Menú Insereix</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Una línia fina de separació que creua tota la pàgina d'esquerra a dreta.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">Com es fa servir:</strong> Per dividir visualment seccions o capítols.</div>
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Insereix > Línia horitzontal</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Col·loca el cursor on vols la separació > <em>Insereix > Línia horitzontal</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Inserir salt de pàgina -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools salt pagina canviar fulla" data-keywords="inserir salt de pàgina canviar de fulla moure següent pàgina ctrl+enter">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Inserir salt de pàgina</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Insereix / Ctrl+Enter</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Força que el text posterior passi immediatament a l'inici de la pàgina següent.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Insereix > Salt > Salt de pàgina</em> (<code class="bg-slate-200 px-1 rounded">Ctrl + Enter</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Col·loca el cursor abans del text que vols moure > <em>Insereix > Salt > Salt de pàgina</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Elements de pàgina -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools capçalera peu numero paginacio" data-keywords="inserir elements de pàgina capçalera peu de pàgina numeració comptador automàtic">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Capçalera, Peu de pàgina i Numeració</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Menú Insereix</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-2">Elements repetitius o estructurals:</p>
+                        <ul class="list-disc pl-4 text-xs text-slate-600 mb-3 space-y-0.5">
+                            <li><strong>Capçalera:</strong> Àrea superior que es repeteix a totes les pàgines (p. ex., títol del llibre).</li>
+                            <li><strong>Peu de pàgina:</strong> Àrea inferior que es repeteix a totes les pàgines (p. ex., autor, nota legal).</li>
+                            <li><strong>Numeració de pàgines:</strong> Comptador automàtic del número de pàgina.</li>
+                        </ul>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Insereix > Capçaleres i peus de pàgina / Números de pàgina</em>.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong>
+                                <ul class="list-disc pl-4 mt-0.5 space-y-0.5">
+                                    <li><strong>Per Capçalera/Peu:</strong> <em>Insereix > Capçaleres i peus de pàgina</em> > Selecciona <em>Capçalera</em> o <em>Peu de pàgina</em> > Escriu el text.</li>
+                                    <li><strong>Per Numeració:</strong> <em>Insereix > Números de pàgina</em> > Selecciona el format i la posició desitjats.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Copiar sense format -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools copiar enganxar sense format pur" data-keywords="copiar enganxar sense format text pur net adaptat estils ctrl+shift+v cmd+option+shift+v">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Copiar sense format</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Edita / Drecera</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Enganxar text copiat prèviament adaptant-lo automàticament a l'estil i format del text de destinació.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Edita > Enganxa sense format</em> (<code class="bg-slate-200 px-1 rounded">Ctrl + Shift + V</code> / <code class="bg-slate-200 px-1 rounded">Cmd + Option + Shift + V</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Copia el text original (<code class="bg-slate-200 px-1 rounded">Ctrl + C</code>) > Col·loca el cursor al document > <em>Edita > Enganxa sense format</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Cerca i substitueix -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools cerca substitueix trobar canviar" data-keywords="cerca substitueix trobar canviar reemplaçar paraula frase automàtic ctrl+h">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Cerca i substitueix</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Edita / Ctrl+H</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Eina per trobar una paraula o frase concreta al document i canviar-la per una altra de manera automàtica a tot el text.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> Menú superior <em>Edita > Cerca i substitueix</em> (<code class="bg-slate-200 px-1 rounded">Ctrl + H</code>).</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> <em>Edita > Cerca i substitueix</em> > Escriu la paraula a cercar a la casella <em>Cerca</em> > Escriu la nova paraula a <em>Substitueix per</em> > Prem <em>Substitueix</em> o <em>Substitueix-ho tot</em>.</div>
+                        </div>
+                    </div>
+
+                    <!-- Canviar el nom del document -->
+                    <div class="feature-card bg-white rounded-xl border border-slate-200 p-5 card-shadow hover:border-blue-300 transition" data-tags="tools nom document titol drive" data-keywords="canviar el nom del document títol fitxer drive reanomenar superior esquerra">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-900 text-base">Canviar el nom del document</h4>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Part Superior Esquerra</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-3">Modificar el títol del fitxer que es guarda a Google Drive.</p>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3 text-xs space-y-1.5">
+                            <div><strong class="text-slate-700">On trobar-ho:</strong> A la part superior esquerra de la pantalla, a la casella de text situada al costat de la icona de Google Docs.</div>
+                            <div><strong class="text-slate-700">Com s'utilitza:</strong> Fes clic sobre el nom actual (o sobre "Document sense títol") > Escriu el nou nom > Prem Enter.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+<!-- ... existing code -->
+   <!-- NOU: Peu de pàgina (Footer) -->
+    <footer class="text-center text-gray-500 text-sm mt-8 p-4 bg-white border-t border-gray-200">
+        <p>
+            &copy; Luis Romance / 
+            <a href="https://www.cfalapau.cat" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">
+                www.cfalapau.cat
+            </a>
+        </p>
+    </footer>
+    
+</body>
+</html>
